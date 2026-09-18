@@ -1,10 +1,11 @@
 import mysql from 'mysql2/promise'
+import bcrypt from 'bcrypt'
 
 /**
  * ตั้งค่าและเตรียมความพร้อมของฐานข้อมูล (Database Initialization)
  * - สร้างฐานข้อมูลหากยังไม่มี
  * - สร้างตารางที่จำเป็นทั้งหมด 11 ตาราง (roles, users, projects, tasks, comments, files, etc.)
- * - ใส่ข้อมูลเริ่มต้น (Seed) เช่น บทบาทผู้ใช้งานเริ่มต้น (Default Roles)
+ * - ใส่ข้อมูลเริ่มต้น (Seed) เช่น บทบาทผู้ใช้งานเริ่มต้น (Default Roles) และ Default Admin
  * - เพิ่มคอลัมน์ที่ขาดหายไปเผื่อกรณีอัปเกรดฐานข้อมูลแบบปลอดภัย
  */
 export const initializeDatabase = async () => {
@@ -70,6 +71,24 @@ export const initializeDatabase = async () => {
         FOREIGN KEY (leader_id) REFERENCES users(id) ON DELETE SET NULL
       )
     `)
+
+    // Seed default admin user if no admin exists
+    try {
+      const [adminUsers] = await connection.query("SELECT id FROM users WHERE email = 'admin@example.com' OR role = 'admin' LIMIT 1")
+      if (adminUsers.length === 0) {
+        const [adminRole] = await connection.query("SELECT id FROM roles WHERE role_name = 'admin' LIMIT 1")
+        const roleId = adminRole[0]?.id || 1
+        const defaultPassword = await bcrypt.hash('Admin@1234', 10)
+        
+        await connection.query(`
+          INSERT INTO users (fullname, email, password, role, role_id, status, is_force_reset)
+          VALUES ('System Admin', 'admin@example.com', ?, 'admin', ?, 'active', 0)
+        `, [defaultPassword, roleId])
+        console.log('Seeded default admin user (admin@example.com).')
+      }
+    } catch (adminErr) {
+      console.error('Error seeding default admin:', adminErr.message)
+    }
 
     // 3. Create projects table
     await connection.query(`
