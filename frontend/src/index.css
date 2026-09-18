@@ -82,6 +82,7 @@
   outline: none !important;
   box-shadow: none !important;
   -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
 /* Dynamic 60-30-10 Utility Classes */
