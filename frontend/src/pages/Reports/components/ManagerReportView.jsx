@@ -308,68 +308,73 @@ export default function ManagerReportView({ data }) {
 
           <div className="h-56 w-full flex items-center justify-center relative">
             {managedProjects.length === 0 ? (
-              <p className="text-xs text-slate-500 font-bold">No Projects</p>
+              <div className="flex flex-col items-center justify-center gap-1">
+                <span className="text-2xl opacity-40">📁</span>
+                <p className="text-xs text-slate-500 font-semibold">{t("noData") || "No Projects"}</p>
+              </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Tooltip content={<CustomChartTooltip />} />
-                  <Pie
-                    data={[
-                      {
-                        name: t("statusCompleted") || "Completed",
-                        value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "completed").length,
-                        fill: "#10b981",
-                      },
-                      {
-                        name: t("statusInProgress") || "In Progress",
-                        value: managedProjects.filter((p) => {
-                          const s = (p.status || "").toLowerCase();
-                          return s === "in progress" || s === "in_progress";
-                        }).length,
-                        fill: "#06b6d4",
-                      },
-                      {
-                        name: t("statusReview") || "Review",
-                        value: managedProjects.filter((p) => {
-                          const s = (p.status || "").toLowerCase();
-                          return s === "review" || s === "reviewing";
-                        }).length,
-                        fill: "#f59e0b",
-                      },
-                      {
-                        name: t("statusPending") || "Pending",
-                        value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "pending").length,
-                        fill: "#94a3b8",
-                      },
-                    ].filter((d) => d.value > 0)}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {[
-                      "#10b981",
-                      "#06b6d4",
-                      "#f59e0b",
-                      "#94a3b8",
-                    ].map((fill, idx) => (
-                      <Cell key={`pm-pie-${idx}`} fill={fill} stroke="none" />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+              <>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip content={<CustomChartTooltip />} />
+                    <Pie
+                      data={[
+                        {
+                          name: t("statusCompleted") || "Completed",
+                          value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "completed").length,
+                          fill: "#10b981",
+                        },
+                        {
+                          name: t("statusInProgress") || "In Progress",
+                          value: managedProjects.filter((p) => {
+                            const s = (p.status || "").toLowerCase();
+                            return s === "in progress" || s === "in_progress";
+                          }).length,
+                          fill: "#06b6d4",
+                        },
+                        {
+                          name: t("statusReview") || "Review",
+                          value: managedProjects.filter((p) => {
+                            const s = (p.status || "").toLowerCase();
+                            return s === "review" || s === "reviewing";
+                          }).length,
+                          fill: "#f59e0b",
+                        },
+                        {
+                          name: t("statusPending") || "Pending",
+                          value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "pending").length,
+                          fill: "#94a3b8",
+                        },
+                      ].filter((d) => d.value > 0)}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {[
+                        "#10b981",
+                        "#06b6d4",
+                        "#f59e0b",
+                        "#94a3b8",
+                      ].map((fill, idx) => (
+                        <Cell key={`pm-pie-${idx}`} fill={fill} stroke="none" />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute flex flex-col items-center pointer-events-none">
+                  <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
+                    {managerCompletionRate}%
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                    {t("completed") || "Rate"}
+                  </span>
+                </div>
+              </>
             )}
-            <div className="absolute flex flex-col items-center pointer-events-none">
-              <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
-                {managerCompletionRate}%
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
-                {t("completed") || "Rate"}
-              </span>
-            </div>
           </div>
 
           <div className="w-full rounded-full h-2 overflow-hidden mt-2" style={{ background: "var(--border-surface)" }}>

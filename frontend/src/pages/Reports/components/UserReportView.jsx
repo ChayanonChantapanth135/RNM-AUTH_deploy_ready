@@ -293,43 +293,48 @@ export default function UserReportView({ data }) {
 
           <div className="h-56 w-full flex items-center justify-center relative">
             {myTasks.length === 0 ? (
-              <p className="text-xs text-slate-500 font-bold">No Task Data</p>
+              <div className="flex flex-col items-center justify-center gap-1">
+                <span className="text-2xl opacity-40">📊</span>
+                <p className="text-xs text-slate-500 font-semibold">{t("noData") || "No Task Data"}</p>
+              </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Tooltip content={<CustomChartTooltip />} />
-                  <Pie
-                    data={[
-                      { name: t("statusCompleted") || "Completed", value: myCompletedCount, fill: "#10b981" },
-                      { name: t("statusInProgress") || "In Progress", value: myInProgressCount, fill: "#6366f1" },
-                      { name: t("statusPending") || "Pending", value: myPendingCount, fill: "#94a3b8" },
-                      { name: t("overdueTasks") || "Overdue", value: myOverdueCount, fill: "#ef4444" },
-                    ].filter(d => d.value > 0)}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {[
-                      { fill: "#10b981" },
-                      { fill: "#6366f1" },
-                      { fill: "#94a3b8" },
-                      { fill: "#ef4444" },
-                    ].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} stroke="none" />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+              <>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip content={<CustomChartTooltip />} />
+                    <Pie
+                      data={[
+                        { name: t("statusCompleted") || "Completed", value: myCompletedCount, fill: "#10b981" },
+                        { name: t("statusInProgress") || "In Progress", value: myInProgressCount, fill: "#6366f1" },
+                        { name: t("statusPending") || "Pending", value: myPendingCount, fill: "#94a3b8" },
+                        { name: t("overdueTasks") || "Overdue", value: myOverdueCount, fill: "#ef4444" },
+                      ].filter(d => d.value > 0)}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {[
+                        { fill: "#10b981" },
+                        { fill: "#6366f1" },
+                        { fill: "#94a3b8" },
+                        { fill: "#ef4444" },
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} stroke="none" />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Center percentage badge */}
+                <div className="absolute flex flex-col items-center pointer-events-none">
+                  <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>{myCompletionRate}%</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>{t("completed") || "Rate"}</span>
+                </div>
+              </>
             )}
-            {/* Center percentage badge */}
-            <div className="absolute flex flex-col items-center pointer-events-none">
-              <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>{myCompletionRate}%</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>{t("completed") || "Rate"}</span>
-            </div>
           </div>
 
           <div className="w-full rounded-full h-2 overflow-hidden mt-2" style={{ background: "var(--border-surface)" }}>
