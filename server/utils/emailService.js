@@ -29,6 +29,27 @@ import { promisify } from 'util';
 const dnsResolve4 = promisify(dns.resolve4);
 
 /**
+ * Get configured Nodemailer transporter for Gmail SMTP
+ */
+async function getTransporterAsync() {
+  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
+  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').trim();
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: emailUser,
+      pass: emailPass,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  return { transporter, emailUser, emailPass };
+}
+
+/**
  * Send email using Resend HTTP API (Bypasses all Cloud SMTP port blocks completely)
  */
 async function sendViaResend({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
@@ -66,8 +87,10 @@ async function sendViaResend({ to, subject, html, fromName = 'Project Management
  * Universal email sender: tries Resend HTTP API first, falls back to SMTP if configured
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null, recipientName = '' }) {
+  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+
   // 1. Try Resend HTTP API
-  if (process.env.RESEND_API_KEY) {
+  if (resendApiKey) {
     try {
       await sendViaResend({ to, subject, html, fromName, replyTo });
       console.log(`[Resend Sent] Email sent successfully to ${to} (${subject})`);
@@ -96,6 +119,7 @@ async function sendMailUniversal({ to, subject, html, fromName = 'Project Manage
   }
 
   await transporter.sendMail(mailOptions);
+  console.log(`[SMTP Sent] Email sent successfully to ${to} (${subject})`);
   return true;
 }
 
@@ -116,11 +140,9 @@ export async function sendProjectCreationEmail({ recipientEmail, recipientName, 
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
-
-    const mailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
+    await sendMailUniversal({
       to: recipientEmail,
+      fromName: 'Project Management System',
       subject: `[Project Management] You have been assigned as Team Leader for: ${projectName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -170,24 +192,13 @@ export async function sendProjectCreationEmail({ recipientEmail, recipientName, 
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated email notification from Project Management System.</p>
         </div>
       `
-    };
+    });
 
-    if (emailPass) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Email Sent] Project creation email sent to: ${recipientEmail} for project: "${projectName}"`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email (Project Creation)',
-        details: `Sent project assignment email to ${recipientEmail} for project "${projectName}"`
-      });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured in .env. Skipped actual SMTP send for project "${projectName}" to ${recipientEmail}.`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email Warning (Project Creation)',
-        details: `Skipped actual SMTP send (missing EMAIL_PASS) to ${recipientEmail} for project "${projectName}"`
-      });
-    }
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (Project Creation)',
+      details: `Sent project assignment email to ${recipientEmail} for project "${projectName}"`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send project creation email to ${recipientEmail}:`, error.message);
     await logEmailActivity({
@@ -414,11 +425,9 @@ export async function sendTaskOverdueLeaderEmail({
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
-
-    const mailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
+    await sendMailUniversal({
       to: recipientEmail,
+      fromName: 'Project Management System',
       subject: `[URGENT] Task Overdue: "${taskTitle}" (${assigneeName})`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -465,24 +474,13 @@ export async function sendTaskOverdueLeaderEmail({
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated email notification from Project Management System.</p>
         </div>
       `
-    };
+    });
 
-    if (emailPass) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Overdue Email Sent] Sent to Leader: ${recipientEmail} for task: "${taskTitle}"`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email (Task Overdue to Leader)',
-        details: `Sent overdue alert to leader ${recipientEmail} for task "${taskTitle}" (Assignee: ${assigneeName})`
-      });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured. Skipped sending overdue email to leader ${recipientEmail}.`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email Warning (Task Overdue to Leader)',
-        details: `Skipped SMTP send (missing EMAIL_PASS) for task "${taskTitle}" to leader ${recipientEmail}`
-      });
-    }
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (Task Overdue to Leader)',
+      details: `Sent overdue alert to leader ${recipientEmail} for task "${taskTitle}" (Assignee: ${assigneeName})`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send overdue task email to ${recipientEmail}:`, error.message);
     await logEmailActivity({
@@ -497,11 +495,18 @@ export async function sendTaskOverdueLeaderEmail({
  * Send contact form message to Admin and auto-reply confirmation to sender
  */
 export async function sendContactFormEmail({ fullName, email, subject, message }) {
-  try {
-    // 1. Send to System Admin
-    const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
-    const safeSenderName = (fullName || 'User').replace(/[^\w\s\u0E00-\u0E7F]/gi, '').trim();
+  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
+  const safeSenderName = (fullName || 'User').replace(/[^\w\s\u0E00-\u0E7F]/gi, '').trim();
 
+  // Always record inquiry in DB activity logs first so no user message is ever lost
+  await logEmailActivity({
+    recipientEmail: emailUser,
+    action: 'Contact Us Form Submitted',
+    details: `Contact message from ${fullName} (${email}) | Subject: "${subject || 'General'}" | Message: "${message}"`
+  });
+
+  try {
+    // 1. Send notification email to System Admin
     await sendMailUniversal({
       to: emailUser,
       fromName: `${safeSenderName} (Contact Form)`,
@@ -551,7 +556,7 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
       `
     });
 
-    // 2. Auto-reply confirmation to sender
+    // 2. Auto-reply confirmation to sender (optional)
     try {
       await sendMailUniversal({
         to: email,
@@ -583,15 +588,8 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
     } catch (e) {
       console.warn(`[Auto-reply Warning] Could not send confirmation copy to sender ${email}:`, e.message);
     }
-
-    await logEmailActivity({
-      recipientEmail: emailUser,
-      action: 'Send Email (Contact Us Form)',
-      details: `Contact message received from ${fullName} (${email}): "${subject}"`
-    });
   } catch (error) {
     console.error(`[Email Error] Failed to send contact email:`, error.message);
-    throw error;
   }
 }
 
