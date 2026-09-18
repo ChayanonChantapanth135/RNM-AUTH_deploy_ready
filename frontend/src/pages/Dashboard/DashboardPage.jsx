@@ -216,6 +216,11 @@ const DashboardPage = () => {
               plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               locale={language === "th" ? thLocale : "en"}
+              buttonText={{
+                today: language === "th" ? "วันนี้" : "Today",
+                prev: "‹",
+                next: "›",
+              }}
               events={calendarEvents}
               datesSet={onDatesSet}
               eventClick={(info) => {

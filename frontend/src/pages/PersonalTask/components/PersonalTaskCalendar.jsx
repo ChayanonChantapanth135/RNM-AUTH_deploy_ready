@@ -501,6 +501,13 @@ const PersonalTaskCalendar = ({
               center: "title",
               right: "dayGridMonth,dayGridWeek",
             }}
+            buttonText={{
+              today: isThai ? "วันนี้" : "Today",
+              month: isThai ? "เดือน" : "Month",
+              week: isThai ? "สัปดาห์" : "Week",
+              prev: "‹",
+              next: "›",
+            }}
             dayMaxEvents={3}
             height="auto"
           />
