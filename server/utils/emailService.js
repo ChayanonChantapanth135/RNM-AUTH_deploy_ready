@@ -28,11 +28,14 @@ async function logEmailActivity({ recipientEmail, action, details, userId = null
  */
 function getTransporter() {
   const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
-  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').trim();
+  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').replace(/\s+/g, '').trim();
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: emailUser, pass: emailPass }
+    auth: { user: emailUser, pass: emailPass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   return { transporter, emailUser, emailPass };
