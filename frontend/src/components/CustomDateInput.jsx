@@ -297,11 +297,20 @@ const CustomDateInput = ({
           }}
           disabled={disabled}
           title="Choose Date"
-          style={{ zIndex: 5, display: "flex", alignItems: "center", cursor: "pointer" }}
+          style={{
+            zIndex: 5,
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
         >
           <ion-icon
             name="calendar-outline"
-            style={{ fontSize: "18px", color: "#64748b", pointerEvents: "none" }}
+            style={{
+              fontSize: "18px",
+              color: "#64748b",
+              pointerEvents: "none",
+            }}
           ></ion-icon>
         </button>
       </div>
@@ -378,7 +387,8 @@ const CustomDateInput = ({
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-surface-hover)";
+                e.currentTarget.style.backgroundColor =
+                  "var(--bg-surface-hover)";
                 e.currentTarget.style.transform = "scale(1.05)";
               }}
               onMouseLeave={(e) => {
@@ -424,7 +434,8 @@ const CustomDateInput = ({
                   transition: "all 0.15s ease",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "var(--bg-surface-hover)")
+                  (e.currentTarget.style.backgroundColor =
+                    "var(--bg-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "var(--bg-surface)")
@@ -489,7 +500,8 @@ const CustomDateInput = ({
                   transition: "all 0.15s ease",
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "var(--bg-surface-hover)")
+                  (e.currentTarget.style.backgroundColor =
+                    "var(--bg-surface-hover)")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor = "var(--bg-surface)")
@@ -558,7 +570,8 @@ const CustomDateInput = ({
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--bg-surface-hover)";
+                e.currentTarget.style.backgroundColor =
+                  "var(--bg-surface-hover)";
                 e.currentTarget.style.transform = "scale(1.05)";
               }}
               onMouseLeave={(e) => {
@@ -626,7 +639,9 @@ const CustomDateInput = ({
                 todayDay === cell.day;
 
               let bg = "transparent";
-              let color = cell.isCurrentMonth ? "var(--text-primary)" : "var(--text-secondary)";
+              let color = cell.isCurrentMonth
+                ? "var(--text-primary)"
+                : "var(--text-secondary)";
               let fontWeight = "500";
               let shadow = "none";
 
