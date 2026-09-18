@@ -62,6 +62,7 @@ export const initializeDatabase = async () => {
         role_id INT NULL,
         avatar VARCHAR(512) DEFAULT NULL,
         status ENUM('active','suspended') DEFAULT 'active',
+        phone VARCHAR(50) DEFAULT NULL,
         start_date DATE NULL DEFAULT NULL,
         expire_date DATE NULL DEFAULT NULL,
         is_force_reset TINYINT(1) DEFAULT 1,
@@ -268,60 +269,65 @@ export const initializeDatabase = async () => {
       )
     `)
 
-    // Safely add missing columns to existing tables
-    const alterQueries = [
-      "ALTER TABLE personal_tasks ADD COLUMN IF NOT EXISTS status ENUM('todo', 'in-progress', 'completed') DEFAULT 'todo'",
-      "ALTER TABLE personal_tasks ADD COLUMN IF NOT EXISTS position INT DEFAULT 0",
-      "ALTER TABLE users CHANGE COLUMN username fullname VARCHAR(255) NOT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS role ENUM('admin','manager','storyboard','animation','designer','programmer') DEFAULT 'storyboard'",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS role_id INT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar VARCHAR(512) DEFAULT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS status ENUM('active','suspended') DEFAULT 'active'",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS start_date DATE NULL DEFAULT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS expire_date DATE NULL DEFAULT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50) DEFAULT NULL",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS leader_id INT NULL",
-      "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS task_type VARCHAR(50) DEFAULT NULL",
-      "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority ENUM('Low', 'Medium', 'High') DEFAULT 'Medium'",
-      "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS due_date DATE DEFAULT NULL",
-      "ALTER TABLE files ADD COLUMN IF NOT EXISTS task_id INT NULL",
-      "ALTER TABLE comments ADD COLUMN IF NOT EXISTS task_id INT NULL",
-      "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS title VARCHAR(255) NULL",
-      "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'system'",
-      "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS link VARCHAR(255) DEFAULT NULL",
-      "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS task_id INT NULL",
-      "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS is_read TINYINT(1) DEFAULT 0",
-      "ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL DEFAULT NULL",
-      "ALTER TABLE projects ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL DEFAULT NULL",
-      "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL DEFAULT NULL",
-      
-      // Performance Indexes
-      "CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications (user_id, is_read)",
-      "CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications (user_id, created_at DESC)",
-      "CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs (created_at DESC)",
-      "CREATE INDEX IF NOT EXISTS idx_activity_logs_user_date ON activity_logs (user_id, created_at DESC)",
-      "CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks (status)",
-      "CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON tasks (due_date)",
-      "CREATE INDEX IF NOT EXISTS idx_tasks_project_status ON tasks (project_id, status, deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_tasks_assigned_status ON tasks (assigned_to, status, deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects (deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_projects_status_del ON projects (status, deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_projects_created_by ON projects (created_by, deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_project_tl_user ON project_team_leaders (user_id, project_id)",
-      "CREATE INDEX IF NOT EXISTS idx_comments_task ON comments (task_id, created_at)",
-      "CREATE INDEX IF NOT EXISTS idx_files_task ON files (task_id, created_at)",
-      "CREATE INDEX IF NOT EXISTS idx_tasks_deleted_at ON tasks (deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_users_deleted_at ON users (deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_users_email_status ON users (email, status, deleted_at)",
-      "CREATE INDEX IF NOT EXISTS idx_users_role_id ON users (role_id)",
-      "CREATE INDEX IF NOT EXISTS idx_personal_tasks_user_status ON personal_tasks (user_id, status)",
-      "CREATE INDEX IF NOT EXISTS idx_personal_tasks_user_pos ON personal_tasks (user_id, status, position)",
-      "CREATE INDEX IF NOT EXISTS idx_personal_tasks_date ON personal_tasks (task_date)",
-      "CREATE INDEX IF NOT EXISTS idx_otp_expires_used ON otp_requests (expires_at, is_used)",
-      "CREATE INDEX IF NOT EXISTS idx_otp_lookup ON otp_requests (user_id, otp_code, is_used, expires_at)",
-    ]
-    for (const q of alterQueries) {
-      try { await connection.query(q) } catch (e) { /* ignore if column already exists */ }
+    // Helper function to safely add a column if it doesn't exist
+    const addColumnIfNotExists = async (table, column, definition) => {
+      try {
+        const [cols] = await connection.query(`
+          SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+          WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?
+        `, [process.env.DB_NAME, table, column]);
+        if (cols.length === 0) {
+          await connection.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    await addColumnIfNotExists('users', 'phone', 'VARCHAR(50) DEFAULT NULL');
+    await addColumnIfNotExists('users', 'start_date', 'DATE NULL DEFAULT NULL');
+    await addColumnIfNotExists('users', 'expire_date', 'DATE NULL DEFAULT NULL');
+    await addColumnIfNotExists('users', 'leader_id', 'INT NULL');
+    await addColumnIfNotExists('users', 'deleted_at', 'TIMESTAMP NULL DEFAULT NULL');
+    await addColumnIfNotExists('tasks', 'task_type', 'VARCHAR(50) DEFAULT NULL');
+    await addColumnIfNotExists('tasks', 'priority', "ENUM('Low', 'Medium', 'High') DEFAULT 'Medium'");
+    await addColumnIfNotExists('tasks', 'due_date', 'DATE DEFAULT NULL');
+    await addColumnIfNotExists('tasks', 'deleted_at', 'TIMESTAMP NULL DEFAULT NULL');
+    await addColumnIfNotExists('projects', 'deleted_at', 'TIMESTAMP NULL DEFAULT NULL');
+    await addColumnIfNotExists('files', 'task_id', 'INT NULL');
+    await addColumnIfNotExists('comments', 'task_id', 'INT NULL');
+    await addColumnIfNotExists('notifications', 'task_id', 'INT NULL');
+    await addColumnIfNotExists('personal_tasks', 'status', "ENUM('todo', 'in-progress', 'completed') DEFAULT 'todo'");
+    await addColumnIfNotExists('personal_tasks', 'position', 'INT DEFAULT 0');
+
+    // Performance Indexes
+    const indexQueries = [
+      "CREATE INDEX idx_notifications_user_read ON notifications (user_id, is_read)",
+      "CREATE INDEX idx_notifications_user_created ON notifications (user_id, created_at DESC)",
+      "CREATE INDEX idx_activity_logs_created_at ON activity_logs (created_at DESC)",
+      "CREATE INDEX idx_activity_logs_user_date ON activity_logs (user_id, created_at DESC)",
+      "CREATE INDEX idx_tasks_status ON tasks (status)",
+      "CREATE INDEX idx_tasks_due_date ON tasks (due_date)",
+      "CREATE INDEX idx_tasks_project_status ON tasks (project_id, status, deleted_at)",
+      "CREATE INDEX idx_tasks_assigned_status ON tasks (assigned_to, status, deleted_at)",
+      "CREATE INDEX idx_projects_deleted_at ON projects (deleted_at)",
+      "CREATE INDEX idx_projects_status_del ON projects (status, deleted_at)",
+      "CREATE INDEX idx_projects_created_by ON projects (created_by, deleted_at)",
+      "CREATE INDEX idx_project_tl_user ON project_team_leaders (user_id, project_id)",
+      "CREATE INDEX idx_comments_task ON comments (task_id, created_at)",
+      "CREATE INDEX idx_files_task ON files (task_id, created_at)",
+      "CREATE INDEX idx_tasks_deleted_at ON tasks (deleted_at)",
+      "CREATE INDEX idx_users_deleted_at ON users (deleted_at)",
+      "CREATE INDEX idx_users_email_status ON users (email, status, deleted_at)",
+      "CREATE INDEX idx_users_role_id ON users (role_id)",
+      "CREATE INDEX idx_personal_tasks_user_status ON personal_tasks (user_id, status)",
+      "CREATE INDEX idx_personal_tasks_user_pos ON personal_tasks (user_id, status, position)",
+      "CREATE INDEX idx_personal_tasks_date ON personal_tasks (task_date)",
+      "CREATE INDEX idx_otp_expires_used ON otp_requests (expires_at, is_used)",
+      "CREATE INDEX idx_otp_lookup ON otp_requests (user_id, otp_code, is_used, expires_at)",
+    ];
+    for (const q of indexQueries) {
+      try { await connection.query(q) } catch (e) { /* ignore if index already exists */ }
     }
 
     const alterProjectsQueries = [
