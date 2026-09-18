@@ -23,23 +23,38 @@ async function logEmailActivity({ recipientEmail, action, details, userId = null
   }
 }
 
+import dns from 'dns';
+import { promisify } from 'util';
+
+const dnsResolve4 = promisify(dns.resolve4);
+
 /**
  * Get configured Nodemailer transporter instance
  */
-import dns from 'dns';
-
-function getTransporter() {
+async function getTransporterAsync() {
   const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
   const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').replace(/\s+/g, '').trim();
 
+  // Resolve Gmail SMTP to explicit IPv4 IP to completely bypass IPv6 ENETUNREACH on Render
+  let host = 'smtp.gmail.com';
+  try {
+    const ips = await dnsResolve4('smtp.gmail.com');
+    if (ips && ips.length > 0) {
+      host = ips[0]; // e.g. 142.250.xxx.xxx
+    }
+  } catch (err) {
+    console.warn('[DNS Warning] Could not resolve smtp.gmail.com to IPv4 directly, using hostname:', err.message);
+  }
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: host,
     port: 587,
     secure: false, // true for 465, false for other ports (uses STARTTLS)
-    lookup: (hostname, options, callback) => {
-      dns.lookup(hostname, { family: 4 }, callback);
-    },
     auth: { user: emailUser, pass: emailPass },
+    tls: {
+      servername: 'smtp.gmail.com', // Necessary for TLS certificate matching when host is an IP
+      rejectUnauthorized: true,
+    },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
@@ -65,7 +80,7 @@ export async function sendProjectCreationEmail({ recipientEmail, recipientName, 
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     const mailOptions = {
       from: `"Project Management System" <${emailUser}>`,
@@ -154,7 +169,7 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     const mailOptions = {
       from: `"Project Management System" <${emailUser}>`,
@@ -251,7 +266,7 @@ export async function sendWelcomeUserEmail({ recipientEmail, recipientName, temp
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     const mailOptions = {
       from: `"Project Management System" <${emailUser}>`,
@@ -315,7 +330,7 @@ export async function sendOtpEmail({ recipientEmail, recipientName, otpCode }) {
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     const mailOptions = {
       from: `"Project Management System" <${emailUser}>`,
@@ -387,7 +402,7 @@ export async function sendTaskOverdueLeaderEmail({
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     const mailOptions = {
       from: `"Project Management System" <${emailUser}>`,
@@ -471,7 +486,7 @@ export async function sendTaskOverdueLeaderEmail({
  */
 export async function sendContactFormEmail({ fullName, email, subject, message }) {
   try {
-    const { transporter, emailUser, emailPass } = getTransporter();
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
 
     // 1. Send to System Admin
     const safeSenderName = (fullName || 'User').replace(/[^\w\s\u0E00-\u0E7F]/gi, '').trim();
