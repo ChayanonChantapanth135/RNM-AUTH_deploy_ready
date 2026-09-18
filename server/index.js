@@ -1,3 +1,7 @@
+import dns from 'dns'
+// บังคับให้ Node.js แปลงชื่อโดเมนทั้งหมด (รวมถึง smtp.gmail.com) เป็น IPv4 เป็นอันดับแรก แก้ปัญหา ENETUNREACH บน Render
+dns.setDefaultResultOrder?.('ipv4first')
+
 import http from 'http'
 import express from 'express'
 import cors from 'cors'

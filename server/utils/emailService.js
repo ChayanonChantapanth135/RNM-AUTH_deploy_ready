@@ -26,6 +26,8 @@ async function logEmailActivity({ recipientEmail, action, details, userId = null
 /**
  * Get configured Nodemailer transporter instance
  */
+import dns from 'dns';
+
 function getTransporter() {
   const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
   const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').replace(/\s+/g, '').trim();
@@ -34,7 +36,9 @@ function getTransporter() {
     host: 'smtp.gmail.com',
     port: 587,
     secure: false, // true for 465, false for other ports (uses STARTTLS)
-    family: 4, // บังคับใช้ IPv4 แก้ปัญหา ENETUNREACH ของ IPv6 บน Cloud/Render
+    lookup: (hostname, options, callback) => {
+      dns.lookup(hostname, { family: 4 }, callback);
+    },
     auth: { user: emailUser, pass: emailPass },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
