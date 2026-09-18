@@ -1,13 +1,12 @@
 import React from "react";
 import { useLanguage } from "../lib/LanguageContext";
-import { motion } from "framer-motion";
 
 /**
- * คอมโพเนนต์ตัวสลับภาษา (Language Switcher Segmented Control)
- * - รองรับ Safari / iOS WebKit สมบูรณ์ 100% (ไม่มีตัวหนังสือล้น หรือเบี้ยว)
- * - สวิตช์สไลด์แบบ Capsule/Pill ปรับขนาดให้พอดี
+ * คอมโพเนนต์ตัวสลับภาษา (Segmented Language Switcher)
+ * - ออกแบบให้แสดงผลคมชัด 100% เท่ากันบนทุกแพลตฟอร์ม (Android, iOS Safari, Desktop)
+ * - ไม่มีการซ้อนทับหรือตัวหนังสือล้น
  */
-const LanguageSwitcher = ({ variant = "light" }) => {
+const LanguageSwitcher = () => {
   const { language, setLanguage } = useLanguage();
 
   const toggleLanguage = () => {
@@ -22,57 +21,49 @@ const LanguageSwitcher = ({ variant = "light" }) => {
       onClick={toggleLanguage}
       title={isEn ? "Switch to Thai (TH)" : "Switch to English (EN)"}
       aria-label="Toggle language switch"
-      className="relative inline-flex items-center justify-between p-1 transition-all duration-300 focus:outline-none select-none cursor-pointer flex-shrink-0"
+      className="relative inline-flex items-center p-0.5 select-none cursor-pointer flex-shrink-0"
       style={{
-        width: "68px",
+        width: "72px",
         height: "32px",
-        minWidth: "68px",
+        minWidth: "72px",
         minHeight: "32px",
         borderRadius: "9999px",
         backgroundColor: "var(--bg-surface-hover)",
         border: "1px solid var(--border-surface)",
         boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.2)",
+        outline: "none",
         WebkitAppearance: "none",
         WebkitTapHighlightColor: "transparent",
       }}
     >
-      {/* Sliding Active Pill */}
-      <motion.div
-        className="absolute top-1 bottom-1 flex items-center justify-center text-[11px] font-black z-10"
+      {/* Sliding Active Pill Backdrop */}
+      <div
+        className="absolute top-0.5 bottom-0.5 transition-all duration-300 ease-out flex-shrink-0"
         style={{
-          width: "28px",
-          height: "22px",
+          width: "33px",
+          height: "26px",
           borderRadius: "9999px",
           backgroundColor: "var(--brand-color)",
-          color: "#ffffff",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-          left: "4px",
+          boxShadow: "0 2px 5px rgba(0, 0, 0, 0.25)",
+          left: isEn ? "36px" : "2px",
         }}
-        animate={{ x: isEn ? 32 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      >
-        {isEn ? "EN" : "TH"}
-      </motion.div>
+      />
 
-      {/* Label TH (Left) */}
+      {/* TH Label */}
       <span
-        className="w-[28px] text-center text-[10px] font-extrabold transition-opacity z-0 pointer-events-none"
+        className="relative z-10 w-1/2 text-center text-[11px] font-black tracking-tight transition-colors duration-200"
         style={{
-          color: "var(--text-secondary)",
-          opacity: isEn ? 0.7 : 0,
-          marginLeft: "2px",
+          color: isEn ? "var(--text-secondary)" : "#ffffff",
         }}
       >
         TH
       </span>
 
-      {/* Label EN (Right) */}
+      {/* EN Label */}
       <span
-        className="w-[28px] text-center text-[10px] font-extrabold transition-opacity z-0 pointer-events-none"
+        className="relative z-10 w-1/2 text-center text-[11px] font-black tracking-tight transition-colors duration-200"
         style={{
-          color: "var(--text-secondary)",
-          opacity: isEn ? 0 : 0.7,
-          marginRight: "2px",
+          color: isEn ? "#ffffff" : "var(--text-secondary)",
         }}
       >
         EN
