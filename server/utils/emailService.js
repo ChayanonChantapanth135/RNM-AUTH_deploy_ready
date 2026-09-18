@@ -23,24 +23,25 @@ async function logEmailActivity({ recipientEmail, action, details, userId = null
   }
 }
 
-import dns from 'dns';
-import { promisify } from 'util';
-
-const dnsResolve4 = promisify(dns.resolve4);
-
 /**
  * Get configured Nodemailer transporter for Gmail SMTP
  */
-async function getTransporterAsync() {
+function getTransporter() {
   const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
-  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').trim();
+  // Strip whitespace from app password
+  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"\s]/g, '').trim();
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // SSL
     auth: {
       user: emailUser,
       pass: emailPass,
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     tls: {
       rejectUnauthorized: false
     }
@@ -50,61 +51,13 @@ async function getTransporterAsync() {
 }
 
 /**
- * Send email using Resend HTTP API (Bypasses all Cloud SMTP port blocks completely)
+ * Universal email sender: sends directly via Gmail SMTP
  */
-async function sendViaResend({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
-  const apiKey = (process.env.RESEND_API_KEY || '').trim();
-  if (!apiKey) return false;
-
-  const resendFrom = process.env.RESEND_FROM || 'onboarding@resend.dev';
-  const payload = {
-    from: `${fromName} <${resendFrom}>`,
-    to: Array.isArray(to) ? to : [to],
-    subject: subject,
-    html: html,
-  };
-  if (replyTo) {
-    payload.reply_to = replyTo;
-  }
-
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.message || JSON.stringify(data));
-  }
-  return true;
-}
-
-/**
- * Universal email sender: tries Resend HTTP API first, falls back to SMTP if configured
- */
-async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null, recipientName = '' }) {
-  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
-
-  // 1. Try Resend HTTP API
-  if (resendApiKey) {
-    try {
-      await sendViaResend({ to, subject, html, fromName, replyTo });
-      console.log(`[Resend Sent] Email sent successfully to ${to} (${subject})`);
-      return true;
-    } catch (resendErr) {
-      console.error(`[Resend Error] Failed to send via Resend:`, resendErr.message);
-      // Fallback to SMTP below
-    }
-  }
-
-  // 2. Fallback to Gmail SMTP
-  const { transporter, emailUser, emailPass } = await getTransporterAsync();
+async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
+  const { transporter, emailUser, emailPass } = getTransporter();
+  
   if (!emailPass) {
-    console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
+    console.warn(`[Email Warning] EMAIL_PASS is not configured. Skipped sending email to ${to}.`);
     return false;
   }
 
@@ -118,8 +71,8 @@ async function sendMailUniversal({ to, subject, html, fromName = 'Project Manage
     mailOptions.replyTo = replyTo;
   }
 
-  await transporter.sendMail(mailOptions);
-  console.log(`[SMTP Sent] Email sent successfully to ${to} (${subject})`);
+  const info = await transporter.sendMail(mailOptions);
+  console.log(`[SMTP Sent] Email sent to ${to} (${subject}) - Response: ${info.response || 'OK'}`);
   return true;
 }
 
