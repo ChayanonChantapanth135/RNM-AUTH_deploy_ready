@@ -21,6 +21,9 @@ import helmet from 'helmet'
 const app = express()
 const server = http.createServer(app)
 
+// เปิดใช้งาน trust proxy สำหรับ Railway / Cloud Load Balancers เพื่อให้ rate limiter ตรวจสอบ IP จริงของ Client ได้ถูกต้อง
+app.set('trust proxy', 1)
+
 // 1. เพิ่ม Security Headers ด้วย Helmet (พร้อมปรับ crossOriginResourcePolicy ให้โหลดรูป avatar ได้)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
