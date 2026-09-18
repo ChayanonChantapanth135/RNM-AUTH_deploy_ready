@@ -467,11 +467,12 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
     const { transporter, emailUser, emailPass } = getTransporter();
 
     // 1. Send to System Admin
+    const safeSenderName = (fullName || 'User').replace(/[^\w\s\u0E00-\u0E7F]/gi, '').trim();
     const adminMailOptions = {
-      from: `"${fullName} (Contact Form)" <${emailUser}>`,
+      from: `"${safeSenderName}" <${emailUser}>`,
       replyTo: email,
       to: emailUser,
-      subject: `[Contact Us Message] ${subject || 'New Inquiry'} - from ${fullName}`,
+      subject: `[Contact Us] ${subject || 'New Inquiry'} - from ${safeSenderName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div style="background: linear-gradient(135deg, #0f172a, #334155); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
