@@ -23,26 +23,44 @@ async function logEmailActivity({ recipientEmail, action, details, userId = null
   }
 }
 
+import dns from 'dns';
+import { promisify } from 'util';
+
+dns.setDefaultResultOrder?.('ipv4first');
+const resolve4Async = promisify(dns.resolve4);
+
 /**
- * Get configured Nodemailer transporter for Gmail SMTP
+ * Get configured Nodemailer transporter for Gmail SMTP (strictly forces IPv4)
  */
-function getTransporter() {
+async function getTransporterAsync() {
   const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
   // Strip whitespace from app password
   const emailPass = (process.env.EMAIL_PASS || '').replace(/['"\s]/g, '').trim();
 
+  let smtpHost = 'smtp.gmail.com';
+  try {
+    const ips = await resolve4Async('smtp.gmail.com');
+    if (ips && ips.length > 0) {
+      smtpHost = ips[0];
+      console.log(`[SMTP IPv4] Connecting to smtp.gmail.com via IPv4 address: ${smtpHost}`);
+    }
+  } catch (e) {
+    console.warn('[SMTP DNS Warning] Using hostname smtp.gmail.com directly:', e.message);
+  }
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: smtpHost,
     port: 465,
     secure: true, // SSL
     auth: {
       user: emailUser,
       pass: emailPass,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
     tls: {
+      servername: 'smtp.gmail.com',
       rejectUnauthorized: false
     }
   });
@@ -51,10 +69,10 @@ function getTransporter() {
 }
 
 /**
- * Universal email sender: sends directly via Gmail SMTP
+ * Universal email sender: sends directly via Gmail SMTP with IPv4 enforcement
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
-  const { transporter, emailUser, emailPass } = getTransporter();
+  const { transporter, emailUser, emailPass } = await getTransporterAsync();
   
   if (!emailPass) {
     console.warn(`[Email Warning] EMAIL_PASS is not configured. Skipped sending email to ${to}.`);
