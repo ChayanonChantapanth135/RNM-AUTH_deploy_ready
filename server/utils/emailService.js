@@ -31,7 +31,10 @@ function getTransporter() {
   const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').replace(/\s+/g, '').trim();
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports (uses STARTTLS)
+    family: 4, // บังคับใช้ IPv4 แก้ปัญหา ENETUNREACH ของ IPv6 บน Cloud/Render
     auth: { user: emailUser, pass: emailPass },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
