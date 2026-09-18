@@ -23,13 +23,21 @@ const ProfileCard = ({
             <img
               src={avatarPreview}
               alt="Profile Avatar"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                if (e.target.nextSibling) {
+                  e.target.nextSibling.style.display = 'block';
+                }
+              }}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
-          ) : (
-            <span className="text-4xl font-extrabold">
-              {fullname ? fullname[0]?.toUpperCase() : "U"}
-            </span>
-          )}
+          ) : null}
+          <span
+            className="text-4xl font-extrabold"
+            style={{ display: avatarPreview ? 'none' : 'block' }}
+          >
+            {fullname ? fullname[0]?.toUpperCase() : (user?.fullname ? user.fullname[0]?.toUpperCase() : "U")}
+          </span>
         </div>
 
         {/* Click overlay */}
