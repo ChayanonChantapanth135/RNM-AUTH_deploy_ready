@@ -36,7 +36,7 @@ async function sendViaBrevo({ to, subject, html, fromName = 'Project Management'
   const apiKey = (process.env.BREVO_API_KEY || '').trim();
   if (!apiKey) return false;
 
-  const senderEmail = (process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'chayanon.sent@gmail.com').trim();
+  const senderEmail = (process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'chayanon.1547@gmail.com').trim();
   const recipients = (Array.isArray(to) ? to : [to]).map((email) => ({ email }));
 
   const payload = {
@@ -108,7 +108,7 @@ async function sendViaResend({ to, subject, html, fromName = 'Project Management
  * Get configured Nodemailer transporter for Gmail SMTP (strictly forces IPv4)
  */
 async function getTransporterAsync() {
-  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
+  const emailUser = (process.env.EMAIL_USER || 'chayanon.1547@gmail.com').replace(/['"]/g, '').trim();
   const emailPass = (process.env.EMAIL_PASS || '').replace(/['"\s]/g, '').trim();
 
   let smtpHost = 'smtp.gmail.com';
