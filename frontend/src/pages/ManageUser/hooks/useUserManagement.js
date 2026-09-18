@@ -272,17 +272,18 @@ export const useUserManagement = (t, language = "en") => {
         await axios.put(`/auth/users/${selectedUserId}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setModalSuccess(t("userUpdatedSuccess") || "บันทึกการแก้ไขเรียบร้อยแล้ว!");
+        setPageSuccessMessage(t("userUpdatedSuccess") || "บันทึกการแก้ไขเรียบร้อยแล้ว!");
       } else {
         await axios.post("/auth/users", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setModalSuccess(t("userCreatedSuccess") || "สร้างบัญชีผู้ใช้ใหม่เรียบร้อยแล้ว!");
+        setPageSuccessMessage(t("userCreatedSuccess") || "สร้างบัญชีผู้ใช้ใหม่เรียบร้อยแล้ว!");
       }
+      setShowAddModal(false);
       fetchUsers();
       setTimeout(() => {
-        setShowAddModal(false);
-      }, 500);
+        setPageSuccessMessage("");
+      }, 3500);
     } catch (err) {
       setModalError(err.response?.data?.message || (isEditMode ? t("userUpdateFailed") : t("userAddFailed")));
     }
