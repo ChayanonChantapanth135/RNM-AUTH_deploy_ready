@@ -252,9 +252,10 @@ export const login = async (req, res) => {
                 return res.status(403).json({ code: 'ACCOUNT_EXPIRED', message: 'บัญชีของคุณหมดอายุการใช้งานแล้ว กรุณาติดต่อผู้ดูแลระบบ' });
             }
         }
+        const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'jwt-secret-key-rnm';
         const tokenExpiresIn = '40m';
         const tokenExpiresInSeconds = 40 * 60;
-        const token = jwt.sign({ id: rows[0].id }, process.env.JWT_KEY, { expiresIn: tokenExpiresIn });
+        const token = jwt.sign({ id: rows[0].id }, jwtSecret, { expiresIn: tokenExpiresIn });
 
         await logActivity(db, rows[0].id, 'Login', `User logged in: ${rows[0].fullname}`);
 
@@ -304,7 +305,8 @@ export const refresh = async (req, res) => {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: 'Token required' });
     try {
-        const decoded = jwt.verify(token, process.env.JWT_KEY, { ignoreExpiration: true });
+        const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'jwt-secret-key-rnm';
+        const decoded = jwt.verify(token, jwtSecret, { ignoreExpiration: true });
         const db = await connectToDatabase();
         const [rows] = await db.query('SELECT * FROM users WHERE id = ? AND deleted_at IS NULL', [decoded.id]);
         if (rows.length === 0) {
@@ -328,7 +330,7 @@ export const refresh = async (req, res) => {
         }
         const tokenExpiresIn = '40m';
         const tokenExpiresInSeconds = 40 * 60;
-        const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_KEY, { expiresIn: tokenExpiresIn });
+        const newToken = jwt.sign({ id: decoded.id }, jwtSecret, { expiresIn: tokenExpiresIn });
         
         return res.status(200).json({
             token: newToken,

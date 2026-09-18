@@ -10,19 +10,28 @@ import bcrypt from 'bcrypt'
  */
 export const initializeDatabase = async () => {
   let connection;
-  try {
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT) || 3306,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-    })
+  const dbName = process.env.DB_NAME || process.env.MYSQLDATABASE || 'railway';
+  const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL;
 
-    // Create database if it doesn't exist
-    await connection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`)
-    
-    // Switch to the database
-    await connection.query(`USE ${process.env.DB_NAME}`)
+  try {
+    if (dbUrl) {
+      connection = await mysql.createConnection(dbUrl);
+    } else {
+      const host = process.env.DB_HOST || process.env.MYSQLHOST || 'localhost';
+      const port = Number(process.env.DB_PORT || process.env.MYSQLPORT) || 3306;
+      const user = process.env.DB_USER || process.env.MYSQLUSER || 'root';
+      const password = process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '';
+
+      try {
+        // Try connecting without specifying DB to create it if needed
+        connection = await mysql.createConnection({ host, port, user, password });
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+        await connection.query(`USE \`${dbName}\``);
+      } catch (connErr) {
+        // If create database is restricted (e.g. Railway managed MySQL), connect directly to the database
+        connection = await mysql.createConnection({ host, port, user, password, database: dbName });
+      }
+    }
     
     // 1. Create roles table
     await connection.query(`
@@ -38,17 +47,21 @@ export const initializeDatabase = async () => {
     const [rolesCount] = await connection.query('SELECT COUNT(*) as count FROM roles')
     if (rolesCount[0].count === 0) {
       const defaultRoles = [
-        ['admin', 'System Administrator with full access'],
-        ['manager', 'Project Manager with access to create/manage own projects'],
-        ['storyboard', 'Storyboard creator and visual planner'],
-        ['animation', 'Animator and motion designer'],
-        ['designer', 'Graphic and UI/UX Designer'],
-        ['programmer', 'Software engineer and developer']
+        { name: 'admin', desc: 'ผู้ดูแลระบบสูงสุด (เข้าถึงได้ทุกระบบ)' },
+        { name: 'manager', desc: 'ผู้จัดการ (จัดการโครงการ, กำกับดูแลผู้ใช้)' },
+        { name: 'storyboard', desc: 'ทีมสตอรี่บอร์ด (จัดการงานและไทม์ไลน์)' },
+        { name: 'animation', desc: 'ทีมอนิเมชั่น (ทำงานและอัปเดตสถานะ)' },
+        { name: 'designer', desc: 'ทีมนักออกแบบ (ออกแบบกราฟิกและสื่อ)' },
+        { name: 'programmer', desc: 'ทีมนักพัฒนา (พัฒนาระบบและแก้ไขบั๊ก)' }
       ]
-      for (const [name, desc] of defaultRoles) {
-        await connection.query('INSERT INTO roles (role_name, description) VALUES (?, ?)', [name, desc])
+
+      for (const role of defaultRoles) {
+        await connection.query(
+          'INSERT IGNORE INTO roles (role_name, description) VALUES (?, ?)',
+          [role.name, role.desc]
+        )
       }
-      console.log('Seeded default roles.')
+      console.log('Seeded default roles successfully.')
     }
 
     // 2. Create users table
@@ -65,7 +78,7 @@ export const initializeDatabase = async () => {
         phone VARCHAR(50) DEFAULT NULL,
         start_date DATE NULL DEFAULT NULL,
         expire_date DATE NULL DEFAULT NULL,
-        is_force_reset TINYINT(1) DEFAULT 1,
+        is_force_reset TINYINT(1) DEFAULT 0,
         leader_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         deleted_at TIMESTAMP NULL DEFAULT NULL,
@@ -74,19 +87,25 @@ export const initializeDatabase = async () => {
       )
     `)
 
-    // Seed default admin user if no admin exists
+    // Seed default admin user (admin@example.com / Admin@1234)
     try {
-      const [adminUsers] = await connection.query("SELECT id FROM users WHERE email = 'admin@example.com' OR role = 'admin' LIMIT 1")
+      const [adminUsers] = await connection.query("SELECT id FROM users WHERE email = 'admin@example.com' LIMIT 1")
+      const defaultPassword = await bcrypt.hash('Admin@1234', 10)
+      const [adminRole] = await connection.query("SELECT id FROM roles WHERE role_name = 'admin' LIMIT 1")
+      const roleId = adminRole[0]?.id || 1
+
       if (adminUsers.length === 0) {
-        const [adminRole] = await connection.query("SELECT id FROM roles WHERE role_name = 'admin' LIMIT 1")
-        const roleId = adminRole[0]?.id || 1
-        const defaultPassword = await bcrypt.hash('Admin@1234', 10)
-        
         await connection.query(`
           INSERT INTO users (fullname, email, password, role, role_id, status, is_force_reset)
           VALUES ('System Admin', 'admin@example.com', ?, 'admin', ?, 'active', 0)
         `, [defaultPassword, roleId])
-        console.log('Seeded default admin user (admin@example.com).')
+        console.log('Seeded default admin user (admin@example.com / Admin@1234).')
+      } else {
+        // Ensure admin@example.com password and active status are up to date
+        await connection.query(`
+          UPDATE users SET password = ?, role = 'admin', role_id = ?, status = 'active', deleted_at = NULL WHERE email = 'admin@example.com'
+        `, [defaultPassword, roleId])
+        console.log('Verified & updated default admin user credentials (admin@example.com).')
       }
     } catch (adminErr) {
       console.error('Error seeding default admin:', adminErr.message)

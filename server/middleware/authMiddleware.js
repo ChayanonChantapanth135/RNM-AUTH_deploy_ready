@@ -56,7 +56,8 @@ export const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const secret = process.env.JWT_KEY || process.env.JWT_SECRET || 'jwt-secret-key-rnm';
+        const decoded = jwt.verify(token, secret);
         req.userId = decoded.id;
         next();
     } catch (err) {
