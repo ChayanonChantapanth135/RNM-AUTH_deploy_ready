@@ -45,12 +45,43 @@
 
 @layer base {
   body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow-x: hidden;
     transition: background-color 0.25s ease, color 0.25s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
+  /* Safari / iOS Button & Input resets */
+  button, input, select, textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Safari Emoji and Icon Normalization */
+.emoji, span[role="img"], [data-emoji] {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+  font-style: normal;
+}
+
+/* Remove Border from Mobile Menu Button in All States */
+#dropdown-mobile-nav,
+#dropdown-mobile-nav:hover,
+#dropdown-mobile-nav:focus,
+#dropdown-mobile-nav:active,
+#dropdown-mobile-nav:visited,
+.btn-link#dropdown-mobile-nav {
+  border: none !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
 }
 
 /* Dynamic 60-30-10 Utility Classes */

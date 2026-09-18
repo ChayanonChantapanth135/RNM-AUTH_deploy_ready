@@ -178,10 +178,21 @@ const Header = () => {
                 <Dropdown align="end">
                   <Dropdown.Toggle
                     variant="link"
-                    className="p-0 border-0 flex items-center no-underline focus:ring-0 after:hidden shadow-none"
+                    className="p-0 border-0 flex items-center no-underline focus:ring-0 after:hidden shadow-none flex-shrink-0"
                     id="dropdown-profile"
                   >
-                    <div className="p-0.5 rounded-full bg-indigo-600 hover:scale-105 transition-transform">
+                    <div 
+                      className="p-0.5 rounded-full hover:scale-105 transition-transform flex-shrink-0 overflow-hidden flex items-center justify-center"
+                      style={{
+                        backgroundColor: "var(--brand-color)",
+                        width: "38px",
+                        height: "38px",
+                        minWidth: "38px",
+                        minHeight: "38px",
+                        borderRadius: "50%",
+                        aspectRatio: "1 / 1"
+                      }}
+                    >
                       {user?.avatar ? (
                         <img
                           src={
@@ -190,16 +201,21 @@ const Header = () => {
                               : `${API_URL}${user.avatar}`
                           }
                           alt="Profile"
-                          className="w-9 h-9 rounded-full object-cover border-2"
-                          style={{ borderColor: "var(--bg-surface)" }}
+                          className="w-full h-full object-cover flex-shrink-0"
+                          style={{ 
+                            borderRadius: "50%", 
+                            aspectRatio: "1 / 1",
+                            objectFit: "cover" 
+                          }}
                         />
                       ) : (
                         <div 
-                          className="w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-sm"
+                          className="w-full h-full flex items-center justify-center font-bold text-sm"
                           style={{
                             backgroundColor: "var(--bg-surface-hover)",
-                            borderColor: "var(--bg-surface)",
                             color: "var(--brand-color)",
+                            borderRadius: "50%",
+                            aspectRatio: "1 / 1"
                           }}
                         >
                           {user?.name?.[0]?.toUpperCase() || "U"}
@@ -273,7 +289,7 @@ const Header = () => {
                     )}
                     <Dropdown.Item
                       as={Link}
-                      to="/MyActivity"
+                      to="/ActivityLogs"
                       className="rounded-xl px-3 py-2 font-medium transition-colors bg-transparent d-flex align-items-center gap-2"
                       style={{ color: "var(--text-primary)" }}
                     >
@@ -321,15 +337,17 @@ const Header = () => {
               )}
             </div>
 
-            {/* Mobile Navigation Dropdown Menu */}
+            {/* Mobile Navigation Dropdown Menu (No Border / Clean Safari Design) */}
             {isLoggedIn && (
               <Dropdown align="end" className="md:hidden">
                 <Dropdown.Toggle
                   variant="link"
-                  className="p-2 rounded-xl transition-colors focus:outline-none border no-underline after:hidden shadow-none flex items-center justify-center"
+                  className="p-2 rounded-xl transition-colors focus:outline-none focus:ring-0 active:outline-none border-0 no-underline after:hidden shadow-none flex items-center justify-center flex-shrink-0"
                   style={{
                     backgroundColor: "var(--bg-surface-hover)",
-                    borderColor: "var(--border-surface)",
+                    border: "none",
+                    boxShadow: "none",
+                    outline: "none",
                     color: "var(--text-primary)",
                   }}
                   id="dropdown-mobile-nav"
