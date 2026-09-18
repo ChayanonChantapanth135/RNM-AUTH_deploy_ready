@@ -39,11 +39,14 @@ const Header = () => {
         if (currentUser) {
           try {
             const res = await axios.get(`/auth/users/${currentUser.id}`);
-            setUser({
+            const updated = {
               ...currentUser,
               avatar: res.data.avatar,
               role: res.data.role,
-            });
+              name: res.data.fullname || res.data.name || currentUser.name,
+            };
+            setUser(updated);
+            localStorage.setItem("userData", JSON.stringify(updated));
           } catch {
             setUser(currentUser);
           }

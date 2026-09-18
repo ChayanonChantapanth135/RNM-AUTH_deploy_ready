@@ -19,7 +19,19 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
      * ฟังก์ชันตรวจสอบสถานะล็อกอินของผู้ใช้งานเพื่อความปลอดภัยฝั่ง Client
      */
     const checkAuth = async () => {
-      const user = await getCurrentUser();
+      let user = await getCurrentUser();
+      
+      // ถ้ามี allowedRoles และ role ปัจจุบันในเครื่องยังไม่ตรง ให้ลอง sync กับเซิร์ฟเวอร์ก่อนเผื่อเพิ่งเปลี่ยน role
+      if (user && allowedRoles && allowedRoles.length > 0) {
+        const currentLocalRole = user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null;
+        if (!currentLocalRole || !allowedRoles.includes(currentLocalRole)) {
+          const syncedUser = await syncCurrentUserProfile();
+          if (syncedUser) {
+            user = syncedUser;
+          }
+        }
+      }
+
       if (user) {
         setAuthenticated(true);
         setIsForceReset(user.is_force_reset === 1);

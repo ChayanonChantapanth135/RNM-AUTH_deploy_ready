@@ -43,6 +43,39 @@ export const signIn = async ({ token, user, expiresInSeconds = 2400 }) => {
 };
 
 /**
+ * ซิงค์ข้อมูลล่าสุดของผู้ใช้ (รวมถึง Role / Avatar) จาก Backend เข้า localStorage
+ * @returns {Promise<Object|null>}
+ */
+export const syncCurrentUserProfile = async () => {
+    const userToken = localStorage.getItem('userToken');
+    const userData = localStorage.getItem('userData');
+    if (!userToken || !userData) return null;
+
+    try {
+        const user = JSON.parse(userData);
+        const axios = (await import('axios')).default;
+        const res = await axios.get(`${API_URL}/auth/users/${user.id}`, {
+            headers: { Authorization: `Bearer ${userToken}` }
+        });
+        if (res.data) {
+            const updatedUser = {
+                ...user,
+                ...res.data,
+                name: res.data.fullname || res.data.name || user.name,
+                role: res.data.role || user.role,
+                avatar: res.data.avatar || user.avatar
+            };
+            localStorage.setItem('userData', JSON.stringify(updatedUser));
+            window.dispatchEvent(new Event('authChanged'));
+            return updatedUser;
+        }
+    } catch (e) {
+        // silently fallback
+    }
+    return null;
+};
+
+/**
  * ส่งคำขอไปยัง Backend เพื่อยืดอายุหรือต่ออายุ Token (Refresh Token) 
  * @returns {Promise<boolean>} สำเร็จ (true) หรือล้มเหลว (false)
  */
