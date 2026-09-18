@@ -1,0 +1,803 @@
+@import "tailwindcss";
+
+:root {
+  /* 60-30-10 Design System Default Tokens (Dark Mode) */
+  --bg-primary: #0F172A;
+  --bg-surface: #1E293B;
+  --bg-surface-hover: #273549;
+  --text-primary: #F8F9FA;
+  --text-secondary: #94A3B8;
+  --border-surface: rgba(255, 255, 255, 0.08);
+
+  /* Status Colors in Dark Mode */
+  --status-todo: #94A3B8;
+  --status-in-progress: #38BDF8;
+  --status-in-review: #FBBF24;
+  --status-completed: #34D399;
+  --status-urgent: #F87171;
+
+  /* Brand Accent Default (Dark: Neon Blue) */
+  --brand-color: #38BDF8;
+  --brand-color-light: #2563EB;
+  --brand-color-dark: #38BDF8;
+  --accent-color: #3B82F6;
+}
+
+:root.light, html.light {
+  /* 60-30-10 Design System Tokens (Light Mode) */
+  --bg-primary: #F8F9FA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F1F5F9;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-surface: #CBD5E1;
+
+  /* Status Colors in Light Mode */
+  --status-todo: #64748B;
+  --status-in-progress: #2563EB;
+  --status-in-review: #D97706;
+  --status-completed: #16A34A;
+  --status-urgent: #DC2626;
+
+  /* Brand Accent Light */
+  --brand-color: #2563EB;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* Dynamic 60-30-10 Utility Classes */
+.theme-bg-main {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.theme-card, .theme-surface {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-surface) !important;
+}
+
+.theme-text-primary {
+  color: var(--text-primary) !important;
+}
+
+.theme-text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.theme-brand-btn {
+  background-color: var(--brand-color) !important;
+  color: #ffffff !important;
+}
+
+.notif-filter-active {
+  background-color: var(--brand-color) !important;
+  color: #ffffff !important;
+}
+
+.notif-filter-active,
+.notif-filter-active *,
+.notif-filter-active span {
+  color: #ffffff !important;
+}
+
+/* Default Input Border Styling */
+input, select, textarea {
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+/* Modals & White Form Containers */
+.modal-content {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea,
+.modal-content .form-control,
+.modal-content .form-select,
+.modal-body input,
+.modal-body select,
+.modal-body textarea,
+.modal-body .form-control,
+.modal-body .form-select,
+.bg-white input,
+.bg-white select,
+.bg-white textarea,
+.swal2-popup input,
+.swal2-popup select,
+.swal2-popup textarea,
+.swal2-input {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus,
+.modal-content .form-control:focus,
+.modal-content .form-select:focus,
+.modal-body input:focus,
+.modal-body select:focus,
+.modal-body textarea:focus,
+.modal-body .form-control:focus,
+.modal-body .form-select:focus,
+.bg-white input:focus,
+.bg-white select:focus,
+.bg-white textarea:focus,
+.swal2-popup input:focus,
+.swal2-popup select:focus,
+.swal2-popup textarea:focus,
+.swal2-input:focus {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: var(--brand-color) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+.modal-content input::placeholder,
+.modal-content textarea::placeholder,
+.modal-body input::placeholder,
+.modal-body textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+.modal-content input[readonly],
+.modal-body input[readonly],
+.modal-content .bg-light,
+.modal-body .bg-light {
+  background-color: #F8FAFC !important;
+  color: #334155 !important;
+  border: 1.5px solid #E2E8F0 !important;
+}
+
+/* Bootstrap Button & Segmented Overrides */
+.btn, .btn-group, .btn-group .btn, button {
+  border-radius: 9999px !important;
+}
+
+/* Dropdown styling */
+.dropdown-toggle::after, #dropdown-profile::after {
+  display: none !important;
+}
+
+.dropdown-menu {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border-surface) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 1rem !important;
+}
+
+.dropdown-item {
+  color: var(--text-secondary) !important;
+  border-radius: 9999px !important;
+  margin-bottom: 2px !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: var(--text-primary) !important;
+  border-radius: 9999px !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-color);
+}
+
+/* Light Modal Specific Scrollbar */
+.modal-content ::-webkit-scrollbar,
+.modal-body ::-webkit-scrollbar,
+.modal-custom-scrollbar::-webkit-scrollbar,
+.light-scrollbar::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.modal-content ::-webkit-scrollbar-track,
+.modal-body ::-webkit-scrollbar-track,
+.modal-custom-scrollbar::-webkit-scrollbar-track,
+.light-scrollbar::-webkit-scrollbar-track {
+  background: #F1F5F9 !important;
+  border-radius: 9999px !important;
+}
+
+.modal-content ::-webkit-scrollbar-thumb,
+.modal-body ::-webkit-scrollbar-thumb,
+.modal-custom-scrollbar::-webkit-scrollbar-thumb,
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1 !important;
+  border-radius: 9999px !important;
+}
+
+.modal-content ::-webkit-scrollbar-thumb:hover,
+.modal-body ::-webkit-scrollbar-thumb:hover,
+.modal-custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.light-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8 !important;
+}
+
+/* Modern Clean Surface Styles (GPU-Friendly, Zero Lag) */
+.glass-panel {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-surface) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  color: var(--text-primary) !important;
+}
+
+.glass-panel-light {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-surface) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.glass-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-surface) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  color: var(--text-primary) !important;
+}
+
+.glass-card:hover {
+  background: var(--bg-surface-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12);
+}
+
+.glow-button {
+  position: relative;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+  border-radius: 9999px !important;
+}
+
+.glow-button:hover {
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+  transform: translateY(-2px);
+}
+
+/* Theme Accent Text Effect */
+.gradient-text {
+  color: var(--brand-color) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--brand-color) !important;
+}
+
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #34d399 0%, var(--brand-color) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Static ambient background blobs (zero GPU overhead) */
+.ambient-blob-1,
+.ambient-blob-2,
+.ambient-blob-3 {
+  opacity: 0.8;
+}
+
+/* Bootstrap Link Overrides */
+a, .no-underline {
+  text-decoration: none !important;
+}
+
+/* Footer Styling Overrides */
+footer, footer p, footer li, footer span {
+  color: var(--text-secondary) !important;
+}
+
+footer a:hover {
+  color: var(--brand-color) !important;
+}
+
+/* Global Status Pill Classes */
+.badge-status-todo {
+  background-color: rgba(100, 116, 139, 0.15) !important;
+  color: var(--status-todo) !important;
+}
+
+.badge-status-in-progress {
+  background-color: rgba(37, 99, 235, 0.15) !important;
+  color: var(--status-in-progress) !important;
+}
+
+.badge-status-in-review {
+  background-color: rgba(217, 119, 6, 0.15) !important;
+  color: var(--status-in-review) !important;
+}
+
+.badge-status-completed {
+  background-color: rgba(22, 163, 74, 0.15) !important;
+  color: var(--status-completed) !important;
+}
+
+.badge-status-urgent {
+  background-color: rgba(220, 38, 38, 0.15) !important;
+  color: var(--status-urgent) !important;
+}
+
+/* Light Theme High Contrast Status & Priority Badges */
+.light .badge-status-completed {
+  background-color: rgba(22, 163, 74, 0.18) !important;
+  color: #15803d !important; /* Deeper Green */
+  font-weight: 700 !important;
+}
+
+.light .badge-status-in-progress {
+  background-color: rgba(37, 99, 235, 0.18) !important;
+  color: #1d4ed8 !important; /* Deeper Blue */
+  font-weight: 700 !important;
+}
+
+.light .badge-status-in-review {
+  background-color: rgba(217, 119, 6, 0.18) !important;
+  color: #b45309 !important; /* Deeper Amber */
+  font-weight: 700 !important;
+}
+
+.light .badge-status-todo {
+  background-color: rgba(100, 116, 139, 0.18) !important;
+  color: #334155 !important; /* Deeper Slate */
+  font-weight: 700 !important;
+}
+
+/* Priority Badges in Light Theme */
+.light .bg-red-500\/20,
+.light .bg-rose-500\/20 {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+  color: #b91c1c !important; /* Deeper Red for High */
+  font-weight: 700 !important;
+}
+
+.light .bg-amber-500\/20,
+.light .bg-yellow-500\/20,
+.light .bg-orange-500\/20 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #b45309 !important; /* Deeper Orange/Amber for Medium */
+  font-weight: 700 !important;
+}
+
+.light .bg-blue-500\/20,
+.light .bg-sky-500\/20 {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+  color: #1d4ed8 !important; /* Deeper Blue for Low */
+  font-weight: 700 !important;
+}
+
+/* ========================================================================= */
+/* LIGHT MODE HIGH CONTRAST TEXT & SURFACE OVERRIDES                         */
+/* Ensures all text is crystal clear, dark & readable in Light mode          */
+/* ========================================================================= */
+
+.light {
+  color-scheme: light;
+}
+
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6,
+.light strong, .light b, .light th {
+  color: #0F172A !important;
+}
+
+.light p, .light span, .light td, .light li, .light label {
+  color: inherit;
+}
+
+/* Specific Tailwind text classes overridden in Light mode */
+.light .text-white,
+.light .text-slate-100 {
+  color: #0F172A !important;
+}
+
+.light .text-slate-200,
+.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light .text-slate-400,
+.light .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* Buttons and Badge texts that MUST remain white on filled gradient/brand background */
+.light .bg-indigo-600,
+.light .bg-indigo-500,
+.light .bg-blue-600,
+.light .bg-blue-500,
+.light .bg-teal-500,
+.light .bg-emerald-500,
+.light .glow-button,
+.light .btn-primary,
+.light .pagination-badge,
+.light [class*="bg-gradient-to"] {
+  color: #FFFFFF !important;
+}
+
+.light .bg-indigo-600 *,
+.light .bg-indigo-500 *,
+.light .bg-blue-600 *,
+.light .glow-button *,
+.light .pagination-badge,
+.light [class*="bg-gradient-to"] * {
+  color: #FFFFFF !important;
+}
+
+/* Light mode form inputs, selects, and controls */
+.light input,
+.light select,
+.light textarea,
+.light .form-control,
+.light .form-select {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.light input:focus,
+.light select:focus,
+.light textarea:focus,
+.light .form-control:focus,
+.light .form-select:focus {
+  background-color: #FFFFFF !important;
+  border-color: var(--brand-color) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+.light .bg-slate-800\/60,
+.light .bg-slate-800\/80,
+.light .bg-slate-900\/80,
+.light .bg-\[\#1e293b\]\/50,
+.light .bg-\[\#1e293b\]\/60 {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Light mode table headers and borders */
+.light thead tr {
+  background-color: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.light thead th {
+  color: #475569 !important;
+}
+
+.light tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+.light tbody td {
+  border-bottom: 1px solid #F1F5F9 !important;
+}
+
+/* Light mode Header and Navigation */
+.light header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.light nav.bg-slate-800\/80 {
+  background-color: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.light nav a.text-slate-300 {
+  color: #475569 !important;
+}
+
+.light nav a.text-slate-300:hover {
+  color: #0F172A !important;
+  background-color: #E2E8F0 !important;
+}
+
+/* FullCalendar Light mode overrides */
+.light .fc-toolbar-title {
+  color: #0F172A !important;
+}
+
+.light .fc-col-header-cell {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+.light .fc-col-header-cell-cushion {
+  color: #475569 !important;
+}
+
+.light .fc-daygrid-day-number {
+  color: #334155 !important;
+}
+
+.light .fc-button {
+  background-color: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+.light .fc-button:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.light .fc-popover {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.light .fc-popover-header {
+  background-color: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.light .fc-popover-title {
+  color: #0F172A !important;
+}
+
+.light .fc-popover-body {
+  background-color: #FFFFFF !important;
+}
+
+/* Modals & SweetAlert in Light mode */
+.light .modal-content {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.light .modal-content input:not(.form-check-input),
+.light .modal-content select,
+.light .modal-content textarea,
+.light .modal-content .form-control,
+.light .modal-content .form-select {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+.light .modal-content input:not(.form-check-input):focus,
+.light .modal-content select:focus,
+.light .modal-content textarea:focus,
+.light .modal-content .form-control:focus,
+.light .modal-content .form-select:focus {
+  background-color: #FFFFFF !important;
+  border-color: var(--brand-color) !important;
+}
+
+.form-check-input:checked {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.form-check-input {
+  cursor: pointer;
+}
+
+.light .swal2-popup {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+.light .swal2-title {
+  color: #0F172A !important;
+}
+
+.light .swal2-html-container {
+  color: #475569 !important;
+}
+
+/* Header & Navigation Bar Styling for Light & Dark Modes */
+header {
+  background-color: var(--bg-surface) !important;
+  border-bottom: 1px solid var(--border-surface) !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.light header {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark header {
+  background-color: #0F172A !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Header Navigation Pills Container */
+.header-nav-container {
+  background-color: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light .header-nav-container {
+  background-color: #F1F5F9 !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+/* Header Navigation Links */
+.header-nav-link {
+  color: #94A3B8 !important;
+  transition: all 0.2s ease;
+}
+
+.header-nav-link:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.light .header-nav-link {
+  color: #64748B !important;
+}
+
+.light .header-nav-link:hover {
+  color: #0F172A !important;
+  background-color: #E2E8F0 !important;
+}
+
+.header-nav-link-active {
+  background-color: var(--brand-color) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.light .header-nav-link-active {
+  background-color: var(--brand-color) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* ==========================================================================
+   📱 Mobile Responsive Enhancements & Screen Adaptation
+   ========================================================================== */
+
+/* 1. Global Viewport Guardrails */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hardware-accelerated ambient glowing background orbs (GPU-friendly, no heavy blur filter recalculations) */
+.ambient-blob-1, .ambient-blob-2, .ambient-blob-3 {
+  max-width: 90vw;
+  max-height: 90vw;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  pointer-events: none;
+  contain: strict;
+}
+
+.ambient-blob-1 {
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.16) 0%, rgba(20, 184, 166, 0) 70%) !important;
+}
+
+.ambient-blob-2 {
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.18) 0%, rgba(79, 70, 229, 0) 70%) !important;
+}
+
+.ambient-blob-3 {
+  background: radial-gradient(circle, rgba(8, 145, 178, 0.16) 0%, rgba(8, 145, 178, 0) 70%) !important;
+}
+
+/* 2. Responsive Table Wrappers & Touch Scroll */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* 3. Bootstrap Modal & Dialog Mobile Adaptations */
+@media (max-width: 640px) {
+  .modal-dialog {
+    margin: 0.5rem !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  .modal-content {
+    border-radius: 1.25rem !important;
+  }
+
+  .modal-body {
+    padding: 1rem !important;
+  }
+
+  /* SweetAlert2 Mobile Optimization */
+  .swal2-popup {
+    width: 92vw !important;
+    max-width: 400px !important;
+    padding: 1.25rem !important;
+    border-radius: 1.25rem !important;
+    font-size: 0.875rem !important;
+  }
+}
+
+/* 4. FullCalendar Mobile Toolbar & Grid Overrides */
+@media (max-width: 640px) {
+  .fc .fc-toolbar {
+    flex-direction: column !important;
+    gap: 0.6rem !important;
+    align-items: stretch !important;
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+    text-align: center !important;
+  }
+
+  .fc .fc-button {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.6rem !important;
+  }
+
+  .fc .fc-col-header-cell-cushion {
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0.1rem !important;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.3rem !important;
+  }
+
+  .fc .fc-daygrid-day-events {
+    margin-top: 1px !important;
+  }
+
+  .fc .fc-event {
+    font-size: 0.65rem !important;
+    padding: 1px 3px !important;
+    margin-bottom: 2px !important;
+  }
+}
