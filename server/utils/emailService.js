@@ -64,6 +64,43 @@ async function sendViaResend({ to, subject, html, fromName = 'Project Management
 }
 
 /**
+ * Get configured Nodemailer transporter for Gmail SMTP (strictly forces IPv4)
+ */
+async function getTransporterAsync() {
+  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
+  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"\s]/g, '').trim();
+
+  let smtpHost = 'smtp.gmail.com';
+  try {
+    const ips = await resolve4Async('smtp.gmail.com');
+    if (ips && ips.length > 0) {
+      smtpHost = ips[0];
+    }
+  } catch (e) {
+    // fallback
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: 465,
+    secure: true,
+    auth: {
+      user: emailUser,
+      pass: emailPass,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    tls: {
+      servername: 'smtp.gmail.com',
+      rejectUnauthorized: false
+    }
+  });
+
+  return { transporter, emailUser, emailPass };
+}
+
+/**
  * Universal email sender: tries Resend HTTP API first (port 443), falls back to Gmail SMTP
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
@@ -79,26 +116,31 @@ async function sendMailUniversal({ to, subject, html, fromName = 'Project Manage
   }
 
   // 2. Fallback to Gmail SMTP
-  const { transporter, emailUser, emailPass } = await getTransporterAsync();
-  
-  if (!emailPass) {
-    console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
+  try {
+    const { transporter, emailUser, emailPass } = await getTransporterAsync();
+    
+    if (!emailPass) {
+      console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
+      return false;
+    }
+
+    const mailOptions = {
+      from: `"${fromName}" <${emailUser}>`,
+      to: to,
+      subject: subject,
+      html: html,
+    };
+    if (replyTo) {
+      mailOptions.replyTo = replyTo;
+    }
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[SMTP Sent] Email sent to ${to} (${subject}) - Response: ${info.response || 'OK'}`);
+    return true;
+  } catch (smtpErr) {
+    console.warn(`[SMTP Warning] SMTP delivery failed for ${to}:`, smtpErr.message);
     return false;
   }
-
-  const mailOptions = {
-    from: `"${fromName}" <${emailUser}>`,
-    to: to,
-    subject: subject,
-    html: html,
-  };
-  if (replyTo) {
-    mailOptions.replyTo = replyTo;
-  }
-
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`[SMTP Sent] Email sent to ${to} (${subject}) - Response: ${info.response || 'OK'}`);
-  return true;
 }
 
 /**
