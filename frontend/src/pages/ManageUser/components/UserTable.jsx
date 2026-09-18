@@ -104,13 +104,22 @@ const UserTable = ({
                               : `${API_URL}${user.avatar}`
                           }
                           alt={user.name}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.style.display = 'none';
+                            if (e.target.nextSibling) {
+                              e.target.nextSibling.style.display = 'flex';
+                            }
+                          }}
                           className="w-9 h-9 rounded-full object-cover shrink-0"
                         />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0">
-                          {user.initials}
-                        </div>
-                      )}
+                      ) : null}
+                      <div 
+                        className="w-9 h-9 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0"
+                        style={{ display: user.avatar ? 'none' : 'flex' }}
+                      >
+                        {user.initials}
+                      </div>
                       <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
                         <span className="font-bold text-white whitespace-nowrap">
                           {user.name}
