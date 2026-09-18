@@ -29,38 +29,74 @@ import { promisify } from 'util';
 const dnsResolve4 = promisify(dns.resolve4);
 
 /**
- * Get configured Nodemailer transporter instance
+ * Send email using Resend HTTP API (Bypasses all Cloud SMTP port blocks completely)
  */
-async function getTransporterAsync() {
-  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
-  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"]/g, '').replace(/\s+/g, '').trim();
+async function sendViaResend({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
+  const apiKey = (process.env.RESEND_API_KEY || '').trim();
+  if (!apiKey) return false;
 
-  // Resolve Gmail SMTP to explicit IPv4 IP to completely bypass IPv6 ENETUNREACH on Render
-  let host = 'smtp.gmail.com';
-  try {
-    const ips = await dnsResolve4('smtp.gmail.com');
-    if (ips && ips.length > 0) {
-      host = ips[0]; // e.g. 142.250.xxx.xxx
-    }
-  } catch (err) {
-    console.warn('[DNS Warning] Could not resolve smtp.gmail.com to IPv4 directly, using hostname:', err.message);
+  const resendFrom = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const payload = {
+    from: `${fromName} <${resendFrom}>`,
+    to: Array.isArray(to) ? to : [to],
+    subject: subject,
+    html: html,
+  };
+  if (replyTo) {
+    payload.reply_to = replyTo;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: host,
-    port: 465,
-    secure: true, // SSL port 465 bypasses port 587 blocking on Render
-    auth: { user: emailUser, pass: emailPass },
-    tls: {
-      servername: 'smtp.gmail.com', // Necessary for TLS certificate matching
-      rejectUnauthorized: true,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
+    body: JSON.stringify(payload),
   });
 
-  return { transporter, emailUser, emailPass };
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || JSON.stringify(data));
+  }
+  return true;
+}
+
+/**
+ * Universal email sender: tries Resend HTTP API first, falls back to SMTP if configured
+ */
+async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null, recipientName = '' }) {
+  // 1. Try Resend HTTP API
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await sendViaResend({ to, subject, html, fromName, replyTo });
+      console.log(`[Resend Sent] Email sent successfully to ${to} (${subject})`);
+      return true;
+    } catch (resendErr) {
+      console.error(`[Resend Error] Failed to send via Resend:`, resendErr.message);
+      // Fallback to SMTP below
+    }
+  }
+
+  // 2. Fallback to Gmail SMTP
+  const { transporter, emailUser, emailPass } = await getTransporterAsync();
+  if (!emailPass) {
+    console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
+    return false;
+  }
+
+  const mailOptions = {
+    from: `"${fromName}" <${emailUser}>`,
+    to: to,
+    subject: subject,
+    html: html,
+  };
+  if (replyTo) {
+    mailOptions.replyTo = replyTo;
+  }
+
+  await transporter.sendMail(mailOptions);
+  return true;
 }
 
 /**
@@ -266,11 +302,11 @@ export async function sendWelcomeUserEmail({ recipientEmail, recipientName, temp
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
+    const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
 
-    const mailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
+    await sendMailUniversal({
       to: recipientEmail,
+      fromName: 'Project Management System',
       subject: 'New Account Registration - Project Management',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -295,24 +331,13 @@ export async function sendWelcomeUserEmail({ recipientEmail, recipientName, temp
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">Please keep these credentials secure and confidential.</p>
         </div>
       `
-    };
+    });
 
-    if (emailPass) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Welcome Email Sent] Email sent to: ${recipientEmail}`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email (Welcome User)',
-        details: `Sent welcome account email with temporary password to ${recipientEmail}`
-      });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured in .env. Skipped sending welcome email to ${recipientEmail}.`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email Warning (Welcome User)',
-        details: `Skipped actual SMTP send (missing EMAIL_PASS) welcome email to ${recipientEmail}`
-      });
-    }
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (Welcome User)',
+      details: `Sent welcome account email with temporary password to ${recipientEmail}`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send welcome email to ${recipientEmail}:`, error.message);
     await logEmailActivity({
@@ -330,11 +355,9 @@ export async function sendOtpEmail({ recipientEmail, recipientName, otpCode }) {
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
-
-    const mailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
+    await sendMailUniversal({
       to: recipientEmail,
+      fromName: 'Project Management System',
       subject: 'OTP Verification Code - Project Management',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -358,24 +381,13 @@ export async function sendOtpEmail({ recipientEmail, recipientName, otpCode }) {
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">If you did not request this email, please ignore it.</p>
         </div>
       `
-    };
+    });
 
-    if (emailPass) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[OTP Email Sent] Email sent to: ${recipientEmail}, OTP: ${otpCode}`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email (OTP)',
-        details: `Sent OTP verification code email to ${recipientEmail}`
-      });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured in .env. Skipping real email delivery, showing OTP on console/frontend.`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email Warning (OTP)',
-        details: `Skipped actual SMTP send (missing EMAIL_PASS) for OTP to ${recipientEmail}`
-      });
-    }
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (OTP)',
+      details: `Sent OTP verification code email to ${recipientEmail}`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send OTP email to ${recipientEmail}:`, error.message);
     await logEmailActivity({
@@ -486,14 +498,14 @@ export async function sendTaskOverdueLeaderEmail({
  */
 export async function sendContactFormEmail({ fullName, email, subject, message }) {
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
-
     // 1. Send to System Admin
+    const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
     const safeSenderName = (fullName || 'User').replace(/[^\w\s\u0E00-\u0E7F]/gi, '').trim();
-    const adminMailOptions = {
-      from: `"${safeSenderName}" <${emailUser}>`,
-      replyTo: email,
+
+    await sendMailUniversal({
       to: emailUser,
+      fromName: `${safeSenderName} (Contact Form)`,
+      replyTo: email,
       subject: `[Contact Us] ${subject || 'New Inquiry'} - from ${safeSenderName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -537,56 +549,46 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">Sent on ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })}</p>
         </div>
       `
-    };
+    });
 
     // 2. Auto-reply confirmation to sender
-    const senderConfirmationMailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
-      to: email,
-      subject: `We've received your message: ${subject || 'Inquiry'}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
-          <div style="background: linear-gradient(135deg, #0d9488, #14b8a6); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Thank You for Contacting Us</h2>
-            <p style="color: #ccfbf1; font-size: 13px; margin-top: 6px;">We have received your message</p>
+    try {
+      await sendMailUniversal({
+        to: email,
+        fromName: 'Project Management System',
+        subject: `We've received your message: ${subject || 'Inquiry'}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
+            <div style="background: linear-gradient(135deg, #0d9488, #14b8a6); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
+              <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Thank You for Contacting Us</h2>
+              <p style="color: #ccfbf1; font-size: 13px; margin-top: 6px;">We have received your message</p>
+            </div>
+
+            <p style="color: #334155; font-size: 15px;">Hello <b>${fullName}</b>,</p>
+            <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+              Thank you for reaching out to us. We have successfully received your message and our team will review it and get back to you as soon as possible.
+            </p>
+
+            <div style="background-color: #ffffff; padding: 16px; border-radius: 12px; border-left: 4px solid #14b8a6; margin: 20px 0;">
+              <p style="margin: 4px 0; color: #64748b; font-size: 13px;"><b>Subject:</b> ${subject}</p>
+              <p style="margin: 8px 0 4px 0; color: #64748b; font-size: 13px;"><b>Message:</b></p>
+              <p style="margin: 0; color: #334155; font-size: 13px; background: #f8fafc; padding: 10px; border-radius: 6px; white-space: pre-wrap;">${message}</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+            <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated confirmation message from Project Management System.</p>
           </div>
-
-          <p style="color: #334155; font-size: 15px;">Hello <b>${fullName}</b>,</p>
-          <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            Thank you for reaching out to us. We have successfully received your message and our team will review it and get back to you as soon as possible.
-          </p>
-
-          <div style="background-color: #ffffff; padding: 16px; border-radius: 12px; border-left: 4px solid #14b8a6; margin: 20px 0;">
-            <p style="margin: 4px 0; color: #64748b; font-size: 13px;"><b>Subject:</b> ${subject}</p>
-            <p style="margin: 8px 0 4px 0; color: #64748b; font-size: 13px;"><b>Message:</b></p>
-            <p style="margin: 0; color: #334155; font-size: 13px; background: #f8fafc; padding: 10px; border-radius: 6px; white-space: pre-wrap;">${message}</p>
-          </div>
-
-          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-          <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated confirmation message from Project Management System.</p>
-        </div>
-      `
-    };
-
-    if (emailPass) {
-      await transporter.sendMail(adminMailOptions);
-      console.log(`[Contact Email Sent] Contact message from ${email} sent to admin (${emailUser})`);
-
-      // Send confirmation to sender (catch error safely so it won't break if recipient email is invalid)
-      try {
-        await transporter.sendMail(senderConfirmationMailOptions);
-      } catch (e) {
-        console.warn(`[Auto-reply Warning] Could not send confirmation copy to sender ${email}:`, e.message);
-      }
-
-      await logEmailActivity({
-        recipientEmail: emailUser,
-        action: 'Send Email (Contact Us Form)',
-        details: `Contact message received from ${fullName} (${email}): "${subject}"`
+        `
       });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured. Skipped sending contact email.`);
+    } catch (e) {
+      console.warn(`[Auto-reply Warning] Could not send confirmation copy to sender ${email}:`, e.message);
     }
+
+    await logEmailActivity({
+      recipientEmail: emailUser,
+      action: 'Send Email (Contact Us Form)',
+      details: `Contact message received from ${fullName} (${email}): "${subject}"`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send contact email:`, error.message);
     throw error;
