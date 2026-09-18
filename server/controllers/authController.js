@@ -3,7 +3,6 @@ import { emitNotificationToUser, emitTaskEvent } from '../lib/socket.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import nodemailer from 'nodemailer';
 import { sendProjectCreationEmail, sendTaskCreationEmail, sendWelcomeUserEmail, sendOtpEmail, sendContactFormEmail } from '../utils/emailService.js';
 import { memoryCache } from '../utils/cacheService.js';
 import path from 'path';
