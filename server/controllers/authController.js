@@ -467,12 +467,12 @@ export const createUser = async (req, res) => {
             [fullname, email, hashPassword, formattedPhone, sqlRole, sqlStatus, avatarUrl, parsedLeaderId, parsedStartDate, parsedExpireDate]
         );
 
-        // Send welcome email to new user via emailService
-        await sendWelcomeUserEmail({
+        // Send welcome email to new user via emailService asynchronously (do not block client response)
+        sendWelcomeUserEmail({
             recipientEmail: email,
             recipientName: fullname,
             tempPassword: password
-        });
+        }).catch(e => console.error('[Background Email Error]:', e.message));
 
         const { creatorId } = req.body;
         await logActivity(db, creatorId ? Number(creatorId) : null, 'Create User', `Created user: ${fullname} (${email})`);

@@ -240,8 +240,12 @@ export const useUserManagement = (t, language = "en") => {
     setShowAddModal(true);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleCreateOrUpdateUser = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     setModalError("");
     setModalSuccess("");
 
@@ -267,6 +271,7 @@ export const useUserManagement = (t, language = "en") => {
     }
     data.append("creatorId", currentUser?.id || "");
 
+    setIsSubmitting(true);
     try {
       if (isEditMode) {
         await axios.put(`/auth/users/${selectedUserId}`, data, {
@@ -286,6 +291,8 @@ export const useUserManagement = (t, language = "en") => {
       }, 3500);
     } catch (err) {
       setModalError(err.response?.data?.message || (isEditMode ? t("userUpdateFailed") : t("userAddFailed")));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
