@@ -30,6 +30,47 @@ dns.setDefaultResultOrder?.('ipv4first');
 const resolve4Async = promisify(dns.resolve4);
 
 /**
+ * Send email using Brevo (Sendinblue) HTTP API (HTTPS Port 443 - Free 300 emails/day, no custom domain required)
+ */
+async function sendViaBrevo({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
+  const apiKey = (process.env.BREVO_API_KEY || '').trim();
+  if (!apiKey) return false;
+
+  const senderEmail = (process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'chayanon.sent@gmail.com').trim();
+  const recipients = (Array.isArray(to) ? to : [to]).map((email) => ({ email }));
+
+  const payload = {
+    sender: {
+      name: fromName,
+      email: senderEmail,
+    },
+    to: recipients,
+    subject: subject,
+    htmlContent: html,
+  };
+
+  if (replyTo) {
+    payload.replyTo = { email: replyTo };
+  }
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || JSON.stringify(data));
+  }
+  return true;
+}
+
+/**
  * Send email using Resend HTTP API (Uses HTTPS Port 443 - 100% immune to Cloud SMTP port blocks)
  */
 async function sendViaResend({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
@@ -101,10 +142,21 @@ async function getTransporterAsync() {
 }
 
 /**
- * Universal email sender: tries Resend HTTP API first (port 443), falls back to Gmail SMTP
+ * Universal email sender: tries Brevo -> Resend -> Gmail SMTP
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
-  // 1. Try Resend HTTP API (port 443 - works on all clouds)
+  // 1. Try Brevo HTTP API (Port 443 - Free 300/day to any recipient)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await sendViaBrevo({ to, subject, html, fromName, replyTo });
+      console.log(`[Brevo Sent] Email successfully delivered to ${to} (${subject}) via HTTPS`);
+      return true;
+    } catch (brevoErr) {
+      console.warn(`[Brevo Warning] HTTP API failed:`, brevoErr.message);
+    }
+  }
+
+  // 2. Try Resend HTTP API (Port 443)
   if (process.env.RESEND_API_KEY) {
     try {
       await sendViaResend({ to, subject, html, fromName, replyTo });
@@ -115,12 +167,12 @@ async function sendMailUniversal({ to, subject, html, fromName = 'Project Manage
     }
   }
 
-  // 2. Fallback to Gmail SMTP
+  // 3. Fallback to Gmail SMTP
   try {
     const { transporter, emailUser, emailPass } = await getTransporterAsync();
     
     if (!emailPass) {
-      console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
+      console.warn(`[Email Warning] Neither BREVO_API_KEY, RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
       return false;
     }
 
