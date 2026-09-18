@@ -48,16 +48,16 @@ async function getTransporterAsync() {
 
   const transporter = nodemailer.createTransport({
     host: host,
-    port: 587,
-    secure: false, // true for 465, false for other ports (uses STARTTLS)
+    port: 465,
+    secure: true, // SSL port 465 bypasses port 587 blocking on Render
     auth: { user: emailUser, pass: emailPass },
     tls: {
-      servername: 'smtp.gmail.com', // Necessary for TLS certificate matching when host is an IP
+      servername: 'smtp.gmail.com', // Necessary for TLS certificate matching
       rejectUnauthorized: true,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
   });
 
   return { transporter, emailUser, emailPass };
