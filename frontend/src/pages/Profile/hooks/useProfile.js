@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { getCurrentUser, signIn } from "../../../lib/auth";
 import { useLanguage } from "../../../lib/LanguageContext";
 
@@ -97,17 +98,29 @@ export const useProfile = () => {
   const handleSaveProfile = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!fullname.trim()) {
-      setErrorMsg(t("profileUsernameEmpty"));
+      Swal.fire({
+        icon: "warning",
+        title: language === "th" ? "กรุณากรอกชื่อ-นามสกุล" : "Name Required",
+        text: t("profileUsernameEmpty") || "Please enter your full name",
+      });
       return;
     }
 
     if (newPassword && !currentPassword) {
-      setErrorMsg(t("currentPasswordRequired") || "Please enter your current password");
+      Swal.fire({
+        icon: "warning",
+        title: language === "th" ? "กรุณาระบุรหัสผ่านปัจจุบัน" : "Current Password Required",
+        text: t("currentPasswordRequired") || "Please enter your current password",
+      });
       return;
     }
 
     if (newPassword && newPassword !== confirmPassword) {
-      setErrorMsg(t("passwordsMismatch") || "Passwords do not match");
+      Swal.fire({
+        icon: "warning",
+        title: language === "th" ? "รหัสผ่านไม่ตรงกัน" : "Password Mismatch",
+        text: t("passwordsMismatch") || "Passwords do not match",
+      });
       return;
     }
 
@@ -144,7 +157,12 @@ export const useProfile = () => {
       });
 
       if (response.status === 200) {
-        setSuccessMsg(t("profileUpdateSuccess"));
+        Swal.fire({
+          icon: "success",
+          title: t("profileUpdateSuccess") || (language === "th" ? "อัปเดตโปรไฟล์สำเร็จ!" : "Profile updated successfully!"),
+          timer: 1500,
+          showConfirmButton: false,
+        });
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
@@ -176,7 +194,12 @@ export const useProfile = () => {
       }
     } catch (err) {
       console.error("Error updating profile:", err);
-      setErrorMsg(err.response?.data?.message || t("profileUpdateFailed"));
+      const errMsg = err.response?.data?.message || t("profileUpdateFailed");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: errMsg,
+      });
     } finally {
       setSaving(false);
     }

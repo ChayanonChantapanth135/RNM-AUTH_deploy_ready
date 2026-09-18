@@ -76,24 +76,6 @@ const ProfilePage = () => {
           <p className="text-xs text-slate-400 mt-1">{t("profileSubtitle")}</p>
         </div>
 
-        {/* Feedback Messages */}
-        {successMsg && (
-          <div className="mb-6 w-full py-3.5 px-5 rounded-2xl bg-[#0e3b40] text-emerald-400 text-sm font-semibold flex items-center gap-3 shadow-xl border-0 animate-fade-in-down">
-            <span className="w-4 h-4 rounded bg-emerald-500 text-slate-950 flex items-center justify-center text-[10px] font-black">
-              ✓
-            </span>
-            <span>{successMsg}</span>
-          </div>
-        )}
-        {errorMsg && (
-          <div className="mb-6 w-full py-3.5 px-5 rounded-2xl bg-[#521c22] text-rose-300 text-sm font-semibold flex items-center gap-3 shadow-xl border-0 animate-fade-in-down">
-            <span className="w-4 h-4 rounded bg-rose-500 text-slate-950 flex items-center justify-center text-[10px] font-black">
-              !
-            </span>
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Avatar & Summary */}
           <div className="lg:col-span-1">

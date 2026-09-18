@@ -108,21 +108,6 @@ const ManageProjectPage = () => {
           </div>
         </div>
 
-        {/* Global Toast Alerts */}
-        {successMessage && (
-          <div className="p-4 rounded-2xl bg-emerald-500/15 border-0 text-emerald-300 text-xs font-semibold mb-6 flex items-center gap-2 shadow-lg">
-            <span>✅</span>
-            <span>{successMessage}</span>
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="p-4 rounded-2xl bg-rose-500/15 border-0 text-rose-300 text-xs font-semibold mb-6 flex items-center gap-2 shadow-lg">
-            <span>⚠️</span>
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
         {/* Filter panel */}
         <ProjectFilter
           searchQuery={searchQuery}

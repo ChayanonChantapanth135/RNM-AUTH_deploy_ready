@@ -94,19 +94,6 @@ const ManageUserPage = () => {
           </div>
         </div>
 
-        {/* Sleek Custom Alert Banner */}
-        {userHook.pageSuccessMessage && (
-          <div
-            className="mb-6 w-full py-3.5 px-5 rounded-2xl bg-[#0e3b40] text-emerald-400 text-sm font-semibold flex items-center gap-3 shadow-xl border-0 animate-fade-in-down"
-            style={{ border: "none" }}
-          >
-            <span className="w-4 h-4 rounded bg-emerald-500 text-slate-950 flex items-center justify-center text-[10px] font-black">
-              ✓
-            </span>
-            <span>{userHook.pageSuccessMessage}</span>
-          </div>
-        )}
-
         {/* Top Filters Block */}
         <div className="glass-panel rounded-3xl p-6 mb-8 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

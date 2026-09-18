@@ -121,24 +121,6 @@ const MyTasksPage = () => {
           </button>
         </div>
 
-        {/* Action Banners */}
-        {successMessage && (
-          <div className="mb-6 w-full py-3.5 px-5 rounded-2xl bg-[#0e3b40] text-emerald-400 text-sm font-semibold flex items-center gap-3 shadow-xl">
-            <span className="w-4 h-4 rounded bg-emerald-500 text-slate-950 flex items-center justify-center text-[10px] font-black">
-              ✓
-            </span>
-            <span>{successMessage}</span>
-          </div>
-        )}
-        {errorMessage && (
-          <div className="mb-6 w-full py-3.5 px-5 rounded-2xl bg-rose-950 text-rose-400 text-sm font-semibold flex items-center gap-3 shadow-xl">
-            <span className="w-4 h-4 rounded bg-rose-500 text-slate-950 flex items-center justify-center text-[10px] font-black">
-              ⚠️
-            </span>
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
         {/* Task statistics */}
         <MyTaskStats stats={stats} t={t} language={language} />
 

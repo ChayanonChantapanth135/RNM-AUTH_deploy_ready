@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { getCurrentUser } from "../../../lib/auth";
 import { safeDateString } from "../../../lib/dateUtils";
 import { getSocket } from "../../../lib/socket";
@@ -358,12 +359,21 @@ export const useProjectManagement = (t) => {
         teamLeaderId: "",
       });
 
-      setSuccessMessage(t("projectCreatedSuccess"));
-      setTimeout(() => setSuccessMessage(""), 5000);
+      Swal.fire({
+        icon: "success",
+        title: t("projectCreatedSuccess") || "สร้างโปรเจกต์สำเร็จ!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       fetchProjects();
     } catch (err) {
       console.error("Create project failed", err);
-      setErrorMessage(t("projectCreateFailed"));
+      const msg = err.response?.data?.message || t("projectCreateFailed") || "สร้างโปรเจกต์ไม่สำเร็จ";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+      });
     }
   };
 
@@ -387,14 +397,17 @@ export const useProjectManagement = (t) => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
 
     if (
       !editFormData.name ||
       !editFormData.endDate ||
       !editFormData.teamLeaderId
     ) {
-      setErrorMessage(t("fillRequiredFieldsProject"));
+      Swal.fire({
+        icon: "warning",
+        title: "Warning",
+        text: t("fillRequiredFieldsProject") || "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
+      });
       return;
     }
 
@@ -431,12 +444,21 @@ export const useProjectManagement = (t) => {
       });
 
       setShowEditModal(false);
-      setSuccessMessage(t("projectUpdatedSuccess"));
-      setTimeout(() => setSuccessMessage(""), 5000);
+      Swal.fire({
+        icon: "success",
+        title: t("projectUpdatedSuccess") || "อัปเดตโปรเจกต์สำเร็จ!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       fetchProjects();
     } catch (err) {
       console.error("Edit project failed", err);
-      setErrorMessage(t("projectUpdateFailed"));
+      const msg = err.response?.data?.message || t("projectUpdateFailed") || "อัปเดตโปรเจกต์ไม่สำเร็จ";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+      });
     }
   };
 
@@ -447,7 +469,11 @@ export const useProjectManagement = (t) => {
 
   const handleDeleteConfirm = async () => {
     if (roleSimulation !== "admin") {
-      setErrorMessage(t("noPermissionDeleteProject"));
+      Swal.fire({
+        icon: "error",
+        title: "Permission Denied",
+        text: t("noPermissionDeleteProject") || "ไม่มีสิทธิ์ลบโปรเจกต์",
+      });
       setShowDeleteModal(false);
       return;
     }
@@ -458,22 +484,33 @@ export const useProjectManagement = (t) => {
       });
 
       setShowDeleteModal(false);
-      setSuccessMessage(t("projectDeletedSuccess"));
-      setTimeout(() => setSuccessMessage(""), 5000);
+      Swal.fire({
+        icon: "success",
+        title: t("projectDeletedSuccess") || "ลบโปรเจกต์สำเร็จ!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       fetchProjects();
     } catch (err) {
       console.error("Delete project failed", err);
-      setErrorMessage(t("projectDeleteFailed"));
+      const msg = err.response?.data?.message || t("projectDeleteFailed") || "ลบโปรเจกต์ไม่สำเร็จ";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+      });
     }
   };
 
   const handleAddTaskSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
 
     if (!taskFormData.title) {
-      setErrorMessage("สร้างไม่สำเร็จ: กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน");
+      Swal.fire({
+        icon: "warning",
+        title: "Warning",
+        text: "สร้างไม่สำเร็จ: กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
+      });
       return;
     }
 
@@ -496,8 +533,12 @@ export const useProjectManagement = (t) => {
 
       await axios.post("/auth/tasks", payload);
 
-      setSuccessMessage("Create Success");
-      setTimeout(() => setSuccessMessage(""), 5000);
+      Swal.fire({
+        icon: "success",
+        title: "Create Task Success!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
       // Reset Form
       setTaskFormData({
@@ -514,10 +555,12 @@ export const useProjectManagement = (t) => {
       fetchProjects();
     } catch (err) {
       console.error("Failed to create task:", err);
-      setErrorMessage(
-        err.response?.data?.message || "สร้างไม่สำเร็จ: เกิดข้อผิดพลาดของระบบ",
-      );
-      setTimeout(() => setErrorMessage(""), 5000);
+      const msg = err.response?.data?.message || "สร้างไม่สำเร็จ: เกิดข้อผิดพลาดของระบบ";
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+      });
     }
   };
 

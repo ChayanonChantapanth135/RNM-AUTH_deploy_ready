@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import ExcelJS from "exceljs";
+import Swal from "sweetalert2";
 // นำเข้า API_URL สำหรับใช้ต่อคำนำหน้าของรูปภาพโปรไฟล์ (Avatar) แบบไดนามิก
 import { API_URL } from "../../../config";
 import { formatDate } from "../../../lib/dateUtils";
@@ -277,18 +278,25 @@ export const useUserManagement = (t, language = "en") => {
         await axios.put(`/auth/users/${selectedUserId}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setPageSuccessMessage(t("userUpdatedSuccess") || "บันทึกการแก้ไขเรียบร้อยแล้ว!");
+        Swal.fire({
+          icon: "success",
+          title: t("userUpdatedSuccess") || "บันทึกการแก้ไขเรียบร้อยแล้ว!",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } else {
         await axios.post("/auth/users", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setPageSuccessMessage(t("userCreatedSuccess") || "สร้างบัญชีผู้ใช้ใหม่เรียบร้อยแล้ว!");
+        Swal.fire({
+          icon: "success",
+          title: t("userCreatedSuccess") || "สร้างบัญชีผู้ใช้ใหม่เรียบร้อยแล้ว!",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       }
       setShowAddModal(false);
       fetchUsers();
-      setTimeout(() => {
-        setPageSuccessMessage("");
-      }, 3500);
     } catch (err) {
       setModalError(err.response?.data?.message || (isEditMode ? t("userUpdateFailed") : t("userAddFailed")));
     } finally {
@@ -314,8 +322,18 @@ export const useUserManagement = (t, language = "en") => {
       });
       fetchUsers();
       setShowStatusModal(false);
+      Swal.fire({
+        icon: "success",
+        title: language === "th" ? "เปลี่ยนสถานะผู้ใช้สำเร็จ" : "Status updated successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(t("statusChangeFailed"));
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: t("statusChangeFailed") || "Failed to change status",
+      });
     }
   };
 
@@ -332,10 +350,18 @@ export const useUserManagement = (t, language = "en") => {
       });
       fetchUsers();
       setShowDeleteModal(false);
-      setPageSuccessMessage(t("deleteUserSuccess") || "Delete Success");
-      setTimeout(() => setPageSuccessMessage(""), 4000);
+      Swal.fire({
+        icon: "success",
+        title: t("deleteUserSuccess") || "ลบผู้ใช้สำเร็จ",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      alert(t("deleteFailed") || "การลบข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: t("deleteFailed") || "การลบข้อมูลล้มเหลว กรุณาลองใหม่อีกครั้ง",
+      });
     }
   };
 

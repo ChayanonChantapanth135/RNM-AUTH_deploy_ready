@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { getCurrentUser } from "../../../lib/auth";
 import { useLanguage } from "../../../lib/LanguageContext";
 import { safeDateString } from "../../../lib/dateUtils";
@@ -230,28 +231,44 @@ export const useMyTasks = () => {
         userId: currentUser?.id,
       });
 
-      setSuccessMessage(language === "th" ? "อัปเดตข้อมูลงานสำเร็จ" : "Task updated successfully");
-      setTimeout(() => setSuccessMessage(""), 4000);
+      Swal.fire({
+        icon: "success",
+        title: language === "th" ? "อัปเดตข้อมูลงานสำเร็จ!" : "Task updated successfully!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setShowViewModal(false);
       await loadData();
     } catch (err) {
       console.error("Failed to update task:", err);
-      setErrorMessage(language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
-      setTimeout(() => setErrorMessage(""), 4000);
+      const msg = err.response?.data?.message || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: msg,
+      });
     }
   };
 
   const handleDeleteTask = async (taskId) => {
     try {
       await axios.delete(`/auth/tasks/${taskId}?userId=${currentUser?.id}`);
-      setSuccessMessage(language === "th" ? "ลบงานสำเร็จ" : "Task deleted successfully");
-      setTimeout(() => setSuccessMessage(""), 4000);
+      Swal.fire({
+        icon: "success",
+        title: language === "th" ? "ลบงานสำเร็จ!" : "Task deleted successfully!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setShowViewModal(false);
       await loadData();
     } catch (err) {
       console.error("Failed to delete task:", err);
-      setErrorMessage(language === "th" ? "ไม่สามารถลบงานได้" : "Failed to delete task");
-      setTimeout(() => setErrorMessage(""), 4000);
+      const msg = err.response?.data?.message || (language === "th" ? "ไม่สามารถลบงานได้" : "Failed to delete task");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: msg,
+      });
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { useLanguage } from "../../lib/LanguageContext";
@@ -10,7 +11,7 @@ import ContactForm from "./components/ContactForm";
  * คอมโพเนนต์หน้าติดต่อเรา (ContractPage Component) - Clean Modular Architecture
  */
 const ContractPage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -18,26 +19,31 @@ const ContractPage = () => {
     subject: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
     setIsSubmitting(true);
 
     try {
       await axios.post("/auth/contact", formData);
-      setSubmitted(true);
+      Swal.fire({
+        icon: "success",
+        title: t("sendMessageSuccess") || (language === "th" ? "ส่งข้อความสำเร็จแล้ว!" : "Message sent successfully!"),
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setFormData({ fullName: "", email: "", subject: "", message: "" });
-      setTimeout(() => setSubmitted(false), 7000);
     } catch (error) {
       console.error("Error sending contact message:", error);
       const msg =
         error.response?.data?.message ||
-        "Failed to send message. Please try again.";
-      setErrorMessage(msg);
+        (language === "th" ? "ไม่สามารถส่งข้อความได้ กรุณาลองใหม่อีกครั้ง" : "Failed to send message. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
+        text: msg,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -120,26 +126,6 @@ const ContractPage = () => {
             </p>
           </div>
         </div>
-
-        {/* Success Alert Toast */}
-        {submitted && (
-          <div className="mb-8 w-full py-4 px-6 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-sm font-semibold flex items-center gap-3 shadow-lg animate-fade-in-down border-0">
-            <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-black">
-              ✓
-            </span>
-            <span>{t("sendMessageSuccess")}</span>
-          </div>
-        )}
-
-        {/* Error Alert Toast */}
-        {errorMessage && (
-          <div className="mb-8 w-full py-4 px-6 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 text-sm font-semibold flex items-center gap-3 shadow-lg animate-fade-in-down border-0">
-            <span className="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center text-xs font-black">
-              ✕
-            </span>
-            <span>{errorMessage}</span>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left Column: Contact Cards */}
