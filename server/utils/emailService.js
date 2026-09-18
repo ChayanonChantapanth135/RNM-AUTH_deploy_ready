@@ -30,52 +30,59 @@ dns.setDefaultResultOrder?.('ipv4first');
 const resolve4Async = promisify(dns.resolve4);
 
 /**
- * Get configured Nodemailer transporter for Gmail SMTP (strictly forces IPv4)
+ * Send email using Resend HTTP API (Uses HTTPS Port 443 - 100% immune to Cloud SMTP port blocks)
  */
-async function getTransporterAsync() {
-  const emailUser = (process.env.EMAIL_USER || 'chayanon.sent@gmail.com').replace(/['"]/g, '').trim();
-  // Strip whitespace from app password
-  const emailPass = (process.env.EMAIL_PASS || '').replace(/['"\s]/g, '').trim();
+async function sendViaResend({ to, subject, html, fromName = 'Project Management', replyTo = null }) {
+  const apiKey = (process.env.RESEND_API_KEY || '').trim();
+  if (!apiKey) return false;
 
-  let smtpHost = 'smtp.gmail.com';
-  try {
-    const ips = await resolve4Async('smtp.gmail.com');
-    if (ips && ips.length > 0) {
-      smtpHost = ips[0];
-      console.log(`[SMTP IPv4] Connecting to smtp.gmail.com via IPv4 address: ${smtpHost}`);
-    }
-  } catch (e) {
-    console.warn('[SMTP DNS Warning] Using hostname smtp.gmail.com directly:', e.message);
+  const resendFrom = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const payload = {
+    from: `${fromName} <${resendFrom}>`,
+    to: Array.isArray(to) ? to : [to],
+    subject: subject,
+    html: html,
+  };
+  if (replyTo) {
+    payload.reply_to = replyTo;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: 465,
-    secure: true, // SSL
-    auth: {
-      user: emailUser,
-      pass: emailPass,
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
-    tls: {
-      servername: 'smtp.gmail.com',
-      rejectUnauthorized: false
-    }
+    body: JSON.stringify(payload),
   });
 
-  return { transporter, emailUser, emailPass };
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || JSON.stringify(data));
+  }
+  return true;
 }
 
 /**
- * Universal email sender: sends directly via Gmail SMTP with IPv4 enforcement
+ * Universal email sender: tries Resend HTTP API first (port 443), falls back to Gmail SMTP
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
+  // 1. Try Resend HTTP API (port 443 - works on all clouds)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await sendViaResend({ to, subject, html, fromName, replyTo });
+      console.log(`[Resend Sent] Email successfully delivered to ${to} (${subject}) via HTTPS`);
+      return true;
+    } catch (resendErr) {
+      console.warn(`[Resend Warning] HTTP API failed, falling back to SMTP:`, resendErr.message);
+    }
+  }
+
+  // 2. Fallback to Gmail SMTP
   const { transporter, emailUser, emailPass } = await getTransporterAsync();
   
   if (!emailPass) {
-    console.warn(`[Email Warning] EMAIL_PASS is not configured. Skipped sending email to ${to}.`);
+    console.warn(`[Email Warning] Neither RESEND_API_KEY nor EMAIL_PASS is configured. Skipped sending email to ${to}.`);
     return false;
   }
 
