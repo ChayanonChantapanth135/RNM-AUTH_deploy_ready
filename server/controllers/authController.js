@@ -1338,7 +1338,16 @@ export const deleteProject = async (req, res) => {
     try {
         const db = await connectToDatabase();
         const [projRows] = await db.query('SELECT name FROM projects WHERE id = ? AND deleted_at IS NULL', [id]);
+        if (projRows.length === 0) {
+            return res.status(404).json({ message: 'Project not found or already deleted' });
+        }
         const projName = projRows[0]?.name || id;
+
+        // 1. Soft-delete project
+        await db.query('UPDATE projects SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
+
+        // 2. Soft-delete all tasks associated with this project
+        await db.query('UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE project_id = ?', [id]);
 
         await logActivity(db, userId, 'Delete Project', `Soft deleted project: ${projName}`);
 

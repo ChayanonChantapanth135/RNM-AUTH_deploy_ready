@@ -477,11 +477,15 @@ export const useProjectManagement = (t) => {
   };
 
   const handleDeleteConfirm = async () => {
-    if (roleSimulation !== "admin") {
+    const userRole = (currentUser?.role || roleSimulation || "").toLowerCase().trim().replace(/\s+/g, "_");
+    const isCreator = Number(selectedProject?.created_by) === Number(currentUser?.id) || Number(selectedProject?.projectManagerId) === Number(currentUser?.id);
+    const isAdmin = userRole === "admin";
+
+    if (!isAdmin && !isCreator) {
       Swal.fire({
         icon: "error",
         title: "Permission Denied",
-        text: t("noPermissionDeleteProject") || "ไม่มีสิทธิ์ลบโปรเจกต์",
+        text: t("noPermissionDeleteProject") || "ไม่มีสิทธิ์ลบโปรเจกต์ (เฉพาะ Admin หรือเจ้าของโปรเจกต์เท่านั้น)",
       });
       setShowDeleteModal(false);
       return;
