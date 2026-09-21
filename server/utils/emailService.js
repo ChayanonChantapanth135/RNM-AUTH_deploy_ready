@@ -77,7 +77,7 @@ async function sendViaResend({ to, subject, html, fromName = 'Project Management
   const apiKey = (process.env.RESEND_API_KEY || '').trim();
   if (!apiKey) return false;
 
-  const resendFrom = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  const resendFrom = process.env.RESEND_FROM || 'support@chayanonlab.link';
   const payload = {
     from: `${fromName} <${resendFrom}>`,
     to: Array.isArray(to) ? to : [to],
@@ -288,11 +288,9 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
   if (!recipientEmail) return;
 
   try {
-    const { transporter, emailUser, emailPass } = await getTransporterAsync();
-
-    const mailOptions = {
-      from: `"Project Management System" <${emailUser}>`,
+    await sendMailUniversal({
       to: recipientEmail,
+      fromName: 'Project Management System',
       subject: `[Project Management] New Task Assigned: ${taskTitle} (Project: ${projectName || 'General'})`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
@@ -350,24 +348,13 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
           <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated email notification from Project Management System.</p>
         </div>
       `
-    };
+    });
 
-    if (emailPass) {
-      await transporter.sendMail(mailOptions);
-      console.log(`[Email Sent] Task creation email sent to: ${recipientEmail} for task: "${taskTitle}"`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email (Task Creation)',
-        details: `Sent task assignment email to ${recipientEmail} for task "${taskTitle}"`
-      });
-    } else {
-      console.warn(`[Email Warning] EMAIL_PASS is not configured in .env. Skipped actual SMTP send for task "${taskTitle}" to ${recipientEmail}.`);
-      await logEmailActivity({
-        recipientEmail,
-        action: 'Send Email Warning (Task Creation)',
-        details: `Skipped actual SMTP send (missing EMAIL_PASS) to ${recipientEmail} for task "${taskTitle}"`
-      });
-    }
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (Task Creation)',
+      details: `Sent task assignment email to ${recipientEmail} for task "${taskTitle}"`
+    });
   } catch (error) {
     console.error(`[Email Error] Failed to send task creation email to ${recipientEmail}:`, error.message);
     await logEmailActivity({
@@ -628,9 +615,9 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
       `
     });
 
-    // 2. Auto-reply confirmation to sender (only if not restricted by sandbox)
+    // 2. Auto-reply confirmation to sender
     try {
-      if (email && email.trim().toLowerCase() === emailUser.toLowerCase()) {
+      if (email) {
         await sendMailUniversal({
           to: email,
           fromName: 'Project Management System',
