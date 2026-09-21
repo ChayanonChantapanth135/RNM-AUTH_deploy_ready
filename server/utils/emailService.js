@@ -469,9 +469,10 @@ export async function sendOtpEmail({ recipientEmail, recipientName, otpCode }) {
 }
 
 /**
- * Send overdue task notification email to assignee's Leader
+ * Send overdue task notification email to assignee's Leader (Limited to at most 1 email per task per leader per day)
  */
 export async function sendTaskOverdueLeaderEmail({
+  taskId,
   recipientEmail,
   recipientName,
   assigneeName,
@@ -484,6 +485,25 @@ export async function sendTaskOverdueLeaderEmail({
   if (!recipientEmail) return;
 
   try {
+    const db = await connectToDatabase();
+
+    // Prevent spamming: Check if overdue email for this task has already been sent to this recipient today
+    if (taskId) {
+      const [alreadySent] = await db.query(
+        `SELECT id FROM activity_logs 
+         WHERE action = 'Send Email (Task Overdue to Leader)' 
+           AND details LIKE ? 
+           AND DATE(created_at) = CURDATE()
+         LIMIT 1`,
+        [`%[TaskID: ${taskId}]%${recipientEmail}%`]
+      );
+
+      if (alreadySent && alreadySent.length > 0) {
+        console.log(`[Email Throttled] Overdue email for task "${taskTitle}" (TaskID: ${taskId}) already sent to ${recipientEmail} today. Skipped.`);
+        return;
+      }
+    }
+
     await sendMailUniversal({
       to: recipientEmail,
       fromName: 'Project Management System',
@@ -538,7 +558,7 @@ export async function sendTaskOverdueLeaderEmail({
     await logEmailActivity({
       recipientEmail,
       action: 'Send Email (Task Overdue to Leader)',
-      details: `Sent overdue alert to leader ${recipientEmail} for task "${taskTitle}" (Assignee: ${assigneeName})`
+      details: `Sent overdue alert to leader ${recipientEmail} for task "${taskTitle}" (Assignee: ${assigneeName}) [TaskID: ${taskId || 'N/A'}]`
     });
   } catch (error) {
     console.error(`[Email Error] Failed to send overdue task email to ${recipientEmail}:`, error.message);

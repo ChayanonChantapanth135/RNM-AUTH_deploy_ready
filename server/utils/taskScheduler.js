@@ -140,9 +140,10 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         dueDate: task.due_date,
       });
 
-      // Send Email to the leader (asynchronously)
+      // Send Email to the leader (asynchronously) - Automatically throttled to max 1 email per task per day
       if (leaderEmail) {
         sendTaskOverdueLeaderEmail({
+          taskId: task.task_id,
           recipientEmail: leaderEmail,
           recipientName: leaderName,
           assigneeName: task.assignee_name,
