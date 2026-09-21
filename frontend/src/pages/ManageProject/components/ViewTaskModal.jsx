@@ -425,11 +425,11 @@ const ViewTaskModal = ({
   };
 
   const getStatusBadgeClass = (status) => {
-    const s = String(status).toLowerCase();
-    if (s === "completed") return "bg-success text-white";
-    if (s === "in progress" || s === "in_progress") return "bg-primary text-white";
-    if (s === "reviewing" || s === "review") return "bg-warning text-dark";
-    return "bg-secondary text-white";
+    const s = String(status || "").toLowerCase().trim();
+    if (s === "completed" || s === "เสร็จสมบูรณ์") return "bg-success !text-white";
+    if (s === "in progress" || s === "in_progress" || s === "กำลังทำ") return "bg-primary !text-white";
+    if (s === "reviewing" || s === "review" || s === "รอตรวจสอบ") return "bg-warning !text-white";
+    return "bg-secondary !text-white";
   };
 
   const translateStatus = (status) => {
@@ -861,7 +861,7 @@ const ViewTaskModal = ({
                             {prevStatus ? (
                               <>
                                 {" "}{language === "th" ? "จาก" : "from"}{" "}
-                                <span className={`badge px-2 py-0.5 rounded ${getStatusBadgeClass(prevStatus)}`}>
+                                <span className={`badge px-2 py-0.5 rounded ${getStatusBadgeClass(prevStatus)}`} style={{ color: "#ffffff" }}>
                                   {translateStatus(prevStatus)}
                                 </span>{" "}
                                 <span className="text-muted">{language === "th" ? "เป็น" : "to"}</span>{" "}
@@ -869,7 +869,7 @@ const ViewTaskModal = ({
                             ) : (
                               language === "th" ? " เป็น " : " to "
                             )}
-                            <span className={`badge px-2 py-0.5 rounded ${getStatusBadgeClass(h.status)}`}>
+                            <span className={`badge px-2 py-0.5 rounded ${getStatusBadgeClass(h.status)}`} style={{ color: "#ffffff" }}>
                               {translateStatus(h.status)}
                             </span>
                           </div>
