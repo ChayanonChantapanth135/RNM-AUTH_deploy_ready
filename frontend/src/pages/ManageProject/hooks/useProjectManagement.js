@@ -272,23 +272,32 @@ export const useProjectManagement = (t) => {
     const role = (currentUser?.role || roleSimulation || "").toLowerCase().trim().replace(/\s+/g, "_");
     const userId = Number(currentUser?.id);
 
+    const isLeader =
+      Number(p.teamLeaderId) === userId ||
+      Number(p.team_leader_id) === userId ||
+      (currentUser?.fullname && p.teamLeaderName === currentUser.fullname) ||
+      (Array.isArray(p.teamLeaders) && p.teamLeaders.some((tl) => Number(tl.id) === userId || Number(tl.user_id) === userId));
+
+    const isCreator =
+      Number(p.created_by) === userId ||
+      Number(p.projectManagerId) === userId ||
+      Number(p.manager_id) === userId;
+
+    const hasAssignedTask =
+      p.tasks &&
+      Array.isArray(p.tasks) &&
+      p.tasks.some(
+        (t) => Number(t.assigned_to) === userId || Number(t.assignedTo) === userId
+      );
+
     if (role === "admin") {
       // Admin sees everything
     } else if (role === "manager" || role === "project_manager") {
-      // Project Manager sees projects created by them OR projects where they have assigned task(s)
-      const isCreator = Number(p.created_by) === userId;
-      const hasAssignedTask = p.tasks && Array.isArray(p.tasks) && p.tasks.some(
-        (t) => Number(t.assigned_to) === userId || Number(t.assignedTo) === userId
-      );
-      if (!isCreator && !hasAssignedTask) return false;
+      // Project Manager sees projects created by them, or where they are Team Leader, or where they have assigned task(s)
+      if (!isCreator && !isLeader && !hasAssignedTask) return false;
     } else {
       // Staff roles (storyboard, animation, designer, programmer, team_leader, etc.)
-      // Can only see projects that are relevant to them (they have a task assigned or are assigned to the project)
-      const isLeader = Number(p.teamLeaderId) === userId || Number(p.team_leader_id) === userId;
-      const isCreator = Number(p.created_by) === userId;
-      const hasAssignedTask = p.tasks && Array.isArray(p.tasks) && p.tasks.some(
-        (t) => Number(t.assigned_to) === userId || Number(t.assignedTo) === userId
-      );
+      // Can only see projects that are relevant to them (Team Leader, Creator, or assigned task)
       if (!isLeader && !isCreator && !hasAssignedTask) {
         return false;
       }
