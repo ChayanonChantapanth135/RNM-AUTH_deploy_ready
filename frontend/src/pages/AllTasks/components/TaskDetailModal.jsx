@@ -720,7 +720,7 @@ const TaskDetailModal = ({
                         className="d-flex justify-content-between align-items-center text-xs pb-1 border-bottom last:border-0 last:pb-0"
                       >
                         <a
-                          href={`${axios.defaults.baseURL || "http://127.0.0.1:3000"}${file.filepath}`}
+                          href={file.filepath?.startsWith("http") ? file.filepath : `${axios.defaults.baseURL || "http://127.0.0.1:3000"}${file.filepath}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-truncate fw-bold text-primary"
