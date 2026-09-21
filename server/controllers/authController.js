@@ -1387,6 +1387,56 @@ const parseDueDate = (dateStr) => {
 };
 
 /**
+ * ตรวจสอบและสร้างชื่อ Task ให้ไม่ซ้ำกันในโปรเจกต์เดียวกัน โดยใส่วงเล็บต่อท้าย (1), (2), ... ตามลำดับ
+ */
+async function resolveUniqueTaskTitle(db, projectId, inputTitle, excludeTaskId = null) {
+    const cleanTitle = (inputTitle || '').trim();
+    if (!cleanTitle || !projectId) return cleanTitle;
+
+    // หา base name โดยตัดวงเล็บตัวเลขท้ายชื่อออกถ้ามี เช่น "Free (1)" -> baseName "Free"
+    const baseMatch = cleanTitle.match(/^(.*?)(?:\s*\((\d+)\))?$/);
+    const baseName = baseMatch && baseMatch[1] ? baseMatch[1].trim() : cleanTitle;
+
+    let query = 'SELECT title FROM tasks WHERE project_id = ? AND deleted_at IS NULL';
+    const params = [projectId];
+    if (excludeTaskId) {
+        query += ' AND id != ?';
+        params.push(excludeTaskId);
+    }
+
+    const [rows] = await db.query(query, params);
+    if (!rows || rows.length === 0) return cleanTitle;
+
+    const escapedBase = baseName.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp('^' + escapedBase + '(?:\\s*\\((\\d+)\\))?$', 'i');
+
+    const existingNumbers = [];
+    let exactBaseExists = false;
+
+    for (const r of rows) {
+        const rowTitle = (r.title || '').trim();
+        const match = rowTitle.match(regex);
+        if (match) {
+            if (match[1]) {
+                existingNumbers.push(parseInt(match[1], 10));
+            } else {
+                exactBaseExists = true;
+            }
+        }
+    }
+
+    // หากไม่มีชื่องานที่ซ้ำกับ base name เลย
+    if (!exactBaseExists && existingNumbers.length === 0) {
+        return cleanTitle;
+    }
+
+    // มีชื่องานซ้ำกัน -> หาเลขสูงสุดแล้ว + 1
+    const maxNum = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
+    const nextNum = Math.max(maxNum + 1, 1);
+    return `${baseName} (${nextNum})`;
+}
+
+/**
  * สร้างงานใหม่ในโปรเจกต์ (Task)
  * - บันทึกงานลงฐานข้อมูล
  * - ส่ง In-App Notification ให้ผู้รับผิดชอบงาน, Team Leader, Creator
@@ -1402,9 +1452,11 @@ export const createTask = async (req, res) => {
     const formattedDueDate = parseDueDate(dueDate);
     try {
         const db = await connectToDatabase();
+        const finalTitle = await resolveUniqueTaskTitle(db, projectId, title);
+
         const [result] = await db.query(
             "INSERT INTO tasks (project_id, title, description, task_type, priority, due_date, assigned_to, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')",
-            [projectId, title, description || null, taskType || null, priority || 'Medium', formattedDueDate, assignedTo ? Number(assignedTo) : null]
+            [projectId, finalTitle, description || null, taskType || null, priority || 'Medium', formattedDueDate, assignedTo ? Number(assignedTo) : null]
         );
         const taskId = result.insertId;
 
@@ -1412,13 +1464,13 @@ export const createTask = async (req, res) => {
         emitTaskEvent('task:created', {
             taskId: Number(taskId),
             projectId: Number(projectId),
-            title,
+            title: finalTitle,
             assignedTo: assignedTo ? Number(assignedTo) : null,
             createdBy: createdBy ? Number(createdBy) : null,
         });
 
         // Fast Response to client immediately without blocking UI
-        res.status(201).json({ message: 'Create Success', taskId });
+        res.status(201).json({ message: 'Create Success', taskId, title: finalTitle });
 
         // Run notifications, history, and status checks concurrently in background
         (async () => {
@@ -1429,7 +1481,7 @@ export const createTask = async (req, res) => {
                 // In-app notification specifically for the assigned user
                 if (assignedTo && Number(assignedTo) !== Number(createdBy)) {
                     const assignTitle = 'ได้รับมอบหมายงานใหม่';
-                    const assignMsg = `คุณได้รับมอบหมายงานใหม่: "${title}" ในโปรเจกต์ "${projectName}"`;
+                    const assignMsg = `คุณได้รับมอบหมายงานใหม่: "${finalTitle}" ในโปรเจกต์ "${projectName}"`;
                     const assignLink = '/MyTasks';
                     const [insertRes] = await db.query(
                         "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
@@ -1458,7 +1510,7 @@ export const createTask = async (req, res) => {
 
                 for (const leaderId of leadersToNotify) {
                     const leaderTitle = 'งานใหม่ในโปรเจกต์';
-                    const leaderMsg = `มีงานใหม่ "${title}" ในโปรเจกต์ "${projectName}"`;
+                    const leaderMsg = `มีงานใหม่ "${finalTitle}" ในโปรเจกต์ "${projectName}"`;
                     const leaderLink = `/Projects?projectId=${projectId}`;
                     const [insertRes] = await db.query(
                         "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
@@ -1478,11 +1530,11 @@ export const createTask = async (req, res) => {
 
                 await db.query(
                     "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'create', ?, ?)",
-                    [taskId, `สร้างงาน: "${title}"`, createdBy || null]
+                    [taskId, `สร้างงาน: "${finalTitle}"`, createdBy || null]
                 );
 
                 await checkAndUpdateProjectStatus(db, projectId);
-                await logActivity(db, createdBy || null, 'Create Task Success', `Created task: ${title} under project ID: ${projectId}`);
+                await logActivity(db, createdBy || null, 'Create Task Success', `Created task: ${finalTitle} under project ID: ${projectId}`);
             } catch (bgErr) {
                 console.error('Error in background task creation notifications:', bgErr.message);
             }
@@ -1563,21 +1615,24 @@ export const updateTask = async (req, res) => {
         }
         const oldTask = oldTaskRows[0];
         const oldAssignee = oldTask.assigned_to;
-        const oldTitle = oldTask.title;
-        const oldStatus = oldTask.status;
+        const targetProjectId = projectId ? Number(projectId) : oldTask.project_id;
+        let finalTitle = title || oldTitle;
+        if (title && title.trim() !== oldTitle.trim()) {
+            finalTitle = await resolveUniqueTaskTitle(db, targetProjectId, title, id);
+        }
 
         const formattedDueDate = parseDueDate(dueDate) || (oldTask.due_date ? String(oldTask.due_date).split("T")[0] : null);
 
         await db.query(
             'UPDATE tasks SET title = ?, description = ?, task_type = ?, priority = ?, due_date = ?, assigned_to = ?, project_id = ?, status = ? WHERE id = ?',
             [
-                title,
+                finalTitle,
                 description || null,
                 taskType || null,
                 priority || 'Medium',
                 formattedDueDate,
                 assignedTo ? Number(assignedTo) : null,
-                projectId ? Number(projectId) : null,
+                targetProjectId,
                 status || 'Pending',
                 id
             ]
@@ -1620,13 +1675,13 @@ export const updateTask = async (req, res) => {
             );
         }
 
-        await logActivity(db, userId || null, 'Update Task Details', `Updated task details for "${title}" (ID: ${id})`);
+        await logActivity(db, userId || null, 'Update Task Details', `Updated task details for "${finalTitle}" (ID: ${id})`);
 
         if (assignedTo && Number(assignedTo) !== Number(oldAssignee) && Number(assignedTo) !== Number(userId)) {
             const [projRows] = await db.query('SELECT name FROM projects WHERE id = ?', [projectId || oldTask.project_id]);
             const projectName = projRows[0]?.name || `ID ${projectId || oldTask.project_id}`;
             const notifTitle = 'ได้รับมอบหมายงานใหม่';
-            const notifMessage = `คุณได้รับมอบหมายงานใหม่: "${title}" ในโปรเจกต์ "${projectName}"`;
+            const notifMessage = `คุณได้รับมอบหมายงานใหม่: "${finalTitle}" ในโปรเจกต์ "${projectName}"`;
             const notifLink = '/MyTasks';
             const [insertRes] = await db.query(
                 "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
@@ -1651,7 +1706,7 @@ export const updateTask = async (req, res) => {
             taskId: Number(id),
             projectId: projectId || oldTask.project_id,
             status,
-            title,
+            title: finalTitle,
             description,
             priority,
             dueDate: formattedDueDate,
@@ -1660,7 +1715,7 @@ export const updateTask = async (req, res) => {
             updatedBy: userId,
         });
 
-        res.status(200).json({ message: 'อัปเดตข้อมูลงานสำเร็จ / Task updated successfully' });
+        res.status(200).json({ message: 'อัปเดตข้อมูลงานสำเร็จ / Task updated successfully', title: finalTitle });
     } catch (error) {
         console.error('Error updating task:', error.message);
         res.status(500).json({ message: error.message });
