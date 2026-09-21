@@ -292,7 +292,7 @@ const Header = () => {
                     )}
                     <Dropdown.Item
                       as={Link}
-                      to="/ActivityLogs"
+                      to="/MyActivity"
                       className="rounded-xl px-3 py-2 font-medium transition-colors bg-transparent d-flex align-items-center gap-2"
                       style={{ color: "var(--text-primary)" }}
                     >

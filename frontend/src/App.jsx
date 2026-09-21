@@ -142,6 +142,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/ActivityLogs"
+              element={
+                <ProtectedRoute>
+                  <MyActivity />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
