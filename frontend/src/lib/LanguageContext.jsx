@@ -1003,7 +1003,7 @@ const translations = {
     projectDetailsName: "ชื่อโปรเจกต์",
     projectDetailsDueDate: "กำหนดส่ง",
     projectDetailsLeader: "หัวหน้าทีมผู้รับผิดชอบ",
-    projectDetailsManager: "ผู้จัดการโปรเจกต์",
+    projectDetailsManager: "Project Manager",
     projectDetailsProgress: "ความคืบหน้าโดยรวม",
     projectDetailsTaskList: "รายการงานในโปรเจกต์",
     projectDetailsNoTasks: "ไม่มีงานที่ต้องทำในโปรเจกต์นี้",
@@ -1329,12 +1329,12 @@ const translations = {
     workloadDistributionTypeDesc: "สัดส่วนปริมาณงานของคุณจำแนกตามประเภทของงาน",
     personalReport: "รายงานส่วนตัว",
     teamLeaderReport: "รายงานหัวหน้าทีม",
-    managerReport: "รายงานผู้จัดการโครงการ",
+    managerReport: "รายงาน Project Manager",
     adminReport: "รายงานผู้ดูแลระบบ",
     adminReportTitle: "รายงานภาพรวมผู้ดูแลระบบ",
     adminReportDesc:
       "ข้อมูลสถิติภาพรวมทุกโครงการ งาน และภาระงานของทีมทั้งหมดในระบบ",
-    managerReportTitle: "รายงานผู้จัดการโครงการ",
+    managerReportTitle: "รายงาน Project Manager",
     managerReportDesc:
       "ภาพรวมโครงการที่ดูแล ความคืบหน้า และประสิทธิภาพการส่งมอบงาน",
     teamLeaderReportTitle: "รายงานหัวหน้าทีมและวิเคราะห์โครงการ",
