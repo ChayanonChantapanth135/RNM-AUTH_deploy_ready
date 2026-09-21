@@ -46,10 +46,28 @@ export const formatDate = (dateVal, language = "en") => {
   return `${day}/${month}/${year}`;
 };
 
+export const parseDateTime = (dateVal) => {
+  if (!dateVal || dateVal === "-") return null;
+  if (dateVal instanceof Date) return isNaN(dateVal.getTime()) ? null : dateVal;
+  
+  if (typeof dateVal === "string") {
+    const str = dateVal.trim();
+    // ถ้าเป็นสตริงจากฐานข้อมูล MySQL (YYYY-MM-DD HH:mm:ss หรือ YYYY-MM-DDTHH:mm:ss) ที่ไม่มี timezone suffix
+    if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?(\.\d+)?$/.test(str)) {
+      const iso = str.replace(" ", "T") + "Z";
+      const d = new Date(iso);
+      if (!isNaN(d.getTime())) return d;
+    }
+  }
+
+  const d = new Date(dateVal);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 export const formatDateTime = (dateVal, language = "en") => {
   if (!dateVal || dateVal === "-") return "-";
-  const d = new Date(dateVal);
-  if (isNaN(d.getTime())) return dateVal;
+  const d = parseDateTime(dateVal);
+  if (!d) return dateVal;
   
   const day = String(d.getDate()).padStart(2, "0");
   const month = String(d.getMonth() + 1).padStart(2, "0");

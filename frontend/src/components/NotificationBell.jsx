@@ -4,6 +4,7 @@ import axios from "axios";
 import { API_URL } from "../config";
 import { useLanguage } from "../lib/LanguageContext";
 import { getSocket } from "../lib/socket";
+import { parseDateTime } from "../lib/dateUtils";
 
 /**
  * คอมโพเนนต์การแจ้งเตือนในระบบ (In-App Notification Bell & Panel)
@@ -285,13 +286,14 @@ const NotificationBell = () => {
 
   const formatTimeAgo = (dateString) => {
     if (!dateString) return "";
-    const date = new Date(dateString);
+    const date = parseDateTime(dateString);
+    if (!date) return "";
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
     if (diffInSeconds < 60) return t("justNow") || "เพิ่งเมื่อครู่";
     if (diffInSeconds < 3600)
-      return `${Math.floor(diffInSeconds / 60)} ${t("minutesAgo") || "นาทีที่แล้ว"}`;
+      return `${Math.max(1, Math.floor(diffInSeconds / 60))} ${t("minutesAgo") || "นาทีที่แล้ว"}`;
     if (diffInSeconds < 86400)
       return `${Math.floor(diffInSeconds / 3600)} ${t("hoursAgo") || "ชม.ที่แล้ว"}`;
     if (diffInSeconds < 604800)
