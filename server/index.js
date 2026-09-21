@@ -43,6 +43,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:3000',
+  'https://chayanonlab.link',
+  'https://www.chayanonlab.link',
   ...frontendUrls
 ];
 
@@ -53,6 +55,11 @@ app.use(cors({
 
     // อนุญาตหากอยู่ใน allowedOrigins list
     if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    // อนุญาต custom domain chayanonlab.link และ subdomains (*.chayanonlab.link)
+    if (/^https:\/\/(?:[a-zA-Z0-9-_]+\.)?chayanonlab\.link$/.test(origin)) {
+      return callback(null, true);
+    }
 
     // อนุญาต Vercel preview/production subdomains (*.vercel.app)
     if (/^https:\/\/[a-zA-Z0-9-_]+\.vercel\.app$/.test(origin)) {
