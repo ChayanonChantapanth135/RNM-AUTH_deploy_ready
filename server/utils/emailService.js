@@ -145,25 +145,25 @@ async function getTransporterAsync() {
  * Universal email sender: tries Brevo -> Resend -> Gmail SMTP
  */
 async function sendMailUniversal({ to, subject, html, fromName = 'Project Management System', replyTo = null }) {
-  // 1. Try Brevo HTTP API (Port 443 - Free 300/day to any recipient)
-  if (process.env.BREVO_API_KEY) {
-    try {
-      await sendViaBrevo({ to, subject, html, fromName, replyTo });
-      console.log(`[Brevo Sent] Email successfully delivered to ${to} (${subject}) via HTTPS`);
-      return true;
-    } catch (brevoErr) {
-      console.warn(`[Brevo Warning] HTTP API failed:`, brevoErr.message);
-    }
-  }
-
-  // 2. Try Resend HTTP API (Port 443)
+  // 1. Try Resend HTTP API (Port 443 - Primary Email Service)
   if (process.env.RESEND_API_KEY) {
     try {
       await sendViaResend({ to, subject, html, fromName, replyTo });
       console.log(`[Resend Sent] Email successfully delivered to ${to} (${subject}) via HTTPS`);
       return true;
     } catch (resendErr) {
-      console.warn(`[Resend Warning] HTTP API failed, falling back to SMTP:`, resendErr.message);
+      console.warn(`[Resend Warning] HTTP API failed:`, resendErr.message);
+    }
+  }
+
+  // 2. Try Brevo HTTP API (Port 443 - Backup)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await sendViaBrevo({ to, subject, html, fromName, replyTo });
+      console.log(`[Brevo Sent] Email successfully delivered to ${to} (${subject}) via HTTPS`);
+      return true;
+    } catch (brevoErr) {
+      console.warn(`[Brevo Warning] HTTP API failed, falling back to SMTP:`, brevoErr.message);
     }
   }
 
