@@ -345,7 +345,7 @@ const ViewTaskModal = ({
           background: "#1e293b",
           color: "#ffffff",
           customClass: {
-            popup: "rounded-2xl shadow-2xl border border-slate-700",
+            popup: "rounded-2xl shadow-2xl border-0",
           },
         });
       } else {
@@ -388,7 +388,7 @@ const ViewTaskModal = ({
           background: "#1e293b",
           color: "#ffffff",
           customClass: {
-            popup: "rounded-2xl shadow-2xl border border-slate-700",
+            popup: "rounded-2xl shadow-2xl border-0",
           },
         });
       }
