@@ -6,8 +6,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configure multer storage for avatar uploads
-const storage = multer.diskStorage({
+import { isCloudinaryConfigured, cloudinaryAvatarStorage, cloudinaryTaskFileStorage } from '../lib/cloudinary.js';
+
+// Configure multer storage for avatar uploads (Cloudinary or local disk fallback)
+const diskAvatarStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '../uploads'));
     },
@@ -18,8 +20,8 @@ const storage = multer.diskStorage({
 });
 
 export const upload = multer({
-    storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+    storage: isCloudinaryConfigured() ? cloudinaryAvatarStorage : diskAvatarStorage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
     fileFilter: (req, file, cb) => {
         const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (allowed.includes(file.mimetype)) {
@@ -30,8 +32,8 @@ export const upload = multer({
     }
 });
 
-// Configure multer storage for task attachments
-const taskFileStorage = multer.diskStorage({
+// Configure multer storage for task attachments (Cloudinary or local disk fallback)
+const diskTaskFileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '../uploads'));
     },
@@ -42,8 +44,8 @@ const taskFileStorage = multer.diskStorage({
 });
 
 export const uploadTaskFileMiddleware = multer({
-    storage: taskFileStorage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
+    storage: isCloudinaryConfigured() ? cloudinaryTaskFileStorage : diskTaskFileStorage,
+    limits: { fileSize: 25 * 1024 * 1024 } // 25MB max
 });
 
 // Middleware to verify JWT token

@@ -1,5 +1,6 @@
 import { connectToDatabase } from '../lib/db.js';
 import { emitNotificationToUser, emitTaskEvent } from '../lib/socket.js';
+import { deleteFromCloudinary } from '../lib/cloudinary.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -17,12 +18,32 @@ const __dirname = path.dirname(__filename);
 // ==========================================
 
 /**
- * ลบไฟล์รูปโปรไฟล์ (Avatar) เก่าออกจากโฟลเดอร์ uploads เมื่อมีการอัปโหลดรูปใหม่
+ * Helper ดึง URL ของไฟล์ที่อัปโหลด (รองรับทั้ง Cloudinary URL และ Local Path)
+ */
+function getUploadedFileUrl(file) {
+    if (!file) return null;
+    // ถ้าใช้ Cloudinary: file.path จะเป็น Full HTTPS URL (เช่น https://res.cloudinary.com/...)
+    if (file.path && (file.path.startsWith('http://') || file.path.startsWith('https://'))) {
+        return file.path;
+    }
+    // ถ้าใช้ Local Disk Storage ให้ใช้ path relative /uploads/
+    return `/uploads/${file.filename}`;
+}
+
+/**
+ * ลบไฟล์รูปโปรไฟล์ (Avatar) เก่าออกจาก Cloudinary หรือโฟลเดอร์ uploads เมื่อมีการอัปโหลดรูปใหม่
  * @param {string} avatarPath - พาธหรือ URL ของรูปเดิม
  */
-function deleteOldAvatar(avatarPath) {
+async function deleteOldAvatar(avatarPath) {
     if (!avatarPath) return;
     try {
+        // หากเป็นรูปบน Cloudinary
+        if (avatarPath.includes('cloudinary.com')) {
+            await deleteFromCloudinary(avatarPath);
+            return;
+        }
+
+        // หากเป็นรูป Local file
         let fileName = '';
         if (avatarPath.startsWith('http')) {
             const parts = avatarPath.split('/uploads/');
@@ -37,7 +58,7 @@ function deleteOldAvatar(avatarPath) {
             const filePath = path.join(__dirname, '../uploads', fileName);
             if (fs.existsSync(filePath)) {
                 fs.unlinkSync(filePath);
-                console.log(`[Avatar Cleanup] Deleted old file: ${filePath}`);
+                console.log(`[Avatar Cleanup] Deleted old local file: ${filePath}`);
             }
         }
     } catch (error) {
@@ -458,10 +479,7 @@ export const createUser = async (req, res) => {
         const parsedStartDate = start_date && start_date.trim() !== '' ? start_date.trim() : null;
         const parsedExpireDate = expire_date && expire_date.trim() !== '' ? expire_date.trim() : null;
 
-        let avatarUrl = null;
-        if (req.file) {
-            avatarUrl = `/uploads/${req.file.filename}`;
-        }
+        let avatarUrl = req.file ? getUploadedFileUrl(req.file) : null;
 
         const [result] = await db.query(
             'INSERT INTO users (fullname, email, password, phone, role, status, avatar, leader_id, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -578,12 +596,14 @@ export const updateUser = async (req, res) => {
             params.push(hashPassword);
         }
 
+        let updatedAvatar = undefined;
         if (req.file) {
             const [userRows] = await db.query('SELECT avatar FROM users WHERE id = ?', [id]);
             if (userRows.length > 0 && userRows[0].avatar) {
-                deleteOldAvatar(userRows[0].avatar);
+                await deleteOldAvatar(userRows[0].avatar);
             }
-            const avatarUrl = `/uploads/${req.file.filename}`;
+            const avatarUrl = getUploadedFileUrl(req.file);
+            updatedAvatar = avatarUrl;
             query += ', avatar = ?';
             params.push(avatarUrl);
         }
@@ -606,7 +626,6 @@ export const updateUser = async (req, res) => {
         }
 
         // Broadcast real-time user updated event
-        let updatedAvatar = req.file ? `/uploads/${req.file.filename}` : undefined;
         emitTaskEvent('user:updated', {
             userId: Number(id),
             id: Number(id),
@@ -740,11 +759,10 @@ export const uploadAvatar = async (req, res) => {
         
         const [userRows] = await db.query('SELECT avatar FROM users WHERE id = ?', [id]);
         if (userRows.length > 0 && userRows[0].avatar) {
-            deleteOldAvatar(userRows[0].avatar);
+            await deleteOldAvatar(userRows[0].avatar);
         }
 
-        const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000';
-        const avatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
+        const avatarUrl = getUploadedFileUrl(req.file);
         
         await db.query('UPDATE users SET avatar = ? WHERE id = ?', [avatarUrl, id]);
         res.status(200).json({ message: 'Avatar uploaded successfully', avatarUrl });
@@ -1866,7 +1884,7 @@ export const uploadTaskFile = async (req, res) => {
     try {
         const db = await connectToDatabase();
         const filename = req.file.originalname;
-        const filepath = `/uploads/${req.file.filename}`;
+        const filepath = getUploadedFileUrl(req.file);
         
         const [insertRes] = await db.query(
             "INSERT INTO files (task_id, filename, filepath, uploaded_by) VALUES (?, ?, ?, ?)",
