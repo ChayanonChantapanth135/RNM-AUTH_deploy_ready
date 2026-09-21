@@ -810,7 +810,9 @@ const ViewTaskModal = ({
                   comments.map((c) => (
                     <div key={c.id} className="text-xs pb-2.5 border-bottom last:border-0 last:pb-0">
                       <div className="d-flex justify-content-between align-items-center mb-1">
-                        <span className="fw-bold text-dark">{c.fullname || c.username} ({c.role})</span>
+                        <span className="fw-bold text-dark">
+                          {c.fullname || c.username} ({c.role?.toLowerCase() === "manager" || c.role?.toLowerCase() === "project_manager" ? "Project Manager" : c.role})
+                        </span>
                         <span className="text-muted" style={{ fontSize: "10px" }}>
                           {formatDateTime(c.created_at, language)}
                         </span>

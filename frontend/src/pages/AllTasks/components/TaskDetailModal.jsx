@@ -778,7 +778,7 @@ const TaskDetailModal = ({
                     >
                       <div className="d-flex justify-content-between align-items-center mb-1">
                         <span className="fw-bold text-dark">
-                          {c.fullname || c.username} ({c.role})
+                          {c.fullname || c.username} ({c.role?.toLowerCase() === "manager" || c.role?.toLowerCase() === "project_manager" ? "Project Manager" : c.role})
                         </span>
                         <span
                           className="text-muted"
