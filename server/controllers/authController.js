@@ -1408,69 +1408,7 @@ export const createTask = async (req, res) => {
         );
         const taskId = result.insertId;
 
-        const [projRows] = await db.query('SELECT name FROM projects WHERE id = ?', [projectId]);
-        const projectName = projRows[0]?.name || `ID ${projectId}`;
-
-        // In-app notification specifically for the assigned user
-        if (assignedTo && Number(assignedTo) !== Number(createdBy)) {
-            const assignTitle = 'ได้รับมอบหมายงานใหม่';
-            const assignMsg = `คุณได้รับมอบหมายงานใหม่: "${title}" ในโปรเจกต์ "${projectName}"`;
-            const assignLink = '/MyTasks';
-            const [insertRes] = await db.query(
-                "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
-                [Number(assignedTo), taskId, assignTitle, assignMsg, 'task', assignLink]
-            );
-            emitNotificationToUser(Number(assignedTo), {
-                id: insertRes.insertId,
-                user_id: Number(assignedTo),
-                task_id: taskId,
-                project_id: projectId,
-                title: assignTitle,
-                message: assignMsg,
-                type: 'task',
-                link: assignLink,
-            });
-        }
-
-        // Notify Project Creator & Team Leaders about the new task (excluding the person who created it and the assignee who got dedicated notification)
-        const [tlRows] = await db.query('SELECT user_id FROM project_team_leaders WHERE project_id = ?', [projectId]);
-        const leadersToNotify = new Set();
-        if (projRows[0]?.created_by) leadersToNotify.add(Number(projRows[0].created_by));
-        tlRows.forEach(r => leadersToNotify.add(Number(r.user_id)));
-
-        if (createdBy) leadersToNotify.delete(Number(createdBy));
-        if (assignedTo) leadersToNotify.delete(Number(assignedTo));
-
-        for (const leaderId of leadersToNotify) {
-            const leaderTitle = 'งานใหม่ในโปรเจกต์';
-            const leaderMsg = `มีงานใหม่ "${title}" ในโปรเจกต์ "${projectName}"`;
-            const leaderLink = `/Projects?projectId=${projectId}`;
-            const [insertRes] = await db.query(
-                "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
-                [leaderId, taskId, leaderTitle, leaderMsg, 'project', leaderLink]
-            );
-            emitNotificationToUser(leaderId, {
-                id: insertRes.insertId,
-                user_id: leaderId,
-                task_id: taskId,
-                project_id: projectId,
-                title: leaderTitle,
-                message: leaderMsg,
-                type: 'project',
-                link: leaderLink,
-            });
-        }
-
-        await db.query(
-            "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'create', ?, ?)",
-            [taskId, `สร้างงาน: "${title}"`, createdBy || null]
-        );
-
-        await checkAndUpdateProjectStatus(db, projectId);
-
-        // Task email is disabled to conserve email quota - Assignees receive in-app notification & socket broadcast instead
-
-        // Real-time broadcast task creation to all connected clients
+        // Instant Real-time broadcast task creation to all connected clients immediately
         emitTaskEvent('task:created', {
             taskId: Number(taskId),
             projectId: Number(projectId),
@@ -1479,11 +1417,81 @@ export const createTask = async (req, res) => {
             createdBy: createdBy ? Number(createdBy) : null,
         });
 
-        await logActivity(db, createdBy || null, 'Create Task Success', `Created task: ${title} under project ID: ${projectId}`);
+        // Fast Response to client immediately without blocking UI
         res.status(201).json({ message: 'Create Success', taskId });
+
+        // Run notifications, history, and status checks concurrently in background
+        (async () => {
+            try {
+                const [projRows] = await db.query('SELECT name, created_by FROM projects WHERE id = ?', [projectId]);
+                const projectName = projRows[0]?.name || `ID ${projectId}`;
+
+                // In-app notification specifically for the assigned user
+                if (assignedTo && Number(assignedTo) !== Number(createdBy)) {
+                    const assignTitle = 'ได้รับมอบหมายงานใหม่';
+                    const assignMsg = `คุณได้รับมอบหมายงานใหม่: "${title}" ในโปรเจกต์ "${projectName}"`;
+                    const assignLink = '/MyTasks';
+                    const [insertRes] = await db.query(
+                        "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
+                        [Number(assignedTo), taskId, assignTitle, assignMsg, 'task', assignLink]
+                    );
+                    emitNotificationToUser(Number(assignedTo), {
+                        id: insertRes.insertId,
+                        user_id: Number(assignedTo),
+                        task_id: taskId,
+                        project_id: projectId,
+                        title: assignTitle,
+                        message: assignMsg,
+                        type: 'task',
+                        link: assignLink,
+                    });
+                }
+
+                // Notify Project Creator & Team Leaders about the new task
+                const [tlRows] = await db.query('SELECT user_id FROM project_team_leaders WHERE project_id = ?', [projectId]);
+                const leadersToNotify = new Set();
+                if (projRows[0]?.created_by) leadersToNotify.add(Number(projRows[0].created_by));
+                tlRows.forEach(r => leadersToNotify.add(Number(r.user_id)));
+
+                if (createdBy) leadersToNotify.delete(Number(createdBy));
+                if (assignedTo) leadersToNotify.delete(Number(assignedTo));
+
+                for (const leaderId of leadersToNotify) {
+                    const leaderTitle = 'งานใหม่ในโปรเจกต์';
+                    const leaderMsg = `มีงานใหม่ "${title}" ในโปรเจกต์ "${projectName}"`;
+                    const leaderLink = `/Projects?projectId=${projectId}`;
+                    const [insertRes] = await db.query(
+                        "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
+                        [leaderId, taskId, leaderTitle, leaderMsg, 'project', leaderLink]
+                    );
+                    emitNotificationToUser(leaderId, {
+                        id: insertRes.insertId,
+                        user_id: leaderId,
+                        task_id: taskId,
+                        project_id: projectId,
+                        title: leaderTitle,
+                        message: leaderMsg,
+                        type: 'project',
+                        link: leaderLink,
+                    });
+                }
+
+                await db.query(
+                    "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'create', ?, ?)",
+                    [taskId, `สร้างงาน: "${title}"`, createdBy || null]
+                );
+
+                await checkAndUpdateProjectStatus(db, projectId);
+                await logActivity(db, createdBy || null, 'Create Task Success', `Created task: ${title} under project ID: ${projectId}`);
+            } catch (bgErr) {
+                console.error('Error in background task creation notifications:', bgErr.message);
+            }
+        })();
     } catch (error) {
         console.error('Error creating task:', error.message);
-        res.status(500).json({ message: 'สร้างไม่สำเร็จ: เกิดข้อผิดพลาดของระบบ' });
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'สร้างไม่สำเร็จ: เกิดข้อผิดพลาดของระบบ' });
+        }
     }
 };
 
