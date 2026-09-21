@@ -286,6 +286,16 @@ export const useMyTasks = () => {
     return matchesSearch && matchesStatus;
   });
 
+  // Priority weight mapping (High: 3, Medium: 2, Low: 1)
+  const priorityWeight = {
+    High: 3,
+    high: 3,
+    Medium: 2,
+    medium: 2,
+    Low: 1,
+    low: 1,
+  };
+
   const tasksByProject = filteredTasks.reduce((acc, task) => {
     if (!acc[task.project]) {
       acc[task.project] = {
@@ -297,6 +307,38 @@ export const useMyTasks = () => {
     acc[task.project].tasks.push(task);
     return acc;
   }, {});
+
+  // Sort tasks in each project group: Incomplete tasks first, then by Priority High -> Low, then Due Date
+  Object.values(tasksByProject).forEach((group) => {
+    group.tasks.sort((a, b) => {
+      const aCompleted = String(a.status).toLowerCase() === "completed" ? 1 : 0;
+      const bCompleted = String(b.status).toLowerCase() === "completed" ? 1 : 0;
+
+      // 1. Incomplete tasks (0) appear before Completed tasks (1)
+      if (aCompleted !== bCompleted) {
+        return aCompleted - bCompleted;
+      }
+
+      // 2. Sort by Priority (High > Medium > Low)
+      const aPrio = priorityWeight[a.priority] || 0;
+      const bPrio = priorityWeight[b.priority] || 0;
+      if (aPrio !== bPrio) {
+        return bPrio - aPrio; // Higher priority on top
+      }
+
+      // 3. Sort by Due Date (earliest first, tasks without due date last)
+      if (a.dueDate && b.dueDate) {
+        if (a.dueDate !== b.dueDate) return a.dueDate.localeCompare(b.dueDate);
+      } else if (a.dueDate && !b.dueDate) {
+        return -1;
+      } else if (!a.dueDate && b.dueDate) {
+        return 1;
+      }
+
+      // 4. Stable tie-breaker by ID desc
+      return (b.id || 0) - (a.id || 0);
+    });
+  });
 
   const projectGroups = Object.values(tasksByProject);
 
