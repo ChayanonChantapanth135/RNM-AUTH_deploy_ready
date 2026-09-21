@@ -4,7 +4,7 @@ import { deleteFromCloudinary } from '../lib/cloudinary.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { sendProjectCreationEmail, sendTaskCreationEmail, sendWelcomeUserEmail, sendOtpEmail, sendContactFormEmail } from '../utils/emailService.js';
+import { sendProjectCreationEmail, sendWelcomeUserEmail, sendOtpEmail, sendContactFormEmail } from '../utils/emailService.js';
 import { memoryCache } from '../utils/cacheService.js';
 import path from 'path';
 import fs from 'fs';
@@ -1459,42 +1459,7 @@ export const createTask = async (req, res) => {
 
         await checkAndUpdateProjectStatus(db, projectId);
 
-        // Send email notifications asynchronously to task assignee
-        (async () => {
-            try {
-                const recipients = new Map();
-
-                if (assignedTo) {
-                    const [assigneeRows] = await db.query("SELECT id, fullname, email FROM users WHERE id = ? AND deleted_at IS NULL", [assignedTo]);
-                    if (assigneeRows.length > 0 && assigneeRows[0].email) {
-                        recipients.set(Number(assigneeRows[0].id), {
-                            email: assigneeRows[0].email,
-                            fullname: assigneeRows[0].fullname,
-                            roleLabel: 'Task Assignee'
-                        });
-                    }
-                }
-
-                const [creatorRows] = createdBy ? await db.query("SELECT fullname FROM users WHERE id = ?", [createdBy]) : [[]];
-
-                for (const [, info] of recipients) {
-                    await sendTaskCreationEmail({
-                        recipientEmail: info.email,
-                        recipientName: info.fullname,
-                        taskTitle: title,
-                        projectName: projectName,
-                        priority: priority || 'Medium',
-                        taskType: taskType || null,
-                        dueDate: formattedDueDate,
-                        description: description || null,
-                        creatorName: creatorRows[0]?.fullname || null,
-                        roleLabel: info.roleLabel
-                    });
-                }
-            } catch (emailErr) {
-                console.error("[Task Email Error]", emailErr.message);
-            }
-        })();
+        // Task email is disabled to conserve email quota - Assignees receive in-app notification & socket broadcast instead
 
         // Real-time broadcast task creation to all connected clients
         emitTaskEvent('task:created', {
