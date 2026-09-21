@@ -679,6 +679,16 @@ footer a:hover {
   cursor: pointer;
 }
 
+.swal2-toast {
+  border: none !important;
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4), 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.swal2-popup.swal2-toast {
+  border: none !important;
+  outline: none !important;
+}
+
 .light .swal2-popup {
   background-color: #FFFFFF !important;
   color: #0F172A !important;
