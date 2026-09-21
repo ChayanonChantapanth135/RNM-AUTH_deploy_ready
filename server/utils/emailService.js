@@ -585,40 +585,7 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
       `
     });
 
-    // 2. Auto-reply confirmation to sender
-    try {
-      if (email) {
-        await sendMailUniversal({
-          to: email,
-          fromName: 'Project Management System',
-          subject: `We've received your message: ${subject || 'Inquiry'}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
-              <div style="background: linear-gradient(135deg, #0d9488, #14b8a6); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Thank You for Contacting Us</h2>
-                <p style="color: #ccfbf1; font-size: 13px; margin-top: 6px;">We have received your message</p>
-              </div>
-
-              <p style="color: #334155; font-size: 15px;">Hello <b>${fullName}</b>,</p>
-              <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-                Thank you for reaching out to us. We have successfully received your message and our team will review it and get back to you as soon as possible.
-              </p>
-
-              <div style="background-color: #ffffff; padding: 16px; border-radius: 12px; border-left: 4px solid #14b8a6; margin: 20px 0;">
-                <p style="margin: 4px 0; color: #64748b; font-size: 13px;"><b>Subject:</b> ${subject}</p>
-                <p style="margin: 8px 0 4px 0; color: #64748b; font-size: 13px;"><b>Message:</b></p>
-                <p style="margin: 0; color: #334155; font-size: 13px; background: #f8fafc; padding: 10px; border-radius: 6px; white-space: pre-wrap;">${message}</p>
-              </div>
-
-              <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-              <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated confirmation message from Project Management System.</p>
-            </div>
-          `
-        });
-      }
-    } catch (e) {
-      // Ignore sandbox auto-reply copy warning
-    }
+    // Auto-reply to sender is disabled to conserve Resend email quota and prevent spam bots
   } catch (error) {
     console.error(`[Email Error] Failed to send contact email:`, error.message);
   }
