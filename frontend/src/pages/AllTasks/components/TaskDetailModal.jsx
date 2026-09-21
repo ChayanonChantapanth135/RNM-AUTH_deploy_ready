@@ -881,14 +881,18 @@ const TaskDetailModal = ({
             <button
               type="button"
               className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-full text-xs font-bold whitespace-nowrap border border-red-500/30 transition-all shadow-sm d-inline-flex align-items-center gap-1"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    language === "th" 
-                      ? "คุณต้องการลบงานนี้จริงหรือไม่?" 
-                      : "Are you sure you want to delete this task?",
-                  )
-                ) {
+              onClick={async () => {
+                const result = await Swal.fire({
+                  title: language === "th" ? "ยืนยันการลบงาน?" : "Delete Task?",
+                  text: language === "th" ? "คุณต้องการลบงานนี้จริงหรือไม่?" : "Are you sure you want to delete this task?",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#ef4444",
+                  cancelButtonColor: "#64748b",
+                  confirmButtonText: language === "th" ? "ลบงาน" : "Delete",
+                  cancelButtonText: language === "th" ? "ยกเลิก" : "Cancel",
+                });
+                if (result.isConfirmed) {
                   handleDeleteTask(selectedTask.id);
                 }
               }}
