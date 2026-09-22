@@ -991,10 +991,10 @@ export default function TeamLeaderReportView({ data }) {
                         {tItem.title || tItem.name || "-"}
                       </h4>
                       <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
-                        <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-indigo-300 font-medium truncate">
+                        <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-white font-bold truncate">
                           📁 {tItem.projectName || "-"}
                         </span>
-                        <span className="text-slate-400 text-xs">
+                        <span className="text-slate-300 text-xs">
                           👤 {tItem.assigned_to_name || tItem.assigneeName || "-"}
                         </span>
                       </div>
