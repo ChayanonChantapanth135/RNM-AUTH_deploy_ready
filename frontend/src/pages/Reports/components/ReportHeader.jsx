@@ -208,7 +208,6 @@ export default function ReportHeader({
                   setReportViewMode && setReportViewMode("manager")
                 }
               >
-                <span className="text-base">💼</span>{" "}
                 <span>{t("managerReport") || "รายงาน Project Manager"}</span>
               </button>
             )}
