@@ -172,11 +172,11 @@ const Header = () => {
           )}
 
           {/* Right Section */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4 flex-shrink-0">
             {isLoggedIn && <NotificationBell />}
             <LanguageSwitcher variant="dark" />
 
-            <div>
+            <div className="flex-shrink-0">
               {loading ? (
                 <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
               ) : isLoggedIn ? (
@@ -345,10 +345,10 @@ const Header = () => {
                   </Dropdown.Menu>
                 </Dropdown>
               ) : (
-                <Link to="/login" className="no-underline">
+                <Link to="/login" className="no-underline flex-shrink-0">
                   <button
                     type="button"
-                    className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm glow-button transition-all"
+                    className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs sm:text-sm glow-button transition-all whitespace-nowrap cursor-pointer"
                   >
                     {t("login")}
                   </button>
