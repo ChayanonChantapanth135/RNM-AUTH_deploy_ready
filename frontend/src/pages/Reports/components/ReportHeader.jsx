@@ -163,11 +163,55 @@ export default function ReportHeader({
         </div>
       </div>
 
-      {/* View Switcher Segmented Control below the card with full width */}
+      {/* View Switcher: Dropdown on Mobile (<sm) and Segmented Control on Desktop (sm+) */}
       {canToggleView && availableViews && availableViews.length > 1 && (
         <div className="w-full mt-4">
+          {/* Mobile Dropdown View */}
+          <div className="sm:hidden relative w-full">
+            <select
+              value={reportViewMode}
+              onChange={(e) => setReportViewMode && setReportViewMode(e.target.value)}
+              className="w-full px-4 py-3 rounded-2xl text-xs font-bold appearance-none cursor-pointer shadow-md focus:outline-none transition-all"
+              style={{
+                background: "var(--bg-surface)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border-surface)",
+              }}
+            >
+              {availableViews.includes("admin") && (
+                <option value="admin" className="bg-slate-900 text-white py-2">
+                  {t("adminReport") || "Admin Report"}
+                </option>
+              )}
+              {availableViews.includes("manager") && (
+                <option value="manager" className="bg-slate-900 text-white py-2">
+                  {t("managerReport") || "Project Manager Report"}
+                </option>
+              )}
+              {availableViews.includes("team_leader") && (
+                <option value="team_leader" className="bg-slate-900 text-white py-2">
+                  {t("teamLeaderReport") || "Team Leader Report"}
+                </option>
+              )}
+              {availableViews.includes("user") && (
+                <option value="user" className="bg-slate-900 text-white py-2">
+                  {t("personalReport") || "Personal Report"}
+                </option>
+              )}
+            </select>
+            <div
+              className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Desktop Segmented Control */}
           <div
-            className="w-full grid grid-cols-2 sm:flex sm:items-center p-1.5 rounded-2xl sm:rounded-full shadow-md gap-1.5 backdrop-blur-md"
+            className="hidden sm:flex sm:items-center p-1.5 rounded-full shadow-md gap-1.5 backdrop-blur-md"
             style={{
               background: "var(--bg-surface)",
               border: "1px solid var(--border-surface)",
@@ -175,7 +219,7 @@ export default function ReportHeader({
           >
             {availableViews.includes("admin") && (
               <button
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   reportViewMode === "admin"
                     ? "shadow-md scale-[1.01]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
@@ -187,14 +231,13 @@ export default function ReportHeader({
                 }
                 onClick={() => setReportViewMode && setReportViewMode("admin")}
               >
-                <span className="text-base"></span>{" "}
-                <span>{t("adminReport") || "รายงานผู้ดูแลระบบ"}</span>
+                <span>{t("adminReport") || "Admin Report"}</span>
               </button>
             )}
 
             {availableViews.includes("manager") && (
               <button
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   reportViewMode === "manager"
                     ? "shadow-md scale-[1.01]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
@@ -208,13 +251,13 @@ export default function ReportHeader({
                   setReportViewMode && setReportViewMode("manager")
                 }
               >
-                <span>{t("managerReport") || "รายงาน Project Manager"}</span>
+                <span>{t("managerReport") || "Project Manager Report"}</span>
               </button>
             )}
 
             {availableViews.includes("team_leader") && (
               <button
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   reportViewMode === "team_leader"
                     ? "shadow-md scale-[1.01]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
@@ -228,14 +271,13 @@ export default function ReportHeader({
                   setReportViewMode && setReportViewMode("team_leader")
                 }
               >
-                <span className="text-base"></span>{" "}
-                <span>{t("teamLeaderReport") || "รายงานหัวหน้าทีม"}</span>
+                <span>{t("teamLeaderReport") || "Team Leader Report"}</span>
               </button>
             )}
 
             {availableViews.includes("user") && (
               <button
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   reportViewMode === "user"
                     ? "shadow-md scale-[1.01]"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
@@ -247,8 +289,7 @@ export default function ReportHeader({
                 }
                 onClick={() => setReportViewMode && setReportViewMode("user")}
               >
-                <span className="text-base"></span>{" "}
-                <span>{t("personalReport") || "รายงานส่วนตัว"}</span>
+                <span>{t("personalReport") || "Personal Report"}</span>
               </button>
             )}
           </div>
