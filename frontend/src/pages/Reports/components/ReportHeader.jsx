@@ -179,22 +179,46 @@ export default function ReportHeader({
               }}
             >
               {availableViews.includes("admin") && (
-                <option value="admin" className="bg-slate-900 text-white py-2">
+                <option
+                  value="admin"
+                  style={{
+                    background: "var(--bg-surface)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   {t("adminReport") || "Admin Report"}
                 </option>
               )}
               {availableViews.includes("manager") && (
-                <option value="manager" className="bg-slate-900 text-white py-2">
+                <option
+                  value="manager"
+                  style={{
+                    background: "var(--bg-surface)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   {t("managerReport") || "Project Manager Report"}
                 </option>
               )}
               {availableViews.includes("team_leader") && (
-                <option value="team_leader" className="bg-slate-900 text-white py-2">
+                <option
+                  value="team_leader"
+                  style={{
+                    background: "var(--bg-surface)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   {t("teamLeaderReport") || "Team Leader Report"}
                 </option>
               )}
               {availableViews.includes("user") && (
-                <option value="user" className="bg-slate-900 text-white py-2">
+                <option
+                  value="user"
+                  style={{
+                    background: "var(--bg-surface)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   {t("personalReport") || "Personal Report"}
                 </option>
               )}

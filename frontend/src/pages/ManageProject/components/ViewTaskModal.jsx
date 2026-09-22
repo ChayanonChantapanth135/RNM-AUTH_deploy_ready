@@ -891,11 +891,11 @@ const ViewTaskModal = ({
         </div>
 
         {/* Modal Footer at the bottom of Modal.Body (spans full width) */}
-        <div className="d-flex justify-content-between align-items-center gap-3 pt-3 border-top mt-4">
+        <div className="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-2.5 pt-3 border-top mt-4">
           {currentUser?.role === "admin" && selectedTask ? (
             <button
               type="button"
-              className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-full text-xs font-bold whitespace-nowrap border border-red-500/30 transition-all shadow-sm d-inline-flex align-items-center gap-1"
+              className="w-full sm:w-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 hover:text-red-300 rounded-full text-xs font-bold whitespace-nowrap border border-red-500/30 transition-all shadow-sm inline-flex items-center justify-center gap-1 cursor-pointer"
               onClick={async () => {
                 const result = await Swal.fire({
                   title: language === "th" ? "ยืนยันการลบงาน?" : "Delete Task?",
@@ -933,22 +933,22 @@ const ViewTaskModal = ({
               <span>{language === "th" ? "ลบงาน" : "Delete Task"}</span>
             </button>
           ) : (
-            <div />
+            <div className="hidden sm:block" />
           )}
 
-          <div className="d-flex gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {isEditing ? (
               <>
                 <button
                   type="button"
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-full text-xs font-semibold whitespace-nowrap border border-red-500/30 transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-full text-xs font-semibold whitespace-nowrap border border-red-500/30 transition-all cursor-pointer text-center"
                   onClick={() => setIsEditing(false)}
                 >
                   {language === "th" ? "ยกเลิก" : "Cancel"}
                 </button>
                 <button
                   type="button"
-                  className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
                   onClick={handleSaveTaskDetails}
                 >
                   {language === "th" ? "บันทึกข้อมูล" : "Save Changes"}
@@ -958,14 +958,14 @@ const ViewTaskModal = ({
               <>
                 <button
                   type="button"
-                  className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-full text-xs font-semibold whitespace-nowrap border border-red-500/30 transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white rounded-full text-xs font-semibold whitespace-nowrap border border-red-500/30 transition-all cursor-pointer text-center"
                   onClick={() => setShowViewTaskModal(false)}
                 >
                   {t("cancelBtn") || "Cancel"}
                 </button>
                 <button
                   type="button"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
                   onClick={handleSaveTaskDetails}
                 >
                   {t("updateStatusBtn") || "Update Status"}

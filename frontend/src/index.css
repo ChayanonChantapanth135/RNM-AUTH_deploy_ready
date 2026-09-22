@@ -489,7 +489,7 @@ footer a:hover {
   color: #FFFFFF !important;
 }
 
-/* Light mode form inputs, selects, and controls */
+/* Light mode form inputs, selects, options, and controls */
 .light input,
 .light select,
 .light textarea,
@@ -498,6 +498,23 @@ footer a:hover {
   background-color: #F1F5F9 !important;
   color: #0F172A !important;
   border: 1px solid #E2E8F0 !important;
+}
+
+/* Dropdown Option Theme Compatibility */
+option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.light option {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+html:not(.light) option,
+:root:not(.light) option {
+  background-color: #1E293B !important;
+  color: #F8F9FA !important;
 }
 
 .light input:focus,
