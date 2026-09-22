@@ -114,18 +114,53 @@ const PersonalTaskCalendar = ({
     window.__draggedCalendarTask = task;
   };
 
-  // Handle Event Drag Stop: detect if dropped down onto the unscheduled dropzone
+  // Handle Event Drag Stop: detect if dropped down onto the unscheduled dropzone (Supports both Mouse & Mobile Touch)
   const handleEventDragStop = (info) => {
     if (info && info.jsEvent) {
-      const clientX = info.jsEvent.clientX;
-      const clientY = info.jsEvent.clientY;
-      const dropTarget = document.elementFromPoint(clientX, clientY);
-      const isOverDropzone = dropTarget?.closest("#unscheduled-tasks-dropzone");
+      let clientX = info.jsEvent.clientX;
+      let clientY = info.jsEvent.clientY;
 
-      if (isOverDropzone && window.__draggedCalendarTask) {
-        const task = window.__draggedCalendarTask;
-        if (task && task.dbId) {
-          onUpdateTaskDate(task.dbId, null);
+      // Extract touch coordinates for mobile screens
+      if (
+        info.jsEvent.changedTouches &&
+        info.jsEvent.changedTouches.length > 0
+      ) {
+        clientX = info.jsEvent.changedTouches[0].clientX;
+        clientY = info.jsEvent.changedTouches[0].clientY;
+      } else if (info.jsEvent.touches && info.jsEvent.touches.length > 0) {
+        clientX = info.jsEvent.touches[0].clientX;
+        clientY = info.jsEvent.touches[0].clientY;
+      }
+
+      if (typeof clientX === "number" && typeof clientY === "number") {
+        const dropzone = document.getElementById("unscheduled-tasks-dropzone");
+        let isOver = false;
+
+        if (dropzone) {
+          const rect = dropzone.getBoundingClientRect();
+          // Check if touch / cursor is within dropzone (with generous 30px touch hit margin)
+          if (
+            clientX >= rect.left - 30 &&
+            clientX <= rect.right + 30 &&
+            clientY >= rect.top - 30 &&
+            clientY <= rect.bottom + 30
+          ) {
+            isOver = true;
+          }
+        }
+
+        if (!isOver) {
+          const dropTarget = document.elementFromPoint(clientX, clientY);
+          if (dropTarget?.closest("#unscheduled-tasks-dropzone")) {
+            isOver = true;
+          }
+        }
+
+        if (isOver && window.__draggedCalendarTask) {
+          const task = window.__draggedCalendarTask;
+          if (task && task.dbId) {
+            onUpdateTaskDate(task.dbId, null);
+          }
         }
       }
     }
@@ -204,6 +239,18 @@ const PersonalTaskCalendar = ({
           </div>
         </div>
       `,
+      footer: task.task_date
+        ? `<div class="w-full text-center"><button id="swal-unschedule-btn" type="button" class="text-xs text-amber-600 hover:text-amber-700 font-semibold underline cursor-pointer bg-transparent border-0 p-1">📌 ${isThai ? "ยกเลิกกำหนดส่ง (ย้ายไปกล่องงานยังไม่ได้กำหนด)" : "Unschedule task (Move to undated box)"}</button></div>`
+        : undefined,
+      didOpen: () => {
+        const unscheduleBtn = document.getElementById("swal-unschedule-btn");
+        if (unscheduleBtn) {
+          unscheduleBtn.addEventListener("click", () => {
+            Swal.close();
+            onUpdateTaskDate(task.dbId, null);
+          });
+        }
+      },
       background: "#ffffff",
       color: "#1f2937",
       returnFocus: false,
