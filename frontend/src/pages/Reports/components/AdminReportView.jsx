@@ -788,8 +788,8 @@ export default function AdminReportView({ data }) {
           </div>
         </div>
 
-        {/* Main Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
@@ -899,6 +899,93 @@ export default function AdminReportView({ data }) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+        <div className="md:hidden flex flex-col gap-3">
+          {currentEntries.map((item) => (
+            <div
+              key={item.id}
+              className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+            >
+              {/* User + Role Header */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  {item.avatar ? (
+                    <img
+                      src={
+                        item.avatar.startsWith("http")
+                          ? item.avatar
+                          : `${API_URL}${item.avatar}`
+                      }
+                      alt={item.fullname}
+                      className="w-9 h-9 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0">
+                      {(item.fullname || "U")[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span className="font-bold text-white text-sm truncate">
+                    {item.fullname}
+                  </span>
+                </div>
+                <span
+                  className={`px-2.5 py-0.5 rounded-md text-[11px] font-semibold shrink-0 ${getRoleBadgeStyle(item.role)}`}
+                >
+                  {formatRole(item.role)}
+                </span>
+              </div>
+
+              {/* Counts: Assigned vs Completed */}
+              <div className="grid grid-cols-2 gap-2 text-center text-xs py-1 px-2 rounded-xl bg-black/20">
+                <div>
+                  <span className="text-slate-400 block text-[10px]">{t("assignedTasksLabel") || "Assigned"}</span>
+                  <span className="font-black text-slate-200 text-sm">{item.assignedCount}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">{t("completedTasksLabel") || "Completed"}</span>
+                  <span className="font-black text-emerald-400 text-sm">{item.completedCount}</span>
+                </div>
+              </div>
+
+              {/* Progress Bar Row */}
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-[11px]">
+                  <span className="text-slate-400 font-semibold">{t("progressRateLabel") || "Progress Rate"}</span>
+                  <span className="font-black text-white">{item.rate}%</span>
+                </div>
+                <div
+                  className="w-full rounded-full h-2 overflow-hidden shadow-inner"
+                  style={{
+                    background: "var(--border-surface)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                  }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${item.rate}%`,
+                      background:
+                        item.rate >= 70
+                          ? "linear-gradient(90deg, #10b981, #34d399)"
+                          : item.rate >= 40
+                            ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                            : item.rate > 0
+                              ? "linear-gradient(90deg, #ef4444, #f87171)"
+                              : "transparent",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {currentEntries.length === 0 && (
+            <div className="text-center text-slate-500 py-8 text-sm">
+              {t("noUsersText") || "ไม่พบข้อมูลผู้ใช้งาน"}
+            </div>
+          )}
         </div>
 
         {/* Pagination Footer */}

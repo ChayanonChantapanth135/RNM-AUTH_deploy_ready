@@ -453,7 +453,7 @@ export default function TeamLeaderReportView({ data }) {
             </p>
           </div>
 
-          <div className="h-56 w-full mt-2 overflow-x-auto overflow-y-hidden custom-scrollbar">
+          <div className="h-56 w-full mt-2">
             {(() => {
               // Group tasks by assignee
               const memberMap = {};
@@ -468,7 +468,10 @@ export default function TeamLeaderReportView({ data }) {
                 }
               });
 
-              const memberData = Object.values(memberMap);
+              const memberData = Object.values(memberMap).map((m) => ({
+                ...m,
+                displayName: m.name.length > 12 ? `${m.name.slice(0, 10)}...` : m.name,
+              }));
 
               if (memberData.length === 0) {
                 return (
@@ -478,17 +481,15 @@ export default function TeamLeaderReportView({ data }) {
                 );
               }
 
-              const dynamicWidth = Math.max(memberData.length * 90, 420);
-
               return (
-                <div style={{ minWidth: `${dynamicWidth}px`, width: "100%", height: "100%" }}>
+                <div className="w-full h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={memberData}
                       margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
-                      <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                      <XAxis dataKey="displayName" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
                       <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
                       <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
                       <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "6px" }} />
@@ -807,8 +808,8 @@ export default function TeamLeaderReportView({ data }) {
           </div>
         </div>
 
-        {/* Table Component */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300 font-bold">
@@ -949,13 +950,72 @@ export default function TeamLeaderReportView({ data }) {
                   <td colSpan="6" className="text-center py-12 text-slate-500">
                     <div className="text-4xl mb-2">📋</div>
                     <p className="text-sm font-semibold">
-                      {t("noActiveTeamTasksText") || "No tasks found"}
+                      {t("noAssignedTasksText") || "No tasks found"}
                     </p>
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+        <div className="md:hidden flex flex-col gap-3">
+          {currentEntries.length > 0 ? (
+            currentEntries.map((tItem) => {
+              const priority = tItem.priority || "Medium";
+              const priorityClass =
+                priority === "High"
+                  ? "bg-rose-500/20 text-rose-300"
+                  : priority === "Medium"
+                    ? "bg-amber-500/20 text-amber-300"
+                    : "bg-blue-500/20 text-blue-300";
+
+              return (
+                <div
+                  key={tItem.id}
+                  className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-base truncate">
+                        {tItem.title || tItem.name || "-"}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
+                        <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-indigo-300 font-medium truncate">
+                          📁 {tItem.projectName || "-"}
+                        </span>
+                        <span className="text-slate-400 text-xs">
+                          👤 {tItem.assigned_to_name || tItem.assigneeName || "-"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="shrink-0">
+                      <StatusPill status={tItem.status} />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${priorityClass}`}
+                    >
+                      {priority}
+                    </span>
+                    <div className="text-[11px] text-slate-400 font-mono shrink-0">
+                      📅 {formatDate(tItem.due_date || tItem.dueDate, language)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-12 text-slate-500">
+              <div className="text-4xl mb-2">📋</div>
+              <p className="text-sm font-semibold">
+                {t("noActiveTeamTasksText") || "No tasks found"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Pagination Footer */}

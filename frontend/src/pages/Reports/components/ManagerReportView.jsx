@@ -418,7 +418,7 @@ export default function ManagerReportView({ data }) {
             </p>
           </div>
 
-          <div className="h-56 w-full mt-2 overflow-x-auto overflow-y-hidden custom-scrollbar">
+          <div className="h-56 w-full mt-2">
             {(() => {
               const projectChartData = managedProjects.map((p) => {
                 const pTasks = p.tasks || [];
@@ -431,7 +431,7 @@ export default function ManagerReportView({ data }) {
                     : p.progress || 0;
 
                 return {
-                  name: p.name?.length > 20 ? `${p.name.slice(0, 18)}...` : p.name,
+                  name: p.name?.length > 14 ? `${p.name.slice(0, 12)}...` : p.name,
                   progress: progress,
                   totalTasks: pTasks.length,
                 };
@@ -445,10 +445,8 @@ export default function ManagerReportView({ data }) {
                 );
               }
 
-              const dynamicWidth = Math.max(projectChartData.length * 90, 420);
-
               return (
-                <div style={{ minWidth: `${dynamicWidth}px`, width: "100%", height: "100%" }}>
+                <div className="w-full h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={projectChartData}
@@ -679,8 +677,8 @@ export default function ManagerReportView({ data }) {
           </div>
         </div>
 
-        {/* Table Component */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300 font-bold">
@@ -807,6 +805,83 @@ export default function ManagerReportView({ data }) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+        <div className="md:hidden flex flex-col gap-3">
+          {currentEntries.length > 0 ? (
+            currentEntries.map((p) => {
+              const pTasks = p.tasks || [];
+              const pCompleted = pTasks.filter(
+                (t) => (t.status || "").toLowerCase() === "completed",
+              ).length;
+              const progress =
+                p.progress !== undefined
+                  ? p.progress
+                  : pTasks.length > 0
+                    ? Math.round((pCompleted / pTasks.length) * 100)
+                    : 0;
+
+              return (
+                <div
+                  key={p.id}
+                  className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-base truncate">
+                        {p.name}
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        👤 {p.teamLeaderName || "-"}
+                      </p>
+                      {pTasks.length > 0 && (
+                        <p className="text-[11px] text-slate-400 mt-0.5">
+                          {pTasks.length} {t("tasks") || "งาน"} ({pCompleted} {t("completed") || "เสร็จสิ้น"})
+                        </p>
+                      )}
+                    </div>
+                    <div className="shrink-0">
+                      <StatusPill status={p.status} />
+                    </div>
+                  </div>
+
+                  {/* Progress Bar Row */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[11px]">
+                      <span className="text-slate-400 font-semibold">{t("colProgress") || "Progress"}</span>
+                      <span className="font-black text-white">{progress}%</span>
+                    </div>
+                    <div
+                      className="w-full rounded-full h-2 overflow-hidden"
+                      style={{ background: "var(--border-surface)" }}
+                    >
+                      <div
+                        className="h-full rounded-full transition-all duration-700"
+                        style={{
+                          width: `${progress}%`,
+                          background: `linear-gradient(90deg, #14b8a6, ${progress > 70 ? "#10b981" : "#6366f1"})`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Due date footer */}
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                    <span>{t("endDateLabel") || "Due Date"}:</span>
+                    <span>📅 {formatDate(p.end_date || p.endDate, language)}</span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-12 text-slate-500">
+              <div className="text-4xl mb-2">📁</div>
+              <p className="text-sm font-semibold">
+                {language === "th" ? "ไม่พบโครงการในหมวดหมู่นี้" : "No projects found"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Pagination Footer */}
