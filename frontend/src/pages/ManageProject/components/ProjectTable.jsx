@@ -27,7 +27,10 @@ const ProjectTable = ({
   const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
   const indexOfLastEntry = safeCurrentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-  const currentEntries = filteredProjects.slice(indexOfFirstEntry, indexOfLastEntry);
+  const currentEntries = filteredProjects.slice(
+    indexOfFirstEntry,
+    indexOfLastEntry,
+  );
 
   const startEntry = totalEntries === 0 ? 0 : indexOfFirstEntry + 1;
   const endEntry = Math.min(indexOfLastEntry, totalEntries);
@@ -52,8 +55,19 @@ const ProjectTable = ({
               <option value={50}>50</option>
             </select>
             <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none text-white">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path>
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M19 9l-7 7-7-7"
+                ></path>
               </svg>
             </div>
           </div>
@@ -66,8 +80,12 @@ const ProjectTable = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300 font-bold">
-              <th className="py-4 px-6">{language === "th" ? "ชื่อโครงการ" : "PROJECT NAME"}</th>
-              <th className="py-4 px-6">{language === "th" ? "หัวหน้าทีม" : "TEAM LEADER"}</th>
+              <th className="py-4 px-6">
+                {language === "th" ? "ชื่อโครงการ" : "PROJECT NAME"}
+              </th>
+              <th className="py-4 px-6">
+                {language === "th" ? "หัวหน้าทีม" : "TEAM LEADER"}
+              </th>
               <th
                 className="py-4 px-6 text-center cursor-pointer select-none"
                 onClick={() => {
@@ -85,9 +103,15 @@ const ProjectTable = ({
                       : "↑"}
                 </span>
               </th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "สถานะ" : "STATUS"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "วันสิ้นสุด" : "DUE DATE"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "จัดการ" : "ACTION"}</th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "สถานะ" : "STATUS"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "วันสิ้นสุด" : "DUE DATE"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "จัดการ" : "ACTION"}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-sm text-slate-200">
@@ -95,18 +119,19 @@ const ProjectTable = ({
               currentEntries.map((project) => {
                 const statusLower = project.status?.toLowerCase() || "";
                 const deadlineStyle = (() => {
-                  if (!project.end_date || statusLower === "completed") return {};
+                  if (!project.end_date || statusLower === "completed")
+                    return {};
                   const now = new Date();
                   const end = new Date(project.end_date);
                   const endDay = new Date(end);
                   endDay.setHours(23, 59, 59, 999);
-                  
+
                   if (now > endDay) {
                     return {
                       backgroundColor: "rgba(244, 63, 94, 0.15)", // light red
                     };
                   }
-                  
+
                   const diffTime = endDay.getTime() - now.getTime();
                   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
                   if (diffTime >= 0 && diffTime <= threeDaysMs) {
@@ -118,26 +143,38 @@ const ProjectTable = ({
                 })();
 
                 return (
-                  <tr key={project.id} className="hover:bg-white/5 transition-colors">
+                  <tr
+                    key={project.id}
+                    className="hover:bg-white/5 transition-colors"
+                  >
                     {/* Project Name */}
-                    <td className="py-4 px-6 font-bold text-white rounded-l-2xl whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 font-bold text-white rounded-l-2xl whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       {project.name}
                     </td>
 
                     {/* Team Leader / Assignee */}
-                    <td className="py-4 px-6 text-slate-300 whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-slate-300 whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       {project.teamLeaderName || "-"}
                     </td>
 
                     {/* Priority Pill */}
-                    <td className="py-4 px-6 text-center whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-center whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       <span
                         className={`inline-block px-3.5 py-1 rounded-full text-xs font-bold ${
                           project.priority === "High"
                             ? "bg-rose-500/20 text-rose-300"
                             : project.priority === "Medium"
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-blue-500/20 text-blue-300"
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-blue-500/20 text-blue-300"
                         }`}
                       >
                         {project.priority || "Medium"}
@@ -145,7 +182,10 @@ const ProjectTable = ({
                     </td>
 
                     {/* Status Pill */}
-                    <td className="py-4 px-6 text-center whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-center whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       {(() => {
                         let badgeClass = "badge-status-todo";
                         let statusText = t("statusPending") || "Pending";
@@ -166,7 +206,9 @@ const ProjectTable = ({
                           statusText = t("statusReview") || "Reviewing";
                         }
                         return (
-                          <span className={`inline-block px-3.5 py-1 rounded-full text-xs font-bold ${badgeClass}`}>
+                          <span
+                            className={`inline-block px-3.5 py-1 rounded-full text-xs font-bold ${badgeClass}`}
+                          >
                             {statusText}
                           </span>
                         );
@@ -174,12 +216,18 @@ const ProjectTable = ({
                     </td>
 
                     {/* Due Date (DD/MM/YYYY) */}
-                    <td className="py-4 px-6 text-center text-slate-400 font-mono whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-center text-slate-400 font-mono whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       {formatDate(project.end_date, language)}
                     </td>
 
                     {/* Action Button: Manage */}
-                    <td className="py-4 px-6 text-center rounded-r-2xl whitespace-nowrap" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-center rounded-r-2xl whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
                       <div className="inline-flex items-center justify-center gap-2">
                         <button
                           className="px-4 py-1.5 text-xs font-bold rounded-2xl transition-all cursor-pointer shadow-sm hover:shadow-md"
@@ -219,7 +267,9 @@ const ProjectTable = ({
               <tr>
                 <td colSpan="6" className="text-center py-12 text-slate-500">
                   <div className="text-4xl mb-2">📂</div>
-                  <p className="text-sm font-semibold">{t("noProjectsFound") || "No projects found"}</p>
+                  <p className="text-sm font-semibold">
+                    {t("noProjectsFound") || "No projects found"}
+                  </p>
                 </td>
               </tr>
             )}
@@ -237,10 +287,16 @@ const ProjectTable = ({
             if (statusLower === "completed") {
               badgeClass = "badge-status-completed";
               statusText = t("statusCompleted") || "Completed";
-            } else if (statusLower === "in_progress" || statusLower === "in progress") {
+            } else if (
+              statusLower === "in_progress" ||
+              statusLower === "in progress"
+            ) {
               badgeClass = "badge-status-in-progress";
               statusText = t("statusInProgress") || "In Progress";
-            } else if (statusLower === "review" || statusLower === "reviewing") {
+            } else if (
+              statusLower === "review" ||
+              statusLower === "reviewing"
+            ) {
               badgeClass = "badge-status-in-review";
               statusText = t("statusReview") || "Reviewing";
             }
@@ -257,7 +313,7 @@ const ProjectTable = ({
                       {project.name}
                     </h4>
                     <p className="text-xs text-slate-400 truncate mt-0.5">
-                      👤 {project.teamLeaderName || "-"}
+                      {project.teamLeaderName || "-"}
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -301,18 +357,20 @@ const ProjectTable = ({
                         project.priority === "High"
                           ? "bg-rose-500/20 text-rose-300"
                           : project.priority === "Medium"
-                          ? "bg-amber-500/20 text-amber-300"
-                          : "bg-blue-500/20 text-blue-300"
+                            ? "bg-amber-500/20 text-amber-300"
+                            : "bg-blue-500/20 text-blue-300"
                       }`}
                     >
                       {project.priority || "Medium"}
                     </span>
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}`}>
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}`}
+                    >
                       {statusText}
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-400 font-mono shrink-0">
-                    📅 {formatDate(project.end_date, language)}
+                    {formatDate(project.end_date, language)}
                   </div>
                 </div>
               </div>
@@ -321,7 +379,9 @@ const ProjectTable = ({
         ) : (
           <div className="text-center py-12 text-slate-500">
             <div className="text-4xl mb-2">📂</div>
-            <p className="text-sm font-semibold">{t("noProjectsFound") || "No projects found"}</p>
+            <p className="text-sm font-semibold">
+              {t("noProjectsFound") || "No projects found"}
+            </p>
           </div>
         )}
       </div>
@@ -330,8 +390,8 @@ const ProjectTable = ({
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-white/5 text-xs text-slate-400">
         <span>
           {t("showingText") || "Showing"} {totalEntries === 0 ? 0 : startEntry}{" "}
-          {t("toText") || "to"} {endEntry} {t("ofText") || "of"}{" "}
-          {totalEntries} {t("entriesText") || "Entries"}
+          {t("toText") || "to"} {endEntry} {t("ofText") || "of"} {totalEntries}{" "}
+          {t("entriesText") || "Entries"}
         </span>
 
         {totalPages > 1 && (

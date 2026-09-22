@@ -31,14 +31,14 @@ const ProjectCard = ({
     const end = new Date(project.end_date);
     const endDay = new Date(end);
     endDay.setHours(23, 59, 59, 999);
-    
+
     if (now > endDay) {
       return {
         background: "rgba(244, 63, 94, 0.15)", // light red
         border: "1.5px solid rgba(244, 63, 94, 0.4)",
       };
     }
-    
+
     const diffTime = endDay.getTime() - now.getTime();
     const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
     if (diffTime >= 0 && diffTime <= threeDaysMs) {
@@ -51,7 +51,7 @@ const ProjectCard = ({
   })();
 
   return (
-    <div 
+    <div
       className="glass-card rounded-3xl p-6 flex flex-col justify-between h-full relative overflow-hidden group"
       style={deadlineStyle}
     >
@@ -60,33 +60,39 @@ const ProjectCard = ({
       <div>
         {/* Status & Priority */}
         <div className="flex justify-between items-center mb-4">
-          <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap inline-block ${badgeClass}`}>
+          <span
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap inline-block ${badgeClass}`}
+          >
             ● {statusText}
           </span>
-          <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
-            project.priority === "High"
-              ? "bg-rose-500/20 text-rose-300"
-              : project.priority === "Medium"
-                ? "bg-amber-500/20 text-amber-300"
-                : "bg-indigo-500/20 text-indigo-300"
-          }`}>
+          <span
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${
+              project.priority === "High"
+                ? "bg-rose-500/20 text-rose-300"
+                : project.priority === "Medium"
+                  ? "bg-amber-500/20 text-amber-300"
+                  : "bg-indigo-500/20 text-indigo-300"
+            }`}
+          >
             {project.priority}
           </span>
         </div>
 
         {/* Project Title */}
-        <h3 className="text-xl font-bold text-white mb-4 tracking-tight">{project.name}</h3>
+        <h3 className="text-xl font-bold text-white mb-4 tracking-tight">
+          {project.name}
+        </h3>
 
         {/* Dates & Team Leader */}
         <div className="space-y-2 mb-6 text-xs text-slate-400">
           <div className="flex items-center gap-2">
-            <span>⏱️ {t("endDateLabel")}:</span>
+            <span> {t("endDateLabel")}:</span>
             <span className="font-semibold text-slate-200">
               {project.end_date ? formatDate(project.end_date, language) : "-"}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span>👤 {t("colTeamLeader")}:</span>
+            <span>{t("colTeamLeader")}:</span>
             <span className="font-semibold text-slate-200">
               {project.teamLeaderName || "-"}
             </span>

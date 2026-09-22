@@ -1066,7 +1066,7 @@ export default function TeamLeaderReportView({ data }) {
                       {priority}
                     </span>
                     <div className="text-[11px] text-slate-400 font-mono shrink-0">
-                      📅 {formatDate(tItem.due_date || tItem.dueDate, language)}
+                      {formatDate(tItem.due_date || tItem.dueDate, language)}
                     </div>
                   </div>
                 </div>

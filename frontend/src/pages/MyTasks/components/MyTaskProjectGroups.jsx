@@ -20,7 +20,7 @@ export default function MyTaskProjectGroups({
   const totalPages = Math.ceil(projectGroups.length / projectsPerPage) || 1;
   const currentProjectGroups = projectGroups.slice(
     (currentPage - 1) * projectsPerPage,
-    currentPage * projectsPerPage
+    currentPage * projectsPerPage,
   );
 
   // Initialize or update open state when projectGroups change
@@ -32,7 +32,7 @@ export default function MyTaskProjectGroups({
           if (next[group.name] === undefined) {
             // Check if all tasks in the project are completed
             const allCompleted = group.tasks.every(
-              (task) => String(task.status).toLowerCase() === "completed"
+              (task) => String(task.status).toLowerCase() === "completed",
             );
             // Default open if active tasks remain, collapse if all done
             next[group.name] = !allCompleted;
@@ -153,8 +153,8 @@ export default function MyTaskProjectGroups({
                     ? "ซ่อนงานทั้งหมด"
                     : "Hide All Tasks"
                   : language === "th"
-                  ? "แสดงงานทั้งหมด"
-                  : "Show All Tasks"}
+                    ? "แสดงงานทั้งหมด"
+                    : "Show All Tasks"}
               </span>
             </button>
           </div>
@@ -166,7 +166,7 @@ export default function MyTaskProjectGroups({
         const isExpanded = expandedGroups[group.name] !== false;
         const totalTasks = group.tasks.length;
         const completedTasks = group.tasks.filter(
-          (t) => String(t.status).toLowerCase() === "completed"
+          (t) => String(t.status).toLowerCase() === "completed",
         ).length;
         const progressRate =
           totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -191,10 +191,12 @@ export default function MyTaskProjectGroups({
               }}
             >
               <div className="flex items-center gap-3">
-                <span className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 shadow-sm"
+                <span
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shrink-0 shadow-sm"
                   style={{
-                    background: "linear-gradient(135deg, rgba(20,184,166,0.15), rgba(99,102,241,0.15))",
-                    border: "1px solid var(--border-surface)"
+                    background:
+                      "linear-gradient(135deg, rgba(20,184,166,0.15), rgba(99,102,241,0.15))",
+                    border: "1px solid var(--border-surface)",
                   }}
                 >
                   📁
@@ -212,7 +214,8 @@ export default function MyTaskProjectGroups({
                     </span>
                     <span className="opacity-30">•</span>
                     <span style={{ color: "var(--text-secondary)" }}>
-                      {completedTasks}/{totalTasks} {t("completed") || "เสร็จสิ้น"} ({progressRate}%)
+                      {completedTasks}/{totalTasks}{" "}
+                      {t("completed") || "เสร็จสิ้น"} ({progressRate}%)
                     </span>
                   </div>
                 </div>
@@ -222,7 +225,10 @@ export default function MyTaskProjectGroups({
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {/* Progress bar mini */}
                 <div className="hidden md:flex items-center gap-2 w-32">
-                  <div className="flex-1 rounded-full h-2 overflow-hidden" style={{ background: "var(--border-surface)" }}>
+                  <div
+                    className="flex-1 rounded-full h-2 overflow-hidden"
+                    style={{ background: "var(--border-surface)" }}
+                  >
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -270,7 +276,10 @@ export default function MyTaskProjectGroups({
                 {/* Desktop Table View */}
                 <div className="hidden md:block overflow-x-auto max-h-[380px] overflow-y-auto pr-1 custom-scrollbar rounded-xl">
                   <table className="w-full text-left border-collapse relative">
-                    <thead className="sticky top-0 z-20" style={{ background: "var(--bg-surface)" }}>
+                    <thead
+                      className="sticky top-0 z-20"
+                      style={{ background: "var(--bg-surface)" }}
+                    >
                       <tr
                         className="text-xs uppercase tracking-wider font-bold shadow-sm"
                         style={{
@@ -293,7 +302,9 @@ export default function MyTaskProjectGroups({
                         <th className="py-3 px-4 text-center">
                           {t("taskDueDateLabel")}
                         </th>
-                        <th className="py-3 px-4 text-center">{t("colManage")}</th>
+                        <th className="py-3 px-4 text-center">
+                          {t("colManage")}
+                        </th>
                       </tr>
                     </thead>
                     <tbody
@@ -337,13 +348,20 @@ export default function MyTaskProjectGroups({
                           if (!type) return "-";
                           if (type === "แปล" || type === "Translate")
                             return t("taskTypeTranslate");
-                          if (type === "สตอรี่บอร์ด" || type === "Storyboard & Script")
+                          if (
+                            type === "สตอรี่บอร์ด" ||
+                            type === "Storyboard & Script"
+                          )
                             return t("taskTypeStoryboard");
                           if (type === "ออกแบบ" || type === "Graphic & Design")
                             return t("taskTypeGraphicDesign");
                           if (type === "อนิเมชัน" || type === "Animation")
                             return t("taskTypeAnimation");
-                          if (type === "ตัดต่อ" || type === "Video Editing" || type === "Video Edit")
+                          if (
+                            type === "ตัดต่อ" ||
+                            type === "Video Editing" ||
+                            type === "Video Edit"
+                          )
                             return t("taskTypeVideoEdit");
                           if (type === "พัฒนาโปรแกรม" || type === "Development")
                             return t("taskTypeDevelopment");
@@ -354,8 +372,10 @@ export default function MyTaskProjectGroups({
 
                         const getTaskRowStyle = (tItem) => {
                           if (tItem.status === "Completed") return {};
-                          const targetDateStr = tItem.rawDueDate || tItem.dueDate;
-                          if (!targetDateStr || targetDateStr === "-") return {};
+                          const targetDateStr =
+                            tItem.rawDueDate || tItem.dueDate;
+                          if (!targetDateStr || targetDateStr === "-")
+                            return {};
 
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
@@ -371,7 +391,7 @@ export default function MyTaskProjectGroups({
                                 taskDueDate = new Date(
                                   y,
                                   parseInt(parts[1], 10) - 1,
-                                  parseInt(parts[0], 10)
+                                  parseInt(parts[0], 10),
                                 );
                               }
                             } else if (dateStr.includes("-")) {
@@ -380,7 +400,7 @@ export default function MyTaskProjectGroups({
                                 taskDueDate = new Date(
                                   parseInt(parts[0], 10),
                                   parseInt(parts[1], 10) - 1,
-                                  parseInt(parts[2], 10)
+                                  parseInt(parts[2], 10),
                                 );
                               }
                             }
@@ -391,18 +411,24 @@ export default function MyTaskProjectGroups({
                             return {};
                           }
 
-                          if (!taskDueDate || isNaN(taskDueDate.getTime())) return {};
+                          if (!taskDueDate || isNaN(taskDueDate.getTime()))
+                            return {};
                           taskDueDate.setHours(0, 0, 0, 0);
 
-                          const diffTime = taskDueDate.getTime() - today.getTime();
+                          const diffTime =
+                            taskDueDate.getTime() - today.getTime();
                           const diffDays = Math.ceil(
-                            diffTime / (1000 * 60 * 60 * 24)
+                            diffTime / (1000 * 60 * 60 * 24),
                           );
 
                           if (diffDays < 0) {
-                            return { backgroundColor: "rgba(225, 29, 72, 0.12)" };
+                            return {
+                              backgroundColor: "rgba(225, 29, 72, 0.12)",
+                            };
                           } else if (diffDays <= 3) {
-                            return { backgroundColor: "rgba(245, 158, 11, 0.15)" };
+                            return {
+                              backgroundColor: "rgba(245, 158, 11, 0.15)",
+                            };
                           }
                           return {};
                         };
@@ -444,7 +470,7 @@ export default function MyTaskProjectGroups({
                               style={{ color: "var(--text-secondary)" }}
                             >
                               {formatDueDateDisplay(
-                                task.rawDueDate || task.dueDate
+                                task.rawDueDate || task.dueDate,
                               )}
                             </td>
                             <td className="py-3.5 px-4 text-center first:rounded-l-xl last:rounded-r-xl">
@@ -506,13 +532,20 @@ export default function MyTaskProjectGroups({
                       if (!type) return "-";
                       if (type === "แปล" || type === "Translate")
                         return t("taskTypeTranslate");
-                      if (type === "สตอรี่บอร์ด" || type === "Storyboard & Script")
+                      if (
+                        type === "สตอรี่บอร์ด" ||
+                        type === "Storyboard & Script"
+                      )
                         return t("taskTypeStoryboard");
                       if (type === "ออกแบบ" || type === "Graphic & Design")
                         return t("taskTypeGraphicDesign");
                       if (type === "อนิเมชัน" || type === "Animation")
                         return t("taskTypeAnimation");
-                      if (type === "ตัดต่อ" || type === "Video Editing" || type === "Video Edit")
+                      if (
+                        type === "ตัดต่อ" ||
+                        type === "Video Editing" ||
+                        type === "Video Edit"
+                      )
                         return t("taskTypeVideoEdit");
                       if (type === "พัฒนาโปรแกรม" || type === "Development")
                         return t("taskTypeDevelopment");
@@ -536,7 +569,10 @@ export default function MyTaskProjectGroups({
                             </h5>
                             <span
                               className="inline-block mt-1 px-2 py-0.5 rounded-md text-[11px] font-bold"
-                              style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}
+                              style={{
+                                background: "rgba(20,184,166,0.12)",
+                                color: "#0d9488",
+                              }}
                             >
                               {formatTaskType(task.taskType)}
                             </span>
@@ -567,8 +603,13 @@ export default function MyTaskProjectGroups({
                               {translateStatus(task.status)}
                             </span>
                           </div>
-                          <div className="text-[11px] font-mono shrink-0" style={{ color: "var(--text-secondary)" }}>
-                            📅 {formatDueDateDisplay(task.rawDueDate || task.dueDate)}
+                          <div
+                            className="text-[11px] font-mono shrink-0"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {formatDueDateDisplay(
+                              task.rawDueDate || task.dueDate,
+                            )}
                           </div>
                         </div>
                       </div>
@@ -606,7 +647,7 @@ export default function MyTaskProjectGroups({
             >
               {t("prevText") || "Previous"}
             </button>
-            
+
             <span
               className="px-3.5 py-1.5 font-bold rounded-xl text-xs shadow-md"
               style={{

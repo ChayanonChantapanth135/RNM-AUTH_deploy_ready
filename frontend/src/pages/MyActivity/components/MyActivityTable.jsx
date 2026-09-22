@@ -51,44 +51,77 @@ const MyActivityTable = ({
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr 
+                <tr
                   className="text-xs uppercase tracking-wider font-semibold"
-                  style={{ 
+                  style={{
                     color: "var(--text-secondary)",
-                    borderBottom: "1px solid var(--border-surface)"
+                    borderBottom: "1px solid var(--border-surface)",
                   }}
                 >
-                  <th className="py-4 px-4 text-left">{t("colAction") || "Action"}</th>
-                  <th className="py-4 px-4 text-left">{t("colDetails") || "Details"}</th>
-                  <th className="py-4 px-4 text-center">{t("colTime") || "Time"}</th>
+                  <th className="py-4 px-4 text-left">
+                    {t("colAction") || "Action"}
+                  </th>
+                  <th className="py-4 px-4 text-left">
+                    {t("colDetails") || "Details"}
+                  </th>
+                  <th className="py-4 px-4 text-center">
+                    {t("colTime") || "Time"}
+                  </th>
                 </tr>
               </thead>
-              <tbody 
+              <tbody
                 className="divide-y text-sm"
                 style={{ borderColor: "var(--border-surface)" }}
               >
                 {currentEntries.length > 0 ? (
                   currentEntries.map((log, index) => {
                     const act = log.action.toLowerCase();
-                    let badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.15)", color: "var(--text-secondary)" };
+                    let badgeStyle = {
+                      backgroundColor: "rgba(100, 116, 139, 0.15)",
+                      color: "var(--text-secondary)",
+                    };
 
                     if (act.includes("create")) {
-                      badgeStyle = { backgroundColor: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
-                    } else if (act.includes("edit") || act.includes("update") || act.includes("reset")) {
-                      badgeStyle = { backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
-                    } else if (act.includes("delete") || act.includes("suspend")) {
-                      badgeStyle = { backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#ef4444" };
+                      badgeStyle = {
+                        backgroundColor: "rgba(16, 185, 129, 0.15)",
+                        color: "#10b981",
+                      };
+                    } else if (
+                      act.includes("edit") ||
+                      act.includes("update") ||
+                      act.includes("reset")
+                    ) {
+                      badgeStyle = {
+                        backgroundColor: "rgba(245, 158, 11, 0.15)",
+                        color: "#f59e0b",
+                      };
+                    } else if (
+                      act.includes("delete") ||
+                      act.includes("suspend")
+                    ) {
+                      badgeStyle = {
+                        backgroundColor: "rgba(239, 68, 68, 0.15)",
+                        color: "#ef4444",
+                      };
                     } else if (act.includes("login")) {
-                      badgeStyle = { backgroundColor: "rgba(99, 102, 241, 0.15)", color: "#6366f1" };
+                      badgeStyle = {
+                        backgroundColor: "rgba(99, 102, 241, 0.15)",
+                        color: "#6366f1",
+                      };
                     } else if (act.includes("logout")) {
-                      badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.2)", color: "#94a3b8" };
+                      badgeStyle = {
+                        backgroundColor: "rgba(100, 116, 139, 0.2)",
+                        color: "#94a3b8",
+                      };
                     }
 
                     return (
                       <tr
                         key={index}
                         className="transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                        style={{ borderBottom: "1px solid var(--border-surface)" }}
+                        style={{
+                          borderBottom: "1px solid var(--border-surface)",
+                        }}
                       >
                         <td className="py-4 px-4 text-left">
                           <span
@@ -98,13 +131,13 @@ const MyActivityTable = ({
                             {t(log.action) || log.action}
                           </span>
                         </td>
-                        <td 
+                        <td
                           className="py-4 px-4 font-medium text-xs text-left"
                           style={{ color: "var(--text-primary)" }}
                         >
                           {log.details}
                         </td>
-                        <td 
+                        <td
                           className="py-4 px-4 text-center text-xs"
                           style={{ color: "var(--text-secondary)" }}
                         >
@@ -115,7 +148,10 @@ const MyActivityTable = ({
                   })
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center py-10 text-slate-400 text-xs font-medium">
+                    <td
+                      colSpan="3"
+                      className="text-center py-10 text-slate-400 text-xs font-medium"
+                    >
                       {t("noActivitiesFound") || "No activity logs found"}
                     </td>
                   </tr>
@@ -129,18 +165,40 @@ const MyActivityTable = ({
             {currentEntries.length > 0 ? (
               currentEntries.map((log, index) => {
                 const act = log.action.toLowerCase();
-                let badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.15)", color: "var(--text-secondary)" };
+                let badgeStyle = {
+                  backgroundColor: "rgba(100, 116, 139, 0.15)",
+                  color: "var(--text-secondary)",
+                };
 
                 if (act.includes("create")) {
-                  badgeStyle = { backgroundColor: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
-                } else if (act.includes("edit") || act.includes("update") || act.includes("reset")) {
-                  badgeStyle = { backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
+                  badgeStyle = {
+                    backgroundColor: "rgba(16, 185, 129, 0.15)",
+                    color: "#10b981",
+                  };
+                } else if (
+                  act.includes("edit") ||
+                  act.includes("update") ||
+                  act.includes("reset")
+                ) {
+                  badgeStyle = {
+                    backgroundColor: "rgba(245, 158, 11, 0.15)",
+                    color: "#f59e0b",
+                  };
                 } else if (act.includes("delete") || act.includes("suspend")) {
-                  badgeStyle = { backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#ef4444" };
+                  badgeStyle = {
+                    backgroundColor: "rgba(239, 68, 68, 0.15)",
+                    color: "#ef4444",
+                  };
                 } else if (act.includes("login")) {
-                  badgeStyle = { backgroundColor: "rgba(99, 102, 241, 0.15)", color: "#6366f1" };
+                  badgeStyle = {
+                    backgroundColor: "rgba(99, 102, 241, 0.15)",
+                    color: "#6366f1",
+                  };
                 } else if (act.includes("logout")) {
-                  badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.2)", color: "#94a3b8" };
+                  badgeStyle = {
+                    backgroundColor: "rgba(100, 116, 139, 0.2)",
+                    color: "#94a3b8",
+                  };
                 }
 
                 return (
@@ -155,11 +213,17 @@ const MyActivityTable = ({
                       >
                         {t(log.action) || log.action}
                       </span>
-                      <span className="text-[11px] font-mono" style={{ color: "var(--text-secondary)" }}>
-                        🕒 {formatDateTime(log.created_at, language)}
+                      <span
+                        className="text-[11px] font-mono"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        {formatDateTime(log.created_at, language)}
                       </span>
                     </div>
-                    <div className="text-xs font-medium mt-1 leading-relaxed" style={{ color: "var(--text-primary)" }}>
+                    <div
+                      className="text-xs font-medium mt-1 leading-relaxed"
+                      style={{ color: "var(--text-primary)" }}
+                    >
                       {log.details}
                     </div>
                   </div>
@@ -176,9 +240,11 @@ const MyActivityTable = ({
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-white/5">
               <span className="text-xs text-slate-400 font-medium">
-                {t("showingText") || "Showing"} {indexOfFirstEntry + 1} {t("toText") || "to"}{" "}
-                {Math.min(indexOfLastEntry, filteredLogs.length)} {t("ofText") || "of"}{" "}
-                {filteredLogs.length} {t("entriesText") || "entries"}
+                {t("showingText") || "Showing"} {indexOfFirstEntry + 1}{" "}
+                {t("toText") || "to"}{" "}
+                {Math.min(indexOfLastEntry, filteredLogs.length)}{" "}
+                {t("ofText") || "of"} {filteredLogs.length}{" "}
+                {t("entriesText") || "entries"}
               </span>
 
               <div className="flex gap-2 items-center">
@@ -204,7 +270,9 @@ const MyActivityTable = ({
                   {currentPage} / {totalPages}
                 </div>
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(p + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-3.5 py-1.5 rounded-xl text-xs font-semibold disabled:opacity-40 transition-all cursor-pointer shadow-sm hover:shadow-md"
                   style={{

@@ -27,9 +27,15 @@ const CustomChartTooltip = ({ active, payload, label }) => {
           boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4)",
         }}
       >
-        <p className="mb-1 text-slate-400 font-semibold">{label || payload[0]?.name}</p>
+        <p className="mb-1 text-slate-400 font-semibold">
+          {label || payload[0]?.name}
+        </p>
         {payload.map((item, idx) => (
-          <p key={idx} className="text-xs font-extrabold flex items-center justify-between gap-4 py-0.5" style={{ color: item.color || item.fill }}>
+          <p
+            key={idx}
+            className="text-xs font-extrabold flex items-center justify-between gap-4 py-0.5"
+            style={{ color: item.color || item.fill }}
+          >
             <span>{item.name}:</span>
             <span className="font-mono">{item.value}</span>
           </p>
@@ -301,8 +307,12 @@ export default function ManagerReportView({ data }) {
               </span>
               {t("projectHealthStatusTitle") || "Project Status Breakdown"}
             </h3>
-            <p className="text-xs mt-1 ml-11" style={{ color: "var(--text-secondary)" }}>
-              {t("projectHealthStatusDesc") || "Distribution of projects by progress status"}
+            <p
+              className="text-xs mt-1 ml-11"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t("projectHealthStatusDesc") ||
+                "Distribution of projects by progress status"}
             </p>
           </div>
 
@@ -310,7 +320,9 @@ export default function ManagerReportView({ data }) {
             {managedProjects.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-1">
                 <span className="text-2xl opacity-40">📁</span>
-                <p className="text-xs text-slate-500 font-semibold">{t("noData") || "No Projects"}</p>
+                <p className="text-xs text-slate-500 font-semibold">
+                  {t("noData") || "No Projects"}
+                </p>
               </div>
             ) : (
               <>
@@ -321,7 +333,10 @@ export default function ManagerReportView({ data }) {
                       data={[
                         {
                           name: t("statusCompleted") || "Completed",
-                          value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "completed").length,
+                          value: managedProjects.filter(
+                            (p) =>
+                              (p.status || "").toLowerCase() === "completed",
+                          ).length,
                           fill: "#10b981",
                         },
                         {
@@ -342,7 +357,9 @@ export default function ManagerReportView({ data }) {
                         },
                         {
                           name: t("statusPending") || "Pending",
-                          value: managedProjects.filter((p) => (p.status || "").toLowerCase() === "pending").length,
+                          value: managedProjects.filter(
+                            (p) => (p.status || "").toLowerCase() === "pending",
+                          ).length,
                           fill: "#94a3b8",
                         },
                       ].filter((d) => d.value > 0)}
@@ -354,22 +371,29 @@ export default function ManagerReportView({ data }) {
                       dataKey="value"
                       stroke="none"
                     >
-                      {[
-                        "#10b981",
-                        "#06b6d4",
-                        "#f59e0b",
-                        "#94a3b8",
-                      ].map((fill, idx) => (
-                        <Cell key={`pm-pie-${idx}`} fill={fill} stroke="none" />
-                      ))}
+                      {["#10b981", "#06b6d4", "#f59e0b", "#94a3b8"].map(
+                        (fill, idx) => (
+                          <Cell
+                            key={`pm-pie-${idx}`}
+                            fill={fill}
+                            stroke="none"
+                          />
+                        ),
+                      )}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute flex flex-col items-center pointer-events-none">
-                  <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
+                  <span
+                    className="text-2xl font-black"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {managerCompletionRate}%
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {t("completed") || "Rate"}
                   </span>
                 </div>
@@ -377,7 +401,10 @@ export default function ManagerReportView({ data }) {
             )}
           </div>
 
-          <div className="w-full rounded-full h-2 overflow-hidden mt-2" style={{ background: "var(--border-surface)" }}>
+          <div
+            className="w-full rounded-full h-2 overflow-hidden mt-2"
+            style={{ background: "var(--border-surface)" }}
+          >
             <div
               className="h-full rounded-full transition-all duration-1000"
               style={{
@@ -411,10 +438,15 @@ export default function ManagerReportView({ data }) {
               >
                 📈
               </span>
-              {t("projectProgressOverviewTitle") || "Project Progress & Delivery Rates"}
+              {t("projectProgressOverviewTitle") ||
+                "Project Progress & Delivery Rates"}
             </h3>
-            <p className="text-xs mt-1 ml-11" style={{ color: "var(--text-secondary)" }}>
-              {t("projectProgressOverviewDesc") || "Completion percentage per managed project"}
+            <p
+              className="text-xs mt-1 ml-11"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t("projectProgressOverviewDesc") ||
+                "Completion percentage per managed project"}
             </p>
           </div>
 
@@ -431,7 +463,8 @@ export default function ManagerReportView({ data }) {
                     : p.progress || 0;
 
                 return {
-                  name: p.name?.length > 12 ? `${p.name.slice(0, 10)}...` : p.name,
+                  name:
+                    p.name?.length > 12 ? `${p.name.slice(0, 10)}...` : p.name,
                   progress: progress,
                   totalTasks: pTasks.length,
                 };
@@ -440,7 +473,9 @@ export default function ManagerReportView({ data }) {
               if (projectChartData.length === 0) {
                 return (
                   <div className="h-full flex items-center justify-center">
-                    <p className="text-xs text-slate-500 font-bold">No Projects Available</p>
+                    <p className="text-xs text-slate-500 font-bold">
+                      No Projects Available
+                    </p>
                   </div>
                 );
               }
@@ -452,7 +487,11 @@ export default function ManagerReportView({ data }) {
                       data={projectChartData}
                       margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        opacity={0.15}
+                        vertical={false}
+                      />
                       <XAxis
                         dataKey="name"
                         stroke="var(--text-secondary)"
@@ -470,7 +509,10 @@ export default function ManagerReportView({ data }) {
                         fontSize={11}
                         tickLine={false}
                       />
-                      <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
+                      <Tooltip
+                        content={<CustomChartTooltip />}
+                        cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                      />
                       <Bar
                         dataKey="progress"
                         name={t("colProgress") || "Progress"}
@@ -480,7 +522,13 @@ export default function ManagerReportView({ data }) {
                         {projectChartData.map((entry, idx) => (
                           <Cell
                             key={`cell-pm-${idx}`}
-                            fill={entry.progress >= 100 ? "#10b981" : entry.progress > 50 ? "#06b6d4" : "#6366f1"}
+                            fill={
+                              entry.progress >= 100
+                                ? "#10b981"
+                                : entry.progress > 50
+                                  ? "#06b6d4"
+                                  : "#6366f1"
+                            }
                           />
                         ))}
                       </Bar>
@@ -842,11 +890,12 @@ export default function ManagerReportView({ data }) {
                         {p.name}
                       </h4>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        👤 {p.teamLeaderName || "-"}
+                        {p.teamLeaderName || "-"}
                       </p>
                       {pTasks.length > 0 && (
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          {pTasks.length} {t("tasks") || "งาน"} ({pCompleted} {t("completed") || "เสร็จสิ้น"})
+                          {pTasks.length} {t("tasks") || "งาน"} ({pCompleted}{" "}
+                          {t("completed") || "เสร็จสิ้น"})
                         </p>
                       )}
                     </div>
@@ -858,7 +907,9 @@ export default function ManagerReportView({ data }) {
                   {/* Progress Bar Row */}
                   <div className="space-y-1">
                     <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-slate-400 font-semibold">{t("colProgress") || "Progress"}</span>
+                      <span className="text-slate-400 font-semibold">
+                        {t("colProgress") || "Progress"}
+                      </span>
                       <span className="font-black text-white">{progress}%</span>
                     </div>
                     <div
@@ -878,7 +929,7 @@ export default function ManagerReportView({ data }) {
                   {/* Due date footer */}
                   <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
                     <span>{t("endDateLabel") || "Due Date"}:</span>
-                    <span>📅 {formatDate(p.end_date || p.endDate, language)}</span>
+                    <span>{formatDate(p.end_date || p.endDate, language)}</span>
                   </div>
                 </div>
               );
@@ -887,7 +938,9 @@ export default function ManagerReportView({ data }) {
             <div className="text-center py-12 text-slate-500">
               <div className="text-4xl mb-2">📁</div>
               <p className="text-sm font-semibold">
-                {language === "th" ? "ไม่พบโครงการในหมวดหมู่นี้" : "No projects found"}
+                {language === "th"
+                  ? "ไม่พบโครงการในหมวดหมู่นี้"
+                  : "No projects found"}
               </p>
             </div>
           )}

@@ -236,10 +236,10 @@ const TaskTable = ({
                           color: "#ffffff",
                         }}
                       >
-                        📁 {task.project}
+                        {task.project}
                       </span>
                       <span className="text-slate-300 text-xs">
-                        👤 {task.assignee}
+                        {task.assignee}
                       </span>
                     </div>
                   </div>
@@ -277,7 +277,7 @@ const TaskTable = ({
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-400 font-mono shrink-0">
-                    📅 {formatDate(task.dueDate, language)}
+                    {formatDate(task.dueDate, language)}
                   </div>
                 </div>
               </div>

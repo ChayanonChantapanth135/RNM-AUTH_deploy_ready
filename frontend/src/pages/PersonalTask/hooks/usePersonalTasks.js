@@ -288,7 +288,7 @@ export const usePersonalTasks = () => {
                 value="${initialDateISO}"
                 class="absolute right-2 opacity-0 w-8 h-8 cursor-pointer" 
               />
-              <span class="absolute right-3 pointer-events-none text-gray-500 text-lg">📅</span>
+              <span class="absolute right-3 pointer-events-none text-gray-500 text-lg"></span>
             </div>
           </div>
         </div>
@@ -412,7 +412,7 @@ export const usePersonalTasks = () => {
                 value="${formattedDateISO}"
                 class="absolute right-2 opacity-0 w-8 h-8 cursor-pointer" 
               />
-              <span class="absolute right-3 pointer-events-none text-gray-500 text-lg">📅</span>
+              <span class="absolute right-3 pointer-events-none text-gray-500 text-lg"></span>
             </div>
           </div>
         </div>

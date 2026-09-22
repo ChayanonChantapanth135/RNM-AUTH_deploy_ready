@@ -323,7 +323,7 @@ const PersonalTaskCalendar = ({
           style={{ borderBottom: "1px solid var(--border-surface)" }}
         >
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📅</span>
+            <span className="text-2xl"></span>
             <div>
               <h2
                 className="text-lg font-bold"
@@ -353,19 +353,25 @@ const PersonalTaskCalendar = ({
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#007aeb]"></span>
               <span style={{ color: "var(--text-secondary)" }}>
-                {isThai ? STATUS_CONFIG.todo.labelTh : STATUS_CONFIG.todo.labelEn}
+                {isThai
+                  ? STATUS_CONFIG.todo.labelTh
+                  : STATUS_CONFIG.todo.labelEn}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
               <span style={{ color: "var(--text-secondary)" }}>
-                {isThai ? STATUS_CONFIG["in-progress"].labelTh : STATUS_CONFIG["in-progress"].labelEn}
+                {isThai
+                  ? STATUS_CONFIG["in-progress"].labelTh
+                  : STATUS_CONFIG["in-progress"].labelEn}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#00b884]"></span>
               <span style={{ color: "var(--text-secondary)" }}>
-                {isThai ? STATUS_CONFIG.completed.labelTh : STATUS_CONFIG.completed.labelEn}
+                {isThai
+                  ? STATUS_CONFIG.completed.labelTh
+                  : STATUS_CONFIG.completed.labelEn}
               </span>
             </div>
           </div>

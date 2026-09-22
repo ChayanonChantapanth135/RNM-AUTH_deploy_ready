@@ -30,15 +30,18 @@ const ProjectDetailModal = ({
       const { taskId, status } = payload;
       if (!selectedProject.tasks) return;
 
-      const hasTask = selectedProject.tasks.some((tItem) => Number(tItem.id) === Number(taskId));
+      const hasTask = selectedProject.tasks.some(
+        (tItem) => Number(tItem.id) === Number(taskId),
+      );
       if (hasTask && setSelectedProject) {
         setSelectedProject((prev) => {
           if (!prev || !prev.tasks) return prev;
           const updatedTasks = prev.tasks.map((tItem) =>
-            Number(tItem.id) === Number(taskId) ? { ...tItem, status } : tItem
+            Number(tItem.id) === Number(taskId) ? { ...tItem, status } : tItem,
           );
           const completedCount = updatedTasks.filter(
-            (tItem) => tItem.status && tItem.status.toLowerCase() === "completed"
+            (tItem) =>
+              tItem.status && tItem.status.toLowerCase() === "completed",
           ).length;
           const progress =
             updatedTasks.length > 0
@@ -55,19 +58,35 @@ const ProjectDetailModal = ({
     };
 
     const handleProjectUpdated = (payload) => {
-      if (Number(payload.projectId || payload.id) === Number(selectedProject.id) && setSelectedProject) {
+      if (
+        Number(payload.projectId || payload.id) ===
+          Number(selectedProject.id) &&
+        setSelectedProject
+      ) {
         setSelectedProject((prev) => {
           if (!prev) return prev;
           return {
             ...prev,
             name: payload.name !== undefined ? payload.name : prev.name,
             status: payload.status !== undefined ? payload.status : prev.status,
-            priority: payload.priority !== undefined ? payload.priority : prev.priority,
-            endDate: payload.endDate !== undefined ? payload.endDate : prev.endDate,
-            end_date: payload.endDate !== undefined ? payload.endDate : prev.end_date,
-            teamLeaderId: payload.teamLeaderId !== undefined ? payload.teamLeaderId : prev.teamLeaderId,
-            teamLeaderName: payload.teamLeaderName !== undefined ? payload.teamLeaderName : prev.teamLeaderName,
-            team_leader_name: payload.teamLeaderName !== undefined ? payload.teamLeaderName : prev.team_leader_name,
+            priority:
+              payload.priority !== undefined ? payload.priority : prev.priority,
+            endDate:
+              payload.endDate !== undefined ? payload.endDate : prev.endDate,
+            end_date:
+              payload.endDate !== undefined ? payload.endDate : prev.end_date,
+            teamLeaderId:
+              payload.teamLeaderId !== undefined
+                ? payload.teamLeaderId
+                : prev.teamLeaderId,
+            teamLeaderName:
+              payload.teamLeaderName !== undefined
+                ? payload.teamLeaderName
+                : prev.teamLeaderName,
+            team_leader_name:
+              payload.teamLeaderName !== undefined
+                ? payload.teamLeaderName
+                : prev.team_leader_name,
           };
         });
       }
@@ -83,15 +102,23 @@ const ProjectDetailModal = ({
       socket.off("project:updated", handleProjectUpdated);
     };
   }, [showDetailModal, selectedProject, setSelectedProject]);
-  const userRole = (currentUser?.role || "").toLowerCase().trim().replace(/\s+/g, "_");
-  const isCreatorOfProject = Number(selectedProject?.created_by) === Number(currentUser?.id);
+  const userRole = (currentUser?.role || "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "_");
+  const isCreatorOfProject =
+    Number(selectedProject?.created_by) === Number(currentUser?.id);
   const isTeamLeaderOfProject =
     Number(selectedProject?.teamLeaderId) === Number(currentUser?.id) ||
     Number(selectedProject?.team_leader_id) === Number(currentUser?.id);
 
   // canManageProject: Admin หรือ Creator ของโปรเจกต์นี้ หรือ Manager ที่สร้างโปรเจกต์นี้
-  const isManagerRole = userRole === "manager" || userRole === "project_manager";
-  const canManageProject = userRole === "admin" || (isManagerRole && isCreatorOfProject) || (!isManagerRole && canManage);
+  const isManagerRole =
+    userRole === "manager" || userRole === "project_manager";
+  const canManageProject =
+    userRole === "admin" ||
+    (isManagerRole && isCreatorOfProject) ||
+    (!isManagerRole && canManage);
 
   const canAddTask = canManageProject || isTeamLeaderOfProject;
 
@@ -134,7 +161,10 @@ const ProjectDetailModal = ({
           <>
             <div className="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
               <h5 className="fw-bold mb-0 d-flex align-items-center gap-1.5">
-                <ion-icon name="folder-open-outline" style={{ fontSize: "20px" }}></ion-icon>
+                <ion-icon
+                  name="folder-open-outline"
+                  style={{ fontSize: "20px" }}
+                ></ion-icon>
                 <span>{t("projectDetailsTitle")}</span>
               </h5>
               <button
@@ -170,7 +200,10 @@ const ProjectDetailModal = ({
                     {t("projectDetailsDueDate")}
                   </span>
                   <strong className="text-dark d-flex align-items-center gap-1">
-                    <ion-icon name="calendar-outline" style={{ fontSize: "16px" }}></ion-icon>
+                    <ion-icon
+                      name="calendar-outline"
+                      style={{ fontSize: "16px" }}
+                    ></ion-icon>
                     <span>{formatDate(selectedProject.endDate, language)}</span>
                   </strong>
                 </div>
@@ -179,8 +212,16 @@ const ProjectDetailModal = ({
                     {t("projectDetailsManager")}
                   </span>
                   <span className="text-indigo-600 font-semibold d-flex align-items-center gap-1">
-                    <ion-icon name="briefcase-outline" style={{ fontSize: "16px" }}></ion-icon>
-                    <span>{selectedProject.projectManagerName || selectedProject.created_by_name || selectedProject.project_manager_name || "-"}</span>
+                    <ion-icon
+                      name="briefcase-outline"
+                      style={{ fontSize: "16px" }}
+                    ></ion-icon>
+                    <span>
+                      {selectedProject.projectManagerName ||
+                        selectedProject.created_by_name ||
+                        selectedProject.project_manager_name ||
+                        "-"}
+                    </span>
                   </span>
                 </div>
                 <div className="mb-3">
@@ -188,8 +229,15 @@ const ProjectDetailModal = ({
                     {t("projectDetailsLeader")}
                   </span>
                   <span className="text-primary fw-bold d-flex align-items-center gap-1">
-                    <ion-icon name="person-outline" style={{ fontSize: "16px" }}></ion-icon>
-                    <span>{selectedProject.teamLeaderName || selectedProject.team_leader_name || "-"}</span>
+                    <ion-icon
+                      name="person-outline"
+                      style={{ fontSize: "16px" }}
+                    ></ion-icon>
+                    <span>
+                      {selectedProject.teamLeaderName ||
+                        selectedProject.team_leader_name ||
+                        "-"}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -216,7 +264,10 @@ const ProjectDetailModal = ({
             {/* Tasks List */}
             <div className="mb-4">
               <h6 className="fw-bold text-dark mb-3 d-flex align-items-center gap-1.5">
-                <ion-icon name="clipboard-outline" style={{ fontSize: "20px" }}></ion-icon>
+                <ion-icon
+                  name="clipboard-outline"
+                  style={{ fontSize: "20px" }}
+                ></ion-icon>
                 <span>{t("projectDetailsTaskList")}</span>
               </h6>
               <div
@@ -252,10 +303,12 @@ const ProjectDetailModal = ({
                         }}
                       >
                         <span className="d-block text-truncate">
-                          👤 {task.assigned_to_name || t("unassigned")}
+                          {task.assigned_to_name || t("unassigned")}
                         </span>
                         {task.dueDate && (
-                          <span className="d-block font-mono">📅 {formatDate(task.dueDate, language)}</span>
+                          <span className="d-block font-mono">
+                            {formatDate(task.dueDate, language)}
+                          </span>
                         )}
                       </div>
 
@@ -279,7 +332,10 @@ const ProjectDetailModal = ({
                           const isAssigned =
                             Number(task.assigned_to) === currentUid ||
                             Number(task.assignedTo) === currentUid;
-                          const canViewDetail = canManageProject || isTeamLeaderOfProject || isAssigned;
+                          const canViewDetail =
+                            canManageProject ||
+                            isTeamLeaderOfProject ||
+                            isAssigned;
 
                           if (!canViewDetail) {
                             return null;
