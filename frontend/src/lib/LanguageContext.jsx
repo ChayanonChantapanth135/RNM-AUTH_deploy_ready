@@ -102,6 +102,7 @@ const translations = {
     fillAllFields: "Please Fill In All Fields",
     loginSuccess: "Login Successful! Redirecting...",
     loginFailed: "Login Failed. Please Try Again.",
+    invalidCredentials: "Invalid email or password",
     accountSuspended:
       "Your account has been suspended. Please contact the administrator.",
     accountExpired:
@@ -832,6 +833,7 @@ const translations = {
     fillAllFields: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
     loginSuccess: "เข้าสู่ระบบสำเร็จ! กำลังนำทางไปยังหน้าแรก...",
     loginFailed: "การเข้าสู่ระบบล้มเหลว โปรดลองอีกครั้ง",
+    invalidCredentials: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
     accountSuspended: "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ",
     accountExpired: "บัญชีของคุณหมดอายุการใช้งานแล้ว กรุณาติดต่อผู้ดูแลระบบ",
     accountNotStarted: "บัญชีนี้จะเริ่มใช้งานได้ตั้งแต่วันที่ {startDate}",

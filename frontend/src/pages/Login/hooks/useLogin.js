@@ -63,15 +63,26 @@ export const useLogin = (t) => {
       }
     } catch (err) {
       const errData = err.response?.data;
-      if (errData?.code === "ACCOUNT_EXPIRED") {
+      const rawMsg = (errData?.message || "").toLowerCase();
+
+      if (errData?.code === "ACCOUNT_EXPIRED" || rawMsg.includes("expired")) {
         setError(t("accountExpired") || "บัญชีของคุณหมดอายุการใช้งานแล้ว กรุณาติดต่อผู้ดูแลระบบ");
-      } else if (errData?.code === "ACCOUNT_NOT_STARTED") {
+      } else if (errData?.code === "ACCOUNT_NOT_STARTED" || rawMsg.includes("not started")) {
         const notStartedMsg = t("accountNotStarted") || "บัญชีนี้จะเริ่มใช้งานได้ตั้งแต่วันที่ {startDate}";
         setError(notStartedMsg.replace("{startDate}", errData.startDate || ""));
-      } else if (errData?.code === "ACCOUNT_SUSPENDED") {
+      } else if (errData?.code === "ACCOUNT_SUSPENDED" || rawMsg.includes("suspended")) {
         setError(t("accountSuspended") || "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+      } else if (
+        errData?.code === "INVALID_CREDENTIALS" ||
+        rawMsg.includes("invalid credential") ||
+        rawMsg.includes("wrong password") ||
+        rawMsg.includes("user not found") ||
+        rawMsg.includes("invalid email") ||
+        rawMsg.includes("incorrect password")
+      ) {
+        setError(t("invalidCredentials") || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       } else {
-        setError(errData?.message || t("loginFailed"));
+        setError(t("loginFailed") || "การเข้าสู่ระบบล้มเหลว โปรดลองอีกครั้ง");
       }
     } finally {
       setLoading(false);
