@@ -453,7 +453,7 @@ export default function TeamLeaderReportView({ data }) {
             </p>
           </div>
 
-          <div className="h-56 w-full mt-2">
+          <div className="h-64 w-full mt-2">
             {(() => {
               // Group tasks by assignee
               const memberMap = {};
@@ -470,7 +470,7 @@ export default function TeamLeaderReportView({ data }) {
 
               const memberData = Object.values(memberMap).map((m) => ({
                 ...m,
-                displayName: m.name.length > 12 ? `${m.name.slice(0, 10)}...` : m.name,
+                displayName: m.name.length > 10 ? `${m.name.slice(0, 8)}...` : m.name,
               }));
 
               if (memberData.length === 0) {
@@ -486,10 +486,19 @@ export default function TeamLeaderReportView({ data }) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={memberData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
-                      <XAxis dataKey="displayName" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                      <XAxis
+                        dataKey="displayName"
+                        stroke="var(--text-secondary)"
+                        fontSize={10}
+                        tickLine={false}
+                        interval={0}
+                        angle={-20}
+                        textAnchor="end"
+                        height={40}
+                      />
                       <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
                       <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
                       <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "6px" }} />

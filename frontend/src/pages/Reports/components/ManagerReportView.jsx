@@ -418,7 +418,7 @@ export default function ManagerReportView({ data }) {
             </p>
           </div>
 
-          <div className="h-56 w-full mt-2">
+          <div className="h-64 w-full mt-2">
             {(() => {
               const projectChartData = managedProjects.map((p) => {
                 const pTasks = p.tasks || [];
@@ -431,7 +431,7 @@ export default function ManagerReportView({ data }) {
                     : p.progress || 0;
 
                 return {
-                  name: p.name?.length > 14 ? `${p.name.slice(0, 12)}...` : p.name,
+                  name: p.name?.length > 12 ? `${p.name.slice(0, 10)}...` : p.name,
                   progress: progress,
                   totalTasks: pTasks.length,
                 };
@@ -450,10 +450,19 @@ export default function ManagerReportView({ data }) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={projectChartData}
-                      margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                      margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
-                      <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                      <XAxis
+                        dataKey="name"
+                        stroke="var(--text-secondary)"
+                        fontSize={10}
+                        tickLine={false}
+                        interval={0}
+                        angle={-20}
+                        textAnchor="end"
+                        height={40}
+                      />
                       <YAxis
                         domain={[0, 100]}
                         unit="%"

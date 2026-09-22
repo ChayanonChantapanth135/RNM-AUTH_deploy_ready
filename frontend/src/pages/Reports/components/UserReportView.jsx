@@ -370,24 +370,33 @@ export default function UserReportView({ data }) {
           </div>
 
           {/* Bar Chart for Task Types */}
-          <div className="h-56 w-full mt-2">
+          <div className="h-64 w-full mt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={[
-                  { name: t("taskTypeTranslate") || "Translate", count: myTaskTypeCounts.translate || 0, fill: "#2dd4bf" },
-                  { name: t("taskTypeStoryboard") || "Storyboard", count: myTaskTypeCounts.storyboard || 0, fill: "#f59e0b" },
-                  { name: t("taskTypeGraphicDesign") || "Design", count: myTaskTypeCounts.graphicDesign || 0, fill: "#ec4899" },
-                  { name: t("taskTypeAnimation") || "Animation", count: myTaskTypeCounts.animation || 0, fill: "#06b6d4" },
-                  { name: t("taskTypeVideoEdit") || "Video", count: myTaskTypeCounts.videoEdit || 0, fill: "#818cf8" },
-                  { name: t("taskTypeDevelopment") || "Dev", count: myTaskTypeCounts.development || 0, fill: "#10b981" },
+                  { name: t("taskTypeTranslate") || "แปล", count: myTaskTypeCounts.translate || 0, fill: "#2dd4bf" },
+                  { name: t("taskTypeStoryboard") || "สตอรี่บอร์ด", count: myTaskTypeCounts.storyboard || 0, fill: "#f59e0b" },
+                  { name: t("taskTypeGraphicDesign") || "ออกแบบ", count: myTaskTypeCounts.graphicDesign || 0, fill: "#ec4899" },
+                  { name: t("taskTypeAnimation") || "อนิเมชัน", count: myTaskTypeCounts.animation || 0, fill: "#06b6d4" },
+                  { name: t("taskTypeVideoEdit") || "ตัดต่อ", count: myTaskTypeCounts.videoEdit || 0, fill: "#818cf8" },
+                  { name: t("taskTypeDevelopment") || "โปรแกรม", count: myTaskTypeCounts.development || 0, fill: "#10b981" },
                 ]}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
-                <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--text-secondary)"
+                  fontSize={10}
+                  tickLine={false}
+                  interval={0}
+                  angle={-25}
+                  textAnchor="end"
+                  height={45}
+                />
                 <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
                 <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                   {[
                     "#2dd4bf",
                     "#f59e0b",
