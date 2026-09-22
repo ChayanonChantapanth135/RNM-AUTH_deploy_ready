@@ -493,7 +493,6 @@ export const useUserManagement = (t, language = "en") => {
         { header: "email", key: "email", width: 30 },
         { header: "phone", key: "phone", width: 18 },
         { header: "role", key: "role", width: 18 },
-        { header: "leader_email", key: "leader_email", width: 30 },
         { header: "status", key: "status", width: 15 },
         { header: "start_date", key: "start_date", width: 18 },
         { header: "expire_date", key: "expire_date", width: 18 },
@@ -506,7 +505,6 @@ export const useUserManagement = (t, language = "en") => {
         email: "somchai@company.com",
         phone: "+66812345678",
         role: "storyboard",
-        leader_email: "leader@company.com",
         status: "active",
         start_date: "2026-09-01",
         expire_date: "2027-09-01",
@@ -518,7 +516,6 @@ export const useUserManagement = (t, language = "en") => {
         email: "somsak@company.com",
         phone: "+66898765432",
         role: "programmer",
-        leader_email: "",
         status: "active",
         start_date: "",
         expire_date: "",
@@ -546,7 +543,7 @@ export const useUserManagement = (t, language = "en") => {
         error: "Please select a role from the dropdown list."
       });
 
-      worksheet.dataValidations.add("F2:F500", {
+      worksheet.dataValidations.add("E2:E500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${statusOptions.join(",")}"`],
@@ -587,13 +584,12 @@ export const useUserManagement = (t, language = "en") => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Users");
 
-      // Define columns
+      // Define columns (Without leader_email to keep data simple and avoid sync confusion)
       worksheet.columns = [
         { header: "fullname", key: "fullname", width: 25 },
         { header: "email", key: "email", width: 30 },
         { header: "phone", key: "phone", width: 18 },
         { header: "role", key: "role", width: 18 },
-        { header: "leader_email", key: "leader_email", width: 30 },
         { header: "status", key: "status", width: 15 },
         { header: "start_date", key: "start_date", width: 18 },
         { header: "expire_date", key: "expire_date", width: 18 },
@@ -609,14 +605,11 @@ export const useUserManagement = (t, language = "en") => {
         else if (u.role === "Designer") rawRole = "designer";
         else if (u.role === "Programmer") rawRole = "programmer";
 
-        const leaderUser = u.leaderId ? users.find((lead) => Number(lead.id) === Number(u.leaderId)) : null;
-
         worksheet.addRow({
           fullname: u.name || "",
           email: u.email || "",
           phone: u.phone !== "-" ? u.phone : "",
           role: rawRole,
-          leader_email: leaderUser ? leaderUser.email : "",
           status: u.status || "active",
           start_date: u.startDate || "",
           expire_date: u.expireDate || "",
@@ -645,7 +638,7 @@ export const useUserManagement = (t, language = "en") => {
         error: "Please select a role from the dropdown list."
       });
 
-      worksheet.dataValidations.add("F2:F500", {
+      worksheet.dataValidations.add("E2:E500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${statusOptions.join(",")}"`],

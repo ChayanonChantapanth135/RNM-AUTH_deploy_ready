@@ -482,9 +482,6 @@ const ImportPreviewModal = ({
                   <th className="py-3 px-4 text-center whitespace-nowrap text-slate-600">
                     {t("colRole") || "บทบาท"}
                   </th>
-                  <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
-                    {t("modalLeaderLabel") || "หัวหน้า"}
-                  </th>
                   <th className="py-3 px-4 text-center whitespace-nowrap text-slate-600">
                     {t("colStatus") || "สถานะ"}
                   </th>
@@ -569,20 +566,6 @@ const ImportPreviewModal = ({
                           {formatRole(user.role)}
                         </span>
                         {isChangedRow && fields.includes("role") && (
-                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
-                            ✏️
-                          </span>
-                        )}
-                      </td>
-                      <td
-                        className={`py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap ${
-                          isChangedRow && fields.includes("leader")
-                            ? "bg-amber-50/80 font-bold text-amber-900"
-                            : ""
-                        }`}
-                      >
-                        {user.leader}
-                        {isChangedRow && fields.includes("leader") && (
                           <span className="ml-1 text-[10px] text-amber-700 font-bold">
                             ✏️
                           </span>
