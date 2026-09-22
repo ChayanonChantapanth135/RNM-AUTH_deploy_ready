@@ -264,10 +264,11 @@ export default function MyTaskProjectGroups({
               </div>
             </div>
 
-            {/* Tasks Table Section (Collapsible & Scrollable with Sticky Header) */}
+            {/* Tasks Table Section (Collapsible) */}
             {isExpanded && (
               <div className="mt-4 pt-1 transition-all duration-300 animate-fadeIn">
-                <div className="overflow-x-auto max-h-[380px] overflow-y-auto pr-1 custom-scrollbar rounded-xl">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto max-h-[380px] overflow-y-auto pr-1 custom-scrollbar rounded-xl">
                   <table className="w-full text-left border-collapse relative">
                     <thead className="sticky top-0 z-20" style={{ background: "var(--bg-surface)" }}>
                       <tr
@@ -359,20 +360,41 @@ export default function MyTaskProjectGroups({
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
 
-                          let dueDate;
-                          if (tItem.rawDueDate) {
-                            dueDate = new Date(tItem.rawDueDate);
-                          } else if (String(targetDateStr).includes("/")) {
-                            const [d, m, y] = targetDateStr.split("/");
-                            dueDate = new Date(`${y}-${m}-${d}`);
-                          } else {
-                            dueDate = new Date(targetDateStr);
+                          let taskDueDate = null;
+                          try {
+                            const dateStr = String(targetDateStr).trim();
+                            if (dateStr.includes("/")) {
+                              const parts = dateStr.split("/");
+                              if (parts.length === 3) {
+                                let y = parseInt(parts[2], 10);
+                                if (y > 2500) y -= 543;
+                                taskDueDate = new Date(
+                                  y,
+                                  parseInt(parts[1], 10) - 1,
+                                  parseInt(parts[0], 10)
+                                );
+                              }
+                            } else if (dateStr.includes("-")) {
+                              const parts = dateStr.split("T")[0].split("-");
+                              if (parts.length === 3) {
+                                taskDueDate = new Date(
+                                  parseInt(parts[0], 10),
+                                  parseInt(parts[1], 10) - 1,
+                                  parseInt(parts[2], 10)
+                                );
+                              }
+                            }
+                            if (!taskDueDate || isNaN(taskDueDate.getTime())) {
+                              taskDueDate = new Date(targetDateStr);
+                            }
+                          } catch {
+                            return {};
                           }
 
-                          if (isNaN(dueDate.getTime())) return {};
-                          dueDate.setHours(0, 0, 0, 0);
+                          if (!taskDueDate || isNaN(taskDueDate.getTime())) return {};
+                          taskDueDate.setHours(0, 0, 0, 0);
 
-                          const diffTime = dueDate - today;
+                          const diffTime = taskDueDate.getTime() - today.getTime();
                           const diffDays = Math.ceil(
                             diffTime / (1000 * 60 * 60 * 24)
                           );
@@ -443,6 +465,115 @@ export default function MyTaskProjectGroups({
                       })}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile Task Cards (Shown on mobile only, no horizontal scroll) */}
+                <div className="md:hidden flex flex-col gap-2.5 mt-2">
+                  {group.tasks.map((task) => {
+                    const statusColors = {
+                      Pending: "badge-status-todo",
+                      "In Progress": "badge-status-in-progress",
+                      Reviewing: "badge-status-in-review",
+                      Completed: "badge-status-completed",
+                    };
+
+                    const priorityColors = {
+                      High: "bg-red-500/20 text-red-400",
+                      Medium: "bg-amber-500/20 text-amber-400",
+                      Low: "bg-blue-500/20 text-blue-400",
+                    };
+
+                    const translateStatus = (status) => {
+                      const s = String(status).toLowerCase();
+                      if (s === "pending") return t("pending");
+                      if (s === "in progress" || s === "in_progress")
+                        return t("inProgress");
+                      if (s === "reviewing" || s === "review")
+                        return t("reviewing");
+                      if (s === "completed") return t("completed");
+                      return status;
+                    };
+
+                    const translatePriority = (priority) => {
+                      const p = String(priority).toLowerCase();
+                      if (p === "high") return t("priorityHigh");
+                      if (p === "medium") return t("priorityMedium");
+                      if (p === "low") return t("priorityLow");
+                      return priority;
+                    };
+
+                    const formatTaskType = (type) => {
+                      if (!type) return "-";
+                      if (type === "แปล" || type === "Translate")
+                        return t("taskTypeTranslate");
+                      if (type === "สตอรี่บอร์ด" || type === "Storyboard & Script")
+                        return t("taskTypeStoryboard");
+                      if (type === "ออกแบบ" || type === "Graphic & Design")
+                        return t("taskTypeGraphicDesign");
+                      if (type === "อนิเมชัน" || type === "Animation")
+                        return t("taskTypeAnimation");
+                      if (type === "ตัดต่อ" || type === "Video Editing" || type === "Video Edit")
+                        return t("taskTypeVideoEdit");
+                      if (type === "พัฒนาโปรแกรม" || type === "Development")
+                        return t("taskTypeDevelopment");
+                      if (type === "อื่นๆ" || type === "Others")
+                        return t("taskTypeOthers");
+                      return type;
+                    };
+
+                    return (
+                      <div
+                        key={task.id}
+                        className="p-3.5 rounded-xl bg-white/[0.04] transition-all flex flex-col gap-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h5
+                              className="font-bold text-sm truncate"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {task.title}
+                            </h5>
+                            <span
+                              className="inline-block mt-1 px-2 py-0.5 rounded-md text-[11px] font-bold"
+                              style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}
+                            >
+                              {formatTaskType(task.taskType)}
+                            </span>
+                          </div>
+                          <button
+                            className="px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm hover:shadow-md shrink-0"
+                            style={{
+                              background: "var(--bg-surface-hover)",
+                              color: "var(--text-primary)",
+                              border: "1px solid var(--border-surface)",
+                            }}
+                            onClick={() => handleManageClick(task)}
+                          >
+                            {t("colManage")}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${priorityColors[task.priority]}`}
+                            >
+                              {translatePriority(task.priority)}
+                            </span>
+                            <span
+                              className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusColors[task.status]}`}
+                            >
+                              {translateStatus(task.status)}
+                            </span>
+                          </div>
+                          <div className="text-[11px] font-mono shrink-0" style={{ color: "var(--text-secondary)" }}>
+                            📅 {formatDueDateDisplay(task.rawDueDate || task.dueDate)}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

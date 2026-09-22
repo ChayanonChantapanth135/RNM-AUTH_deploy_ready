@@ -561,8 +561,8 @@ export default function UserReportView({ data }) {
           </div>
         </div>
 
-        {/* Table Component */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300 font-bold">
@@ -677,6 +677,66 @@ export default function UserReportView({ data }) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+        <div className="md:hidden flex flex-col gap-3">
+          {currentEntries.length > 0 ? (
+            currentEntries.map((tItem) => {
+              const priority = tItem.priority || "Medium";
+              const priorityClass =
+                priority === "High"
+                  ? "bg-rose-500/20 text-rose-300"
+                  : priority === "Medium"
+                  ? "bg-amber-500/20 text-amber-300"
+                  : "bg-blue-500/20 text-blue-300";
+
+              return (
+                <div
+                  key={tItem.id}
+                  className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+                >
+                  {/* Header: Title + Project + Task Type */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-white text-base truncate">
+                        {tItem.title || tItem.name || "-"}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
+                        <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-indigo-300 font-medium truncate">
+                          📁 {tItem.projectName || "-"}
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold shrink-0"
+                      style={{ background: "rgba(20,184,166,0.12)", color: "#0d9488" }}
+                    >
+                      {formatTaskType(tItem.taskType || tItem.task_type)}
+                    </span>
+                  </div>
+
+                  {/* Footer: Priority + Status + Due Date */}
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${priorityClass}`}>
+                        {priority}
+                      </span>
+                      <StatusPill status={tItem.status} />
+                    </div>
+                    <div className="text-[11px] text-slate-400 font-mono shrink-0">
+                      📅 {formatDate(tItem.due_date || tItem.dueDate, language)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-12 text-slate-500">
+              <div className="text-4xl mb-2">📋</div>
+              <p className="text-sm font-semibold">{t("noAssignedTasksText") || "No tasks found"}</p>
+            </div>
+          )}
         </div>
 
         {/* Pagination Footer */}

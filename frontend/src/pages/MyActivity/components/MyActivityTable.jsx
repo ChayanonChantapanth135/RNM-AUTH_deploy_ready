@@ -47,81 +47,130 @@ const MyActivityTable = ({
         </div>
       ) : (
         <>
-          {/* Desktop Table View (Hidden on mobile) */}
+          {/* Desktop Table View */}
           <div className="hidden md:block overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr 
-                className="border-b text-xs uppercase tracking-wider font-bold"
-                style={{ 
-                  borderColor: "var(--border-surface)", 
-                  color: "var(--text-secondary)" 
-                }}
-              >
-                <th className="py-4 px-4 text-left">{t("colAction") || "Action"}</th>
-                <th className="py-4 px-4 text-left">{t("colDetails") || "Details"}</th>
-                <th className="py-4 px-4 text-center">{t("colTime") || "Time"}</th>
-              </tr>
-            </thead>
-            <tbody 
-              className="divide-y text-sm"
-              style={{ borderColor: "var(--border-surface)" }}
-            >
-              {currentEntries.length > 0 ? (
-                currentEntries.map((log, index) => {
-                  const act = log.action.toLowerCase();
-                  let badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.15)", color: "var(--text-secondary)" };
-
-                  if (act.includes("create")) {
-                    badgeStyle = { backgroundColor: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
-                  } else if (act.includes("edit") || act.includes("update") || act.includes("reset")) {
-                    badgeStyle = { backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
-                  } else if (act.includes("delete") || act.includes("suspend")) {
-                    badgeStyle = { backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#ef4444" };
-                  } else if (act.includes("login")) {
-                    badgeStyle = { backgroundColor: "rgba(99, 102, 241, 0.15)", color: "#6366f1" };
-                  } else if (act.includes("logout")) {
-                    badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.2)", color: "#94a3b8" };
-                  }
-
-                  return (
-                    <tr
-                      key={index}
-                      className="transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                      style={{ borderBottom: "1px solid var(--border-surface)" }}
-                    >
-                      <td className="py-4 px-4 text-left">
-                        <span
-                          className="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap inline-block"
-                          style={badgeStyle}
-                        >
-                          {t(log.action) || log.action}
-                        </span>
-                      </td>
-                      <td 
-                        className="py-4 px-4 font-medium text-xs text-left"
-                        style={{ color: "var(--text-primary)" }}
-                      >
-                        {log.details}
-                      </td>
-                      <td 
-                        className="py-4 px-4 text-center text-xs"
-                        style={{ color: "var(--text-secondary)" }}
-                      >
-                        {formatDateTime(log.created_at, language)}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="3" className="text-center py-10 text-slate-400 text-xs font-medium">
-                    {t("noActivitiesFound") || "No activity logs found"}
-                  </td>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr 
+                  className="text-xs uppercase tracking-wider font-semibold"
+                  style={{ 
+                    color: "var(--text-secondary)",
+                    borderBottom: "1px solid var(--border-surface)"
+                  }}
+                >
+                  <th className="py-4 px-4 text-left">{t("colAction") || "Action"}</th>
+                  <th className="py-4 px-4 text-left">{t("colDetails") || "Details"}</th>
+                  <th className="py-4 px-4 text-center">{t("colTime") || "Time"}</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody 
+                className="divide-y text-sm"
+                style={{ borderColor: "var(--border-surface)" }}
+              >
+                {currentEntries.length > 0 ? (
+                  currentEntries.map((log, index) => {
+                    const act = log.action.toLowerCase();
+                    let badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.15)", color: "var(--text-secondary)" };
+
+                    if (act.includes("create")) {
+                      badgeStyle = { backgroundColor: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
+                    } else if (act.includes("edit") || act.includes("update") || act.includes("reset")) {
+                      badgeStyle = { backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
+                    } else if (act.includes("delete") || act.includes("suspend")) {
+                      badgeStyle = { backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#ef4444" };
+                    } else if (act.includes("login")) {
+                      badgeStyle = { backgroundColor: "rgba(99, 102, 241, 0.15)", color: "#6366f1" };
+                    } else if (act.includes("logout")) {
+                      badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.2)", color: "#94a3b8" };
+                    }
+
+                    return (
+                      <tr
+                        key={index}
+                        className="transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                        style={{ borderBottom: "1px solid var(--border-surface)" }}
+                      >
+                        <td className="py-4 px-4 text-left">
+                          <span
+                            className="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap inline-block"
+                            style={badgeStyle}
+                          >
+                            {t(log.action) || log.action}
+                          </span>
+                        </td>
+                        <td 
+                          className="py-4 px-4 font-medium text-xs text-left"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {log.details}
+                        </td>
+                        <td 
+                          className="py-4 px-4 text-center text-xs"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          {formatDateTime(log.created_at, language)}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="text-center py-10 text-slate-400 text-xs font-medium">
+                      {t("noActivitiesFound") || "No activity logs found"}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+          <div className="md:hidden flex flex-col gap-3">
+            {currentEntries.length > 0 ? (
+              currentEntries.map((log, index) => {
+                const act = log.action.toLowerCase();
+                let badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.15)", color: "var(--text-secondary)" };
+
+                if (act.includes("create")) {
+                  badgeStyle = { backgroundColor: "rgba(16, 185, 129, 0.15)", color: "#10b981" };
+                } else if (act.includes("edit") || act.includes("update") || act.includes("reset")) {
+                  badgeStyle = { backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b" };
+                } else if (act.includes("delete") || act.includes("suspend")) {
+                  badgeStyle = { backgroundColor: "rgba(239, 68, 68, 0.15)", color: "#ef4444" };
+                } else if (act.includes("login")) {
+                  badgeStyle = { backgroundColor: "rgba(99, 102, 241, 0.15)", color: "#6366f1" };
+                } else if (act.includes("logout")) {
+                  badgeStyle = { backgroundColor: "rgba(100, 116, 139, 0.2)", color: "#94a3b8" };
+                }
+
+                return (
+                  <div
+                    key={index}
+                    className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className="px-2.5 py-0.5 rounded-lg text-xs font-semibold whitespace-nowrap inline-block"
+                        style={badgeStyle}
+                      >
+                        {t(log.action) || log.action}
+                      </span>
+                      <span className="text-[11px] font-mono" style={{ color: "var(--text-secondary)" }}>
+                        🕒 {formatDateTime(log.created_at, language)}
+                      </span>
+                    </div>
+                    <div className="text-xs font-medium mt-1 leading-relaxed" style={{ color: "var(--text-primary)" }}>
+                      {log.details}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-10 text-slate-400 text-xs font-medium">
+                {t("noActivitiesFound") || "No activity logs found"}
+              </div>
+            )}
+          </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -169,7 +218,7 @@ const MyActivityTable = ({
               </div>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

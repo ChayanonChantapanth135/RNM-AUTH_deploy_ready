@@ -61,8 +61,8 @@ const ProjectTable = ({
         </div>
       </div>
 
-      {/* Table Component */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table Component */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-300 font-bold">
@@ -203,7 +203,7 @@ const ProjectTable = ({
                             </button>
                             <button
                               className="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-medium transition-colors"
-                              onClick={() => handleOpenDelete(project)}
+                              onClick={() => handleDelete(project)}
                               title="ลบโครงการ"
                             >
                               🗑️
@@ -225,6 +225,105 @@ const ProjectTable = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card Layout (Shown on mobile only, no horizontal scroll) */}
+      <div className="md:hidden flex flex-col gap-3">
+        {currentEntries.length > 0 ? (
+          currentEntries.map((project) => {
+            const statusLower = project.status?.toLowerCase() || "";
+            let badgeClass = "badge-status-todo";
+            let statusText = t("statusPending") || "Pending";
+            if (statusLower === "completed") {
+              badgeClass = "badge-status-completed";
+              statusText = t("statusCompleted") || "Completed";
+            } else if (statusLower === "in_progress" || statusLower === "in progress") {
+              badgeClass = "badge-status-in-progress";
+              statusText = t("statusInProgress") || "In Progress";
+            } else if (statusLower === "review" || statusLower === "reviewing") {
+              badgeClass = "badge-status-in-review";
+              statusText = t("statusReview") || "Reviewing";
+            }
+
+            return (
+              <div
+                key={project.id}
+                className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+              >
+                {/* Header: Project name + Actions */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-white text-base truncate">
+                      {project.name}
+                    </h4>
+                    <p className="text-xs text-slate-400 truncate mt-0.5">
+                      👤 {project.teamLeaderName || "-"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      className="px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm hover:shadow-md"
+                      style={{
+                        background: "var(--bg-surface-hover)",
+                        color: "var(--text-primary)",
+                        border: "1px solid var(--border-surface)",
+                      }}
+                      onClick={() => handleViewDetails(project)}
+                    >
+                      {language === "th" ? "จัดการ" : "Manage"}
+                    </button>
+                    {canManage && (
+                      <>
+                        <button
+                          className="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-xs transition-colors"
+                          onClick={() => handleOpenEdit(project)}
+                          title="แก้ไขโครงการ"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-colors"
+                          onClick={() => handleDelete(project)}
+                          title="ลบโครงการ"
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Footer: Priority + Status + Due Date */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                        project.priority === "High"
+                          ? "bg-rose-500/20 text-rose-300"
+                          : project.priority === "Medium"
+                          ? "bg-amber-500/20 text-amber-300"
+                          : "bg-blue-500/20 text-blue-300"
+                      }`}
+                    >
+                      {project.priority || "Medium"}
+                    </span>
+                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${badgeClass}`}>
+                      {statusText}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-mono shrink-0">
+                    📅 {formatDate(project.end_date, language)}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-12 text-slate-500">
+            <div className="text-4xl mb-2">📂</div>
+            <p className="text-sm font-semibold">{t("noProjectsFound") || "No projects found"}</p>
+          </div>
+        )}
       </div>
 
       {/* Pagination Footer */}

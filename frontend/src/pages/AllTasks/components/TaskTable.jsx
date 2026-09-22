@@ -44,7 +44,8 @@ const TaskTable = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider">
@@ -147,6 +148,85 @@ const TaskTable = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View (Shown on mobile only, no horizontal scroll) */}
+      <div className="md:hidden flex flex-col gap-3">
+        {currentItems.length > 0 ? (
+          currentItems.map((task) => {
+            const statusLower = task.status?.toLowerCase();
+            const statusClass =
+              task.status === "Completed"
+                ? "badge-status-completed"
+                : task.status === "In Progress"
+                ? "badge-status-in-progress"
+                : task.status === "Reviewing" || task.status === "In Review"
+                ? "badge-status-in-review"
+                : "badge-status-todo";
+
+            return (
+              <div
+                key={task.id}
+                className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
+              >
+                {/* Header: Title + Manage Button */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-white text-base truncate">
+                      {task.title}
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
+                      <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-indigo-300 font-medium truncate">
+                        📁 {task.project}
+                      </span>
+                      <span className="text-slate-400 text-xs">
+                        👤 {task.assignee}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className="px-3 py-1.5 text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm hover:shadow-md shrink-0"
+                    style={{
+                      background: "var(--bg-surface-hover)",
+                      color: "var(--text-primary)",
+                      border: "1px solid var(--border-surface)",
+                    }}
+                    onClick={() => onManageClick(task)}
+                  >
+                    {language === "th" ? "จัดการ" : "Manage"}
+                  </button>
+                </div>
+
+                {/* Footer: Priority + Status + Due Date */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                        task.priority === "High"
+                          ? "bg-red-500/20 text-red-300"
+                          : task.priority === "Medium"
+                          ? "bg-amber-500/20 text-amber-300"
+                          : "bg-blue-500/20 text-blue-300"
+                      }`}
+                    >
+                      {task.priority}
+                    </span>
+                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusClass}`}>
+                      {task.status}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-mono shrink-0">
+                    📅 {formatDate(task.dueDate, language)}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="py-8 text-center text-slate-500 text-sm">
+            {language === "th" ? "ไม่พบข้อมูลงานที่ค้นหา" : "No tasks found matching current filters."}
+          </div>
+        )}
       </div>
 
       {/* Footer Pagination Row */}
