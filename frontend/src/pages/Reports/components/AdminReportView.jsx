@@ -558,19 +558,28 @@ export default function AdminReportView({ data }) {
           </div>
 
           {/* Recharts BarChart for Project Statuses */}
-          <div className="h-44 w-full mb-4">
+          <div className="h-56 w-full mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={[
-                  { name: t("pending") || "Pending", count: projectStatusCounts.pending, fill: "#94a3b8" },
-                  { name: t("inProgress") || "In Progress", count: projectStatusCounts.inProgress, fill: "#6366f1" },
-                  { name: t("reviewing") || "Review", count: projectStatusCounts.review, fill: "#f59e0b" },
-                  { name: t("completed") || "Completed", count: projectStatusCounts.completed, fill: "#10b981" },
+                  { name: t("pending") || "รอดำเนินการ", count: projectStatusCounts.pending, fill: "#94a3b8" },
+                  { name: t("inProgress") || "กำลังดำเนินการ", count: projectStatusCounts.inProgress, fill: "#6366f1" },
+                  { name: t("reviewing") || "รอตรวจสอบ", count: projectStatusCounts.review, fill: "#f59e0b" },
+                  { name: t("completed") || "เสร็จสิ้น", count: projectStatusCounts.completed, fill: "#10b981" },
                 ]}
-                margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
+                margin={{ top: 5, right: 10, left: -25, bottom: 25 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
-                <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
+                <XAxis
+                  dataKey="name"
+                  stroke="var(--text-secondary)"
+                  fontSize={10}
+                  tickLine={false}
+                  interval={0}
+                  angle={-20}
+                  textAnchor="end"
+                  height={40}
+                />
                 <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
                 <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
                 <Bar dataKey="count" radius={[6, 6, 0, 0]}>
