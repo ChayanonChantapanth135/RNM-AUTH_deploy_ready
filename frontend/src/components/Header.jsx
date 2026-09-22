@@ -126,16 +126,18 @@ const Header = () => {
                   {t("manageUsers")}
                 </Link>
               )}
-              <Link
-                to="/PersonalTask"
-                className={`px-4 py-2 rounded-xl text-sm font-semibold no-underline ${
-                  isActive("/PersonalTask")
-                    ? "header-nav-link-active"
-                    : "header-nav-link"
-                }`}
-              >
-                {t("personalTask")}
-              </Link>
+              {user?.role !== "admin" && (
+                <Link
+                  to="/PersonalTask"
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold no-underline ${
+                    isActive("/PersonalTask")
+                      ? "header-nav-link-active"
+                      : "header-nav-link"
+                  }`}
+                >
+                  {t("personalTask")}
+                </Link>
+              )}
               <Link
                 to="/Projects"
                 className={`px-4 py-2 rounded-xl text-sm font-semibold no-underline ${
@@ -277,18 +279,32 @@ const Header = () => {
                       <span>{t("profile")}</span>
                     </Dropdown.Item>
                     {user?.role === "admin" && (
-                      <Dropdown.Item
-                        as={Link}
-                        to="/MyTasks"
-                        className="rounded-xl px-3 py-2 font-medium transition-colors bg-transparent d-flex align-items-center gap-2"
-                        style={{ color: "var(--text-primary)" }}
-                      >
-                        <ion-icon
-                          name="clipboard-outline"
-                          style={{ fontSize: "16px" }}
-                        ></ion-icon>
-                        <span>{t("myTask")}</span>
-                      </Dropdown.Item>
+                      <>
+                        <Dropdown.Item
+                          as={Link}
+                          to="/PersonalTask"
+                          className="rounded-xl px-3 py-2 font-medium transition-colors bg-transparent d-flex align-items-center gap-2"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          <ion-icon
+                            name="calendar-outline"
+                            style={{ fontSize: "16px" }}
+                          ></ion-icon>
+                          <span>{t("personalTask")}</span>
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as={Link}
+                          to="/MyTasks"
+                          className="rounded-xl px-3 py-2 font-medium transition-colors bg-transparent d-flex align-items-center gap-2"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          <ion-icon
+                            name="clipboard-outline"
+                            style={{ fontSize: "16px" }}
+                          ></ion-icon>
+                          <span>{t("myTask")}</span>
+                        </Dropdown.Item>
+                      </>
                     )}
                     <Dropdown.Item
                       as={Link}
@@ -408,20 +424,22 @@ const Header = () => {
                     </Dropdown.Item>
                   )}
 
-                  <Dropdown.Item
-                    as={Link}
-                    to="/PersonalTask"
-                    className={`rounded-xl px-3 py-2.5 font-bold text-sm transition-all flex items-center gap-3 no-underline mt-1 ${
-                      isActive("/PersonalTask")
-                        ? "header-nav-link-active"
-                        : "header-nav-link"
-                    }`}
-                  >
-                    <span className="text-base">📝</span>
-                    <span className="whitespace-nowrap">
-                      {t("personalTask")}
-                    </span>
-                  </Dropdown.Item>
+                  {user?.role !== "admin" && (
+                    <Dropdown.Item
+                      as={Link}
+                      to="/PersonalTask"
+                      className={`rounded-xl px-3 py-2.5 font-bold text-sm transition-all flex items-center gap-3 no-underline mt-1 ${
+                        isActive("/PersonalTask")
+                          ? "header-nav-link-active"
+                          : "header-nav-link"
+                      }`}
+                    >
+                      <span className="text-base">📝</span>
+                      <span className="whitespace-nowrap">
+                        {t("personalTask")}
+                      </span>
+                    </Dropdown.Item>
+                  )}
 
                   <Dropdown.Item
                     as={Link}
