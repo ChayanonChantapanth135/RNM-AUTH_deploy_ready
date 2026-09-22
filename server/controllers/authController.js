@@ -2741,7 +2741,8 @@ export const reorderPersonalTasks = async (req, res) => {
         }
         const db = await connectToDatabase();
 
-        const ids = tasks.map(t => parseInt(t.id, 10)).filter(Boolean);
+        const validTasks = tasks.filter(t => t && t.id);
+        const ids = validTasks.map(t => parseInt(t.id, 10)).filter(Boolean);
         if (ids.length === 0) {
             return res.status(400).json({ message: 'Invalid task IDs' });
         }
@@ -2752,17 +2753,23 @@ export const reorderPersonalTasks = async (req, res) => {
         let statusCases = '';
         let positionCases = '';
         let completedCases = '';
-        const params = [];
+        const statusParams = [];
+        const positionParams = [];
+        const completedParams = [];
 
-        tasks.forEach(item => {
+        validTasks.forEach(item => {
+            const taskId = parseInt(item.id, 10);
             const isCompleted = item.status === 'completed' ? 1 : 0;
-            statusCases += 'WHEN id = ? THEN ? ';
-            positionCases += 'WHEN id = ? THEN ? ';
-            completedCases += 'WHEN id = ? THEN ? ';
-            params.push(item.id, item.status, item.id, item.position, item.id, isCompleted);
-        });
 
-        params.push(...ids);
+            statusCases += 'WHEN id = ? THEN ? ';
+            statusParams.push(taskId, item.status);
+
+            positionCases += 'WHEN id = ? THEN ? ';
+            positionParams.push(taskId, parseInt(item.position, 10) || 0);
+
+            completedCases += 'WHEN id = ? THEN ? ';
+            completedParams.push(taskId, isCompleted);
+        });
 
         const sql = `
             UPDATE personal_tasks 
@@ -2772,6 +2779,8 @@ export const reorderPersonalTasks = async (req, res) => {
                 is_completed = CASE ${completedCases} ELSE is_completed END
             WHERE id IN (${placeholders})
         `;
+
+        const params = [...statusParams, ...positionParams, ...completedParams, ...ids];
 
         await db.query(sql, params);
         res.status(200).json({ message: 'Tasks reordered successfully' });
