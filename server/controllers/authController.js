@@ -832,21 +832,31 @@ export const importUsers = async (req, res) => {
             return null;
         };
 
-        // Cache existing users map for fast leader lookups by email, name, or id
-        const [allDbUsers] = await db.query('SELECT id, email, fullname FROM users WHERE deleted_at IS NULL');
+        // Cache existing users map with full details for fast diffing and leader lookups
+        const [allDbUsers] = await db.query(
+            'SELECT id, email, fullname, role, status, phone, leader_id, start_date, expire_date FROM users WHERE deleted_at IS NULL'
+        );
         const userByEmail = new Map();
         const userByName = new Map();
         const userById = new Map();
+        const fullUserByEmail = new Map();
 
         allDbUsers.forEach((u) => {
-            if (u.email) userByEmail.set(u.email.toLowerCase().trim(), u.id);
-            if (u.fullname) userByName.set(u.fullname.toLowerCase().trim(), u.id);
+            const normalizedEmail = (u.email || '').toLowerCase().trim();
+            const normalizedName = (u.fullname || '').toLowerCase().trim();
+            if (normalizedEmail) {
+                userByEmail.set(normalizedEmail, u.id);
+                fullUserByEmail.set(normalizedEmail, u);
+            }
+            if (normalizedName) userByName.set(normalizedName, u.id);
             userById.set(Number(u.id), u.id);
         });
 
+        let skippedCount = 0;
+
         for (const item of users) {
             const fullname = (item.fullname || item.username || item.name || '').trim();
-            const email = (item.email || '').trim();
+            const email = (item.email || '').trim().toLowerCase();
             const password = (item.password || '').trim();
             const role = normalizeRole(item.role);
             const status = (item.status || 'active').trim().toLowerCase() === 'suspended' ? 'suspended' : 'active';
@@ -871,10 +881,43 @@ export const importUsers = async (req, res) => {
                 continue;
             }
 
-            const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+            const existing = fullUserByEmail.get(email);
 
-            if (existing.length > 0) {
-                const userIdToUpdate = existing[0].id;
+            if (existing) {
+                const userIdToUpdate = existing.id;
+                const dbStartDate = existing.start_date ? normalizeDateStr(existing.start_date) : null;
+                const dbExpireDate = existing.expire_date ? normalizeDateStr(existing.expire_date) : null;
+                const dbPhone = formatPhoneNumber(existing.phone || '');
+                const dbRole = normalizeRole(existing.role);
+                const dbStatus = (existing.status || 'active').trim().toLowerCase() === 'suspended' ? 'suspended' : 'active';
+                const dbLeaderId = existing.leader_id ? Number(existing.leader_id) : null;
+                const targetLeaderId = (leaderId && leaderId !== userIdToUpdate) ? leaderId : (existing.leader_id || null);
+
+                // Smart Diff: Check if anything actually changed
+                const isNameChanged = fullname !== (existing.fullname || '').trim();
+                const isRoleChanged = role !== dbRole;
+                const isStatusChanged = status !== dbStatus;
+                const isPhoneChanged = phone !== dbPhone && (phone !== '' || dbPhone !== '');
+                const isStartDateChanged = startDate !== dbStartDate && (startDate !== null || dbStartDate !== null);
+                const isExpireDateChanged = expireDate !== dbExpireDate && (expireDate !== null || dbExpireDate !== null);
+                const isLeaderChanged = leaderId && leaderId !== userIdToUpdate && leaderId !== dbLeaderId;
+                const isPasswordChanged = Boolean(password);
+
+                const hasAnyChange =
+                    isNameChanged ||
+                    isRoleChanged ||
+                    isStatusChanged ||
+                    isPhoneChanged ||
+                    isStartDateChanged ||
+                    isExpireDateChanged ||
+                    isLeaderChanged ||
+                    isPasswordChanged;
+
+                if (!hasAnyChange) {
+                    skippedCount++;
+                    continue; // Skip DB update since data is identical!
+                }
+
                 let query = 'UPDATE users SET fullname = ?, role = ?, status = ?, phone = ?, start_date = ?, expire_date = ?';
                 let params = [fullname, role, status, phone, startDate, expireDate];
 
@@ -911,13 +954,14 @@ export const importUsers = async (req, res) => {
             db,
             userId || null,
             'Import Users',
-            `Bulk imported: ${importedCount} new, updated: ${updatedCount} existing`
+            `Bulk imported: ${importedCount} new, updated: ${updatedCount} modified, skipped: ${skippedCount} unchanged`
         );
 
         res.status(200).json({
             message: 'Import completed successfully',
             imported: importedCount,
             updated: updatedCount,
+            skipped: skippedCount,
         });
     } catch (error) {
         console.error('Error importing users:', error.message);

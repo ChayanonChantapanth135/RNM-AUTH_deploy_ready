@@ -1,6 +1,19 @@
 import React, { useState, useMemo } from "react";
 import { Modal } from "react-bootstrap";
 
+const normalizeRole = (role) => {
+  if (!role) return "storyboard";
+  const r = String(role).toLowerCase().trim();
+  if (r === "admin") return "admin";
+  if (r === "manager" || r === "project_manager" || r === "project manager")
+    return "manager";
+  if (r === "storyboard") return "storyboard";
+  if (r === "animation") return "animation";
+  if (r === "designer") return "designer";
+  if (r === "programmer") return "programmer";
+  return r;
+};
+
 const formatRole = (role) => {
   if (!role) return "-";
   const r = String(role).toLowerCase().trim();
@@ -31,8 +44,45 @@ const getRoleBadgeStyle = (role) => {
   return "bg-slate-100 text-slate-800 border border-slate-300";
 };
 
+const normalizePhone = (phoneStr) => {
+  if (!phoneStr) return "";
+  const cleaned = String(phoneStr).replace(/\D/g, "");
+  return cleaned;
+};
+
+const normalizeDateStr = (dateVal) => {
+  if (!dateVal) return "";
+  const str = String(dateVal).trim();
+  if (!str || str === "-" || str.toLowerCase() === "null") return "";
+
+  // DD/MM/YYYY or DD-MM-YYYY
+  const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (dmyMatch) {
+    const day = dmyMatch[1].padStart(2, "0");
+    const month = dmyMatch[2].padStart(2, "0");
+    const year = dmyMatch[3];
+    return `${year}-${month}-${day}`;
+  }
+
+  // ISO String
+  if (str.includes("T")) {
+    return str.split("T")[0];
+  }
+
+  // YYYY-MM-DD
+  const ymdMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if (ymdMatch) {
+    const year = ymdMatch[1];
+    const month = ymdMatch[2].padStart(2, "0");
+    const day = ymdMatch[3].padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  return str;
+};
+
 /**
- * คอมโพเนนต์ Popup Preview สำหรับแสดงรายชื่อผู้ใช้ที่กำลังจะ Import จากไฟล์ Excel/CSV
+ * คอมโพเนนต์ Popup Preview พร้อมระบบ Smart Diffing (ตรวจสอบการเปลี่ยนแปลงเฉพาะฟิลด์)
  */
 const ImportPreviewModal = ({
   show,
@@ -47,14 +97,20 @@ const ImportPreviewModal = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // วิเคราะห์สถานะของแต่ละแถว (New User / Update User / Invalid)
-  const analyzedUsers = useMemo(() => {
-    const existingEmailSet = new Set(
-      existingUsers
-        .map((u) => (u.email || "").toLowerCase().trim())
-        .filter(Boolean),
-    );
+  // แผนผังผู้ใช้เดิมในระบบ (ค้นหาด้วย Email แบบ O(1))
+  const existingUserMap = useMemo(() => {
+    const map = new Map();
+    existingUsers.forEach((u) => {
+      const email = (u.email || "").toLowerCase().trim();
+      if (email) {
+        map.set(email, u);
+      }
+    });
+    return map;
+  }, [existingUsers]);
 
+  // วิเคราะห์สถานะของแต่ละแถวด้วย Smart Diff
+  const analyzedUsers = useMemo(() => {
     return users.map((user, idx) => {
       const fullname = (
         user.fullname ||
@@ -63,21 +119,93 @@ const ImportPreviewModal = ({
         ""
       ).trim();
       const email = (user.email || "").toLowerCase().trim();
-      const phone = (user.phone || user.phonenumber || user.tel || "").trim();
-      const role = user.role || "storyboard";
-      const leader = (user.leader_email || user.leader || user.leader_name || user.leader_id || "").trim();
-      const status = user.status || "active";
-      const startDate = user.start_date || user.startdate || user.startDate || "";
-      const expireDate = user.expire_date || user.expiredate || user.expireDate || "";
+      const rawPhone = user.phone || user.phonenumber || user.tel || "";
+      const phone = String(rawPhone).trim();
+      const role = normalizeRole(user.role || "storyboard");
+      const leader = (
+        user.leader_email ||
+        user.leader ||
+        user.leader_name ||
+        user.leader_id ||
+        ""
+      )
+        .toString()
+        .trim();
+      const status =
+        (user.status || "active").toLowerCase().trim() === "suspended"
+          ? "suspended"
+          : "active";
+      const startDate = normalizeDateStr(
+        user.start_date || user.startdate || user.startDate,
+      );
+      const expireDate = normalizeDateStr(
+        user.expire_date || user.expiredate || user.expireDate,
+      );
+      const password = (user.password || "").trim();
 
       const isValid = Boolean(email && fullname);
-      const isExisting = existingEmailSet.has(email);
+      const existing = existingUserMap.get(email);
+      const isExisting = Boolean(existing);
 
-      let importType = "new"; // "new", "update", "invalid"
+      let importType = "new"; // "new", "changed", "unchanged", "invalid"
+      const changedFields = [];
+
       if (!isValid) {
         importType = "invalid";
       } else if (isExisting) {
-        importType = "update";
+        // ทำการเปรียบเทียบข้อมูลจริงทีละ Field
+        const exName = (existing.fullname || existing.name || "").trim();
+        const exPhone = normalizePhone(existing.phone);
+        const curPhone = normalizePhone(phone);
+        const exRole = normalizeRole(existing.rawRole || existing.role);
+        const exStatus =
+          (existing.status || "active").toLowerCase().trim() === "suspended"
+            ? "suspended"
+            : "active";
+        const exStartDate = normalizeDateStr(
+          existing.startDate || existing.start_date,
+        );
+        const exExpireDate = normalizeDateStr(
+          existing.expireDate || existing.expire_date,
+        );
+
+        if (fullname.toLowerCase() !== exName.toLowerCase()) {
+          changedFields.push("fullname");
+        }
+        if (curPhone !== exPhone && (curPhone !== "" || exPhone !== "")) {
+          changedFields.push("phone");
+        }
+        if (role !== exRole) {
+          changedFields.push("role");
+        }
+        if (status !== exStatus) {
+          changedFields.push("status");
+        }
+        if (startDate !== exStartDate && (startDate !== "" || exStartDate !== "")) {
+          changedFields.push("startDate");
+        }
+        if (expireDate !== exExpireDate && (expireDate !== "" || exExpireDate !== "")) {
+          changedFields.push("expireDate");
+        }
+        if (leader && leader !== "-" && leader.toLowerCase() !== "null") {
+          const exLeaderName = (existing.leaderName || "").toLowerCase();
+          const exLeaderId = String(existing.leaderId || "");
+          if (
+            !exLeaderName.includes(leader.toLowerCase()) &&
+            leader.toLowerCase() !== exLeaderId
+          ) {
+            changedFields.push("leader");
+          }
+        }
+        if (password) {
+          changedFields.push("password");
+        }
+
+        if (changedFields.length > 0) {
+          importType = "changed";
+        } else {
+          importType = "unchanged";
+        }
       }
 
       return {
@@ -92,22 +220,32 @@ const ImportPreviewModal = ({
         expireDate: expireDate || "-",
         isValid,
         importType,
+        changedFields,
+        rawUser: user,
       };
     });
-  }, [users, existingUsers]);
+  }, [users, existingUserMap]);
 
   const stats = useMemo(() => {
     let newCount = 0;
-    let updateCount = 0;
+    let changedCount = 0;
+    let unchangedCount = 0;
     let invalidCount = 0;
 
     analyzedUsers.forEach((u) => {
       if (u.importType === "new") newCount++;
-      else if (u.importType === "update") updateCount++;
+      else if (u.importType === "changed") changedCount++;
+      else if (u.importType === "unchanged") unchangedCount++;
       else invalidCount++;
     });
 
-    return { newCount, updateCount, invalidCount, total: analyzedUsers.length };
+    return {
+      newCount,
+      changedCount,
+      unchangedCount,
+      invalidCount,
+      total: analyzedUsers.length,
+    };
   }, [analyzedUsers]);
 
   const filteredList = useMemo(() => {
@@ -126,6 +264,19 @@ const ImportPreviewModal = ({
       return matchesSearch && matchesStatus;
     });
   }, [analyzedUsers, searchTerm, statusFilter]);
+
+  // ส่งเฉพาะผู้ใช้ใหม่ และผู้ใช้ที่มีข้อมูลเปลี่ยนแปลงไปยัง Backend
+  const handleConfirmSync = () => {
+    const usersToImport = analyzedUsers
+      .filter((u) => u.importType === "new" || u.importType === "changed")
+      .map((u) => u.rawUser);
+
+    if (onConfirm) {
+      onConfirm(usersToImport);
+    }
+  };
+
+  const actionableCount = stats.newCount + stats.changedCount;
 
   return (
     <Modal
@@ -203,25 +354,25 @@ const ImportPreviewModal = ({
           <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-200 shadow-sm flex flex-col">
             <span className="text-[11px] sm:text-xs font-bold text-amber-700 flex items-center gap-1.5">
               <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-amber-500"></span>
-              {t("importUpdateUsers") || "อัปเดตข้อมูลเดิม"}
+              {t("importChangedUsers") || "ข้อมูลเปลี่ยนแปลง"}
             </span>
             <span className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">
-              {stats.updateCount}
+              {stats.changedCount}
             </span>
           </div>
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-rose-50 border border-rose-200 shadow-sm flex flex-col">
-            <span className="text-[11px] sm:text-xs font-bold text-rose-700 flex items-center gap-1.5">
-              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-rose-500"></span>
-              {t("importInvalidUsers") || "ข้อมูลไม่สมบูรณ์"}
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-300 shadow-sm flex flex-col">
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 flex items-center gap-1.5">
+              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-400"></span>
+              {t("importUnchangedUsers") || "ไม่มีการแก้ไข"}
             </span>
-            <span className="text-xl sm:text-2xl font-black text-rose-600 mt-0.5">
-              {stats.invalidCount}
+            <span className="text-xl sm:text-2xl font-black text-slate-600 mt-0.5">
+              {stats.unchangedCount}
             </span>
           </div>
         </div>
 
         {/* Filter / Search Bar */}
-        <div className="p-4 sm:p-6 pb-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="relative w-full sm:w-80">
             <input
               type="text"
@@ -243,7 +394,7 @@ const ImportPreviewModal = ({
           <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 statusFilter === "all"
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -252,8 +403,18 @@ const ImportPreviewModal = ({
               {t("roleFilterAll") || "ทั้งหมด"} ({stats.total})
             </button>
             <button
+              onClick={() => setStatusFilter("changed")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                statusFilter === "changed"
+                  ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
+                  : "bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700"
+              }`}
+            >
+              {t("importChangedUsers") || "ข้อมูลเปลี่ยน"} ({stats.changedCount})
+            </button>
+            <button
               onClick={() => setStatusFilter("new")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 statusFilter === "new"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
                   : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
@@ -262,19 +423,19 @@ const ImportPreviewModal = ({
               {t("importNewUsers") || "ผู้ใช้ใหม่"} ({stats.newCount})
             </button>
             <button
-              onClick={() => setStatusFilter("update")}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                statusFilter === "update"
-                  ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
-                  : "bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700"
+              onClick={() => setStatusFilter("unchanged")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                statusFilter === "unchanged"
+                  ? "bg-slate-700 text-white shadow-md"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              {t("importUpdateUsers") || "อัปเดต"} ({stats.updateCount})
+              {t("importUnchangedUsers") || "ไม่เปลี่ยน"} ({stats.unchangedCount})
             </button>
             {stats.invalidCount > 0 && (
               <button
                 onClick={() => setStatusFilter("invalid")}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                   statusFilter === "invalid"
                     ? "bg-rose-600 text-white shadow-md shadow-rose-600/20"
                     : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-700"
@@ -286,11 +447,22 @@ const ImportPreviewModal = ({
           </div>
         </div>
 
+        {/* Notice Info */}
+        <div className="px-4 sm:px-6 py-1">
+          <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <span>⚡</span>
+            <span>
+              {t("importChangedOnlyNotice") ||
+                "ระบบจะบันทึกเฉพาะรายการใหม่และรายการที่มีการเปลี่ยนแปลง เพื่อความรวดเร็วและลดโหลดฐานข้อมูล"}
+            </span>
+          </div>
+        </div>
+
         {/* Table Preview */}
         <div className="px-4 sm:px-6 py-2">
           <div
             className="overflow-x-auto rounded-2xl border border-slate-200 bg-white light-scrollbar"
-            style={{ maxHeight: "380px", overflowY: "auto" }}
+            style={{ maxHeight: "360px", overflowY: "auto" }}
           >
             <table className="w-full border-collapse">
               <thead className="sticky top-0 z-10 bg-slate-100 border-b border-slate-200 shadow-sm">
@@ -329,15 +501,26 @@ const ImportPreviewModal = ({
               </thead>
               <tbody className="divide-y divide-slate-200 text-xs text-slate-700">
                 {filteredList.map((user) => {
+                  const isChangedRow = user.importType === "changed";
+                  const fields = user.changedFields || [];
+
                   return (
                     <tr
                       key={user.idx}
-                      className="hover:bg-slate-50 transition-colors"
+                      className={`hover:bg-slate-50 transition-colors ${
+                        user.importType === "unchanged" ? "opacity-75" : ""
+                      }`}
                     >
                       <td className="py-3 px-3 text-center text-slate-400 font-medium">
                         {user.idx}
                       </td>
-                      <td className="py-3 px-4 text-left font-bold text-slate-900 whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-left font-bold text-slate-900 whitespace-nowrap ${
+                          isChangedRow && fields.includes("fullname")
+                            ? "bg-amber-50/80 text-amber-900"
+                            : ""
+                        }`}
+                      >
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-full bg-indigo-100 border border-indigo-200 text-indigo-700 font-black flex items-center justify-center text-[11px] shrink-0">
                             {user.fullname
@@ -347,15 +530,37 @@ const ImportPreviewModal = ({
                           <span className="text-slate-900">
                             {user.fullname}
                           </span>
+                          {isChangedRow && fields.includes("fullname") && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200 text-amber-800 font-bold">
+                              ✏️ แก้ไข
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap">
                         {user.email}
                       </td>
-                      <td className="py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap ${
+                          isChangedRow && fields.includes("phone")
+                            ? "bg-amber-50/80 font-bold text-amber-900"
+                            : ""
+                        }`}
+                      >
                         {user.phone}
+                        {isChangedRow && fields.includes("phone") && (
+                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
+                            ✏️
+                          </span>
+                        )}
                       </td>
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-center whitespace-nowrap ${
+                          isChangedRow && fields.includes("role")
+                            ? "bg-amber-50/80"
+                            : ""
+                        }`}
+                      >
                         <span
                           className={`inline-block px-2.5 py-1 rounded-lg text-[11px] font-bold ${getRoleBadgeStyle(
                             user.role,
@@ -363,11 +568,33 @@ const ImportPreviewModal = ({
                         >
                           {formatRole(user.role)}
                         </span>
+                        {isChangedRow && fields.includes("role") && (
+                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
+                            ✏️
+                          </span>
+                        )}
                       </td>
-                      <td className="py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap ${
+                          isChangedRow && fields.includes("leader")
+                            ? "bg-amber-50/80 font-bold text-amber-900"
+                            : ""
+                        }`}
+                      >
                         {user.leader}
+                        {isChangedRow && fields.includes("leader") && (
+                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
+                            ✏️
+                          </span>
+                        )}
                       </td>
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-center whitespace-nowrap ${
+                          isChangedRow && fields.includes("status")
+                            ? "bg-amber-50/80"
+                            : ""
+                        }`}
+                      >
                         {user.status === "suspended" ? (
                           <span className="inline-block px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px]">
                             {t("suspendedLabel") || "Suspended"}
@@ -377,11 +604,28 @@ const ImportPreviewModal = ({
                             {t("activeLabel") || "Active"}
                           </span>
                         )}
+                        {isChangedRow && fields.includes("status") && (
+                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
+                            ✏️
+                          </span>
+                        )}
                       </td>
-                      <td className="py-3 px-4 text-center text-slate-600 font-medium whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-center text-slate-600 font-medium whitespace-nowrap ${
+                          isChangedRow && fields.includes("startDate")
+                            ? "bg-amber-50/80 font-bold text-amber-900"
+                            : ""
+                        }`}
+                      >
                         {user.startDate}
                       </td>
-                      <td className="py-3 px-4 text-center text-slate-600 font-medium whitespace-nowrap">
+                      <td
+                        className={`py-3 px-4 text-center text-slate-600 font-medium whitespace-nowrap ${
+                          isChangedRow && fields.includes("expireDate")
+                            ? "bg-amber-50/80 font-bold text-amber-900"
+                            : ""
+                        }`}
+                      >
                         {user.expireDate}
                       </td>
                       <td className="py-3 px-4 text-center whitespace-nowrap">
@@ -390,9 +634,14 @@ const ImportPreviewModal = ({
                             {t("importActionCreate") || "New Account"}
                           </span>
                         )}
-                        {user.importType === "update" && (
+                        {user.importType === "changed" && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 font-bold text-[11px] shadow-sm">
-                            {t("importActionUpdate") || "Update Account"}
+                            {t("importActionChanged") || "Update (Changed)"}
+                          </span>
+                        )}
+                        {user.importType === "unchanged" && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 font-medium text-[11px]">
+                            {t("importActionUnchanged") || "No Change (Skip)"}
                           </span>
                         )}
                         {user.importType === "invalid" && (
@@ -408,7 +657,7 @@ const ImportPreviewModal = ({
                 {filteredList.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={10}
                       className="text-center text-slate-400 py-10 text-xs font-semibold"
                     >
                       {t("noUsersText") || "ไม่พบข้อมูลที่ค้นหา"}
@@ -421,15 +670,21 @@ const ImportPreviewModal = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/80 mt-2">
+        <div className="p-5 sm:p-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/80 mt-2">
           <div className="text-xs text-slate-600 text-center sm:text-left font-medium">
             <span>
-              {t("importConfirmSummary") || "พร้อมนำเข้าทั้งหมด"}{" "}
+              {t("importConfirmSummary") || "พร้อมนำเข้า/อัปเดต"}{" "}
               <strong className="text-emerald-700 font-black">
-                {stats.newCount + stats.updateCount}
+                {actionableCount}
               </strong>{" "}
               {t("entriesText") || "รายการ"}
             </span>
+            {stats.unchangedCount > 0 && (
+              <span className="text-slate-500 ml-2">
+                ({t("importUnchangedUsers") || "ข้อมูลเหมือนเดิม"}{" "}
+                {stats.unchangedCount} {t("entriesText") || "รายการ ข้ามอัตโนมัติ"})
+              </span>
+            )}
             {stats.invalidCount > 0 && (
               <span className="text-rose-600 ml-2 font-semibold">
                 ({t("importInvalidSkipped") || "ระบบจะข้ามรายการที่ไม่สมบูรณ์"}{" "}
@@ -449,10 +704,8 @@ const ImportPreviewModal = ({
             </button>
             <button
               type="button"
-              disabled={
-                loading || (stats.newCount === 0 && stats.updateCount === 0)
-              }
-              onClick={onConfirm}
+              disabled={loading || actionableCount === 0}
+              onClick={handleConfirmSync}
               className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
@@ -465,7 +718,11 @@ const ImportPreviewModal = ({
               ) : (
                 <>
                   <span>✓</span>
-                  <span>{t("confirmBtn") || "ตกลงนำเข้าข้อมูล"}</span>
+                  <span>
+                    {actionableCount === 0
+                      ? t("importNoChanges") || "ไม่มีข้อมูลเปลี่ยนแปลง"
+                      : `${t("confirmBtn") || "ตกลงนำเข้า"} (${actionableCount})`}
+                  </span>
                 </>
               )}
             </button>

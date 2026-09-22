@@ -447,18 +447,29 @@ export const useUserManagement = (t, language = "en") => {
   };
 
   // ฟังก์ชันกดยืนยันการนำเข้าและส่งข้อมูลไปยังหลังบ้านเพื่อบันทึก
-  const handleImportConfirm = async () => {
+  const handleImportConfirm = async (usersToSubmit) => {
     try {
+      const payloadUsers =
+        Array.isArray(usersToSubmit) && usersToSubmit.length > 0
+          ? usersToSubmit
+          : importUsersList;
+
+      if (!payloadUsers || payloadUsers.length === 0) {
+        setShowImportConfirm(false);
+        return;
+      }
+
       setLoading(true);
       setShowImportConfirm(false);
       const response = await axios.post("/auth/users/import", {
-        users: importUsersList,
+        users: payloadUsers,
         userId: currentUser?.id,
       });
       // จัดเก็บข้อมูลสถิติจำนวนที่สร้างใหม่และอัปเดตเพื่อนำไปรายงานผล
       setImportResultDetails({
         imported: response.data.imported || 0,
         updated: response.data.updated || 0,
+        skipped: response.data.skipped || 0,
       });
       setShowImportResult(true); // เปิดป๊อปอัปรายงานผลสำเร็จ
       await fetchUsers(); // โหลดตารางผู้ใช้ใหม่
