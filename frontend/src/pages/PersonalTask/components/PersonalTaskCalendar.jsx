@@ -85,6 +85,7 @@ const PersonalTaskCalendar = ({
 
     const draggable = new Draggable(externalTasksContainerRef.current, {
       itemSelector: ".fc-external-task",
+      longPressDelay: 250,
       eventData: (eventEl) => {
         const taskDataStr = eventEl.getAttribute("data-task");
         const task = taskDataStr ? JSON.parse(taskDataStr) : null;
@@ -475,6 +476,15 @@ const PersonalTaskCalendar = ({
             max-height: 280px !important;
             overflow-y: auto !important;
           }
+          .fc-event, .fc-external-task {
+            touch-action: none !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+            cursor: grab !important;
+          }
+          .fc-event:active, .fc-external-task:active {
+            cursor: grabbing !important;
+          }
         `}</style>
 
         {/* FullCalendar Component */}
@@ -486,6 +496,9 @@ const PersonalTaskCalendar = ({
             events={events}
             editable={true}
             droppable={true}
+            eventLongPressDelay={250}
+            selectLongPressDelay={250}
+            longPressDelay={250}
             snapDuration="24:00:00"
             dragRevertDuration={0}
             eventDragMinDistance={3}
