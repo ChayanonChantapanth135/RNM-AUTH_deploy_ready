@@ -143,29 +143,16 @@ export const THEME_ACCENTS = {
       200: "#fef9c3",
     },
   },
-  Black: {
-    name: "Black",
-    code: "#18181b",
-    light: "#09090b",
-    dark: "#18181b",
-    gradient: "from-zinc-800 to-zinc-950",
-    shades: {
-      600: "#09090b",
-      500: "#18181b",
-      400: "#27272a",
-      300: "#3f3f46",
-      200: "#52525b",
-    },
-  },
 };
 
 export const ThemeProvider = ({ children }) => {
   const [appearance, setAppearance] = useState(
     () => localStorage.getItem("appearance") || "Dark"
   );
-  const [accentColor, setAccentColor] = useState(
-    () => localStorage.getItem("accentColor") || "Blue"
-  );
+  const [accentColor, setAccentColor] = useState(() => {
+    const saved = localStorage.getItem("accentColor");
+    return saved && saved !== "Black" && THEME_ACCENTS[saved] ? saved : "Blue";
+  });
   const [isDarkEffective, setIsDarkEffective] = useState(true);
 
   // Appearance Change Effect
@@ -204,6 +191,10 @@ export const ThemeProvider = ({ children }) => {
 
   // Accent Color & Status Colors CSS Variables Injection
   useEffect(() => {
+    if (accentColor === "Black" || !THEME_ACCENTS[accentColor]) {
+      setAccentColor("Blue");
+      return;
+    }
     localStorage.setItem("accentColor", accentColor);
     const themeObj = THEME_ACCENTS[accentColor] || THEME_ACCENTS.Blue;
     const isDark = isDarkEffective;
