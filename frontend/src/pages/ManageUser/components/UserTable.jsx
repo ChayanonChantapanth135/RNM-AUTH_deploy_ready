@@ -68,8 +68,8 @@ const UserTable = ({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Desktop Table View (Hidden on mobile) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
@@ -211,6 +211,151 @@ const UserTable = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View (Shown on mobile only, eliminating horizontal scroll) */}
+      <div className="md:hidden flex flex-col gap-3">
+        {currentEntries.map((user) => {
+          const isSelf =
+            currentUser &&
+            (Number(currentUser.id) === Number(user.id) ||
+              currentUser.email?.toLowerCase() ===
+                user.email?.toLowerCase());
+
+          return (
+            <div
+              key={user.id}
+              className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all flex flex-col gap-3"
+            >
+              {/* User Header: Avatar + Name + Badges + Actions */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  {user.avatar ? (
+                    <img
+                      src={
+                        user.avatar.startsWith("http")
+                          ? user.avatar
+                          : `${API_URL}${user.avatar}`
+                      }
+                      alt={user.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                        if (e.target.nextSibling) {
+                          e.target.nextSibling.style.display = 'flex';
+                        }
+                      }}
+                      className="w-10 h-10 rounded-full object-cover shrink-0"
+                    />
+                  ) : null}
+                  <div
+                    className="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0"
+                    style={{ display: user.avatar ? 'none' : 'flex' }}
+                  >
+                    {user.initials}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-bold text-white text-sm truncate">
+                        {user.name}
+                      </span>
+                      {user.isLeader && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-bold tracking-wide shrink-0">
+                          {t("leaderBadge") || "Leader"}
+                        </span>
+                      )}
+                      {isSelf && (
+                        <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[9px] font-semibold shrink-0">
+                          {t("youBadge")}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-400 truncate mt-0.5">
+                      {user.email}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center text-xs transition-colors"
+                    onClick={() => handleOpenEdit(user)}
+                    aria-label="Edit"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    disabled={isSelf}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-colors ${
+                      isSelf
+                        ? "opacity-30 cursor-not-allowed bg-white/5"
+                        : user.status === "suspended"
+                        ? "bg-emerald-500/20 text-emerald-300"
+                        : "bg-amber-500/20 text-amber-300"
+                    }`}
+                    onClick={() => !isSelf && handleToggleStatus(user)}
+                    title={
+                      isSelf
+                        ? t("cannotSuspendSelf") ||
+                          "ไม่สามารถระงับสิทธิ์ตัวเองได้"
+                        : ""
+                    }
+                    aria-label="Toggle Status"
+                  >
+                    {user.status === "suspended" ? "🔓" : "⏸️"}
+                  </button>
+                  <button
+                    disabled={isSelf}
+                    className={`w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-colors ${
+                      isSelf ? "opacity-30 cursor-not-allowed" : ""
+                    }`}
+                    onClick={() => !isSelf && handleDeleteUser(user)}
+                    title={
+                      isSelf
+                        ? t("cannotDeleteSelf") || "ไม่สามารถลบตัวเองได้"
+                        : ""
+                    }
+                    aria-label="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              {/* Badges & Last Login Row */}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5 text-xs">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span
+                    className={`px-2 py-0.5 rounded-md font-semibold text-[11px] ${getRoleBadgeStyle(
+                      user.role
+                    )}`}
+                  >
+                    {formatRole(user.role)}
+                  </span>
+                  {user.status === "active" ? (
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-semibold text-[11px]">
+                      {t("activeLabel")}
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-semibold text-[11px]">
+                      {t("suspendedLabel")}
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-slate-400 shrink-0">
+                  <span className="opacity-60">{t("colLastLogin")}:</span> {user.lastLogin || "-"}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {currentEntries.length === 0 && (
+          <div className="text-center text-slate-500 py-8 text-sm">
+            {t("noUsersText")}
+          </div>
+        )}
       </div>
 
       {/* Pagination footer */}
