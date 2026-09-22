@@ -231,15 +231,15 @@ const ProjectDetailModal = ({
                   displayTasks.map((task) => (
                     <div
                       key={task.id}
-                      className="list-group-item d-flex align-items-center justify-content-between py-3 rounded-2xl mb-1 border-0"
+                      className="list-group-item d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between p-3 rounded-2xl mb-2 border-0 gap-2"
                       style={getTaskStyle(task)}
                     >
                       {/* Left: Task Title */}
                       <div
                         className="d-flex flex-column justify-content-center"
-                        style={{ flex: 1, minWidth: "150px" }}
+                        style={{ flex: 1, minWidth: 0 }}
                       >
-                        <span className="text-dark fw-medium">
+                        <span className="text-dark fw-bold text-break">
                           {task.title}
                         </span>
                       </div>
@@ -248,21 +248,19 @@ const ProjectDetailModal = ({
                       <div
                         className="d-flex flex-column gap-1 text-muted small"
                         style={{
-                          flex: 1,
-                          minWidth: "180px",
-                          paddingLeft: "15px",
+                          minWidth: 0,
                         }}
                       >
-                        <span className="d-block">
+                        <span className="d-block text-truncate">
                           👤 {task.assigned_to_name || t("unassigned")}
                         </span>
                         {task.dueDate && (
-                          <span className="d-block">📅 {formatDate(task.dueDate, language)}</span>
+                          <span className="d-block font-mono">📅 {formatDate(task.dueDate, language)}</span>
                         )}
                       </div>
 
-                      {/* Middle-Right: Status Badge */}
-                      <div className="ms-3" style={{ minWidth: "110px" }}>
+                      {/* Bottom-Right / Row on Desktop: Status Badge & Action */}
+                      <div className="d-flex align-items-center justify-content-between justify-content-sm-end gap-2 w-100 w-sm-auto mt-1 mt-sm-0 pt-2 pt-sm-0 border-top border-sm-0">
                         <span
                           className={`badge text-xs ${
                             task.status === "Completed"
@@ -276,10 +274,7 @@ const ProjectDetailModal = ({
                         >
                           {task.status || "Pending"}
                         </span>
-                      </div>
 
-                      {/* Right: View Task Detail Button (Fixed width container to keep alignment) */}
-                      <div className="ms-3 d-flex justify-content-end" style={{ width: "125px", minWidth: "125px" }}>
                         {(() => {
                           const isAssigned =
                             Number(task.assigned_to) === currentUid ||
@@ -292,7 +287,8 @@ const ProjectDetailModal = ({
 
                           return (
                             <button
-                              className="btn btn-sm btn-primary rounded-lg text-xs w-100"
+                              className="btn btn-sm btn-primary rounded-lg text-xs"
+                              style={{ minWidth: "90px" }}
                               onClick={() => {
                                 setSelectedTask(task);
                                 setTempStatus(task.status || "Pending");
