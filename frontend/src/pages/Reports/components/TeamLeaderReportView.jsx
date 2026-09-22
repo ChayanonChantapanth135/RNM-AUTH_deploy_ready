@@ -27,9 +27,15 @@ const CustomChartTooltip = ({ active, payload, label }) => {
           boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.4)",
         }}
       >
-        <p className="mb-1 text-slate-400 font-semibold">{label || payload[0]?.name}</p>
+        <p className="mb-1 text-slate-400 font-semibold">
+          {label || payload[0]?.name}
+        </p>
         {payload.map((item, idx) => (
-          <p key={idx} className="text-xs font-extrabold flex items-center justify-between gap-4 py-0.5" style={{ color: item.color || item.fill }}>
+          <p
+            key={idx}
+            className="text-xs font-extrabold flex items-center justify-between gap-4 py-0.5"
+            style={{ color: item.color || item.fill }}
+          >
             <span>{item.name}:</span>
             <span className="font-mono">{item.value}</span>
           </p>
@@ -330,8 +336,12 @@ export default function TeamLeaderReportView({ data }) {
               </span>
               {t("teamStatusDistribution") || "Team Task Status"}
             </h3>
-            <p className="text-xs mt-1 ml-11" style={{ color: "var(--text-secondary)" }}>
-              {t("teamStatusDistributionDesc") || "Breakdown of tasks assigned across your team"}
+            <p
+              className="text-xs mt-1 ml-11"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t("teamStatusDistributionDesc") ||
+                "Breakdown of tasks assigned across your team"}
             </p>
           </div>
 
@@ -339,7 +349,9 @@ export default function TeamLeaderReportView({ data }) {
             {tlTasks.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-1">
                 <span className="text-2xl opacity-40">📊</span>
-                <p className="text-xs text-slate-500 font-semibold">{t("noData") || "No Task Data"}</p>
+                <p className="text-xs text-slate-500 font-semibold">
+                  {t("noData") || "No Task Data"}
+                </p>
               </div>
             ) : (
               <>
@@ -350,7 +362,10 @@ export default function TeamLeaderReportView({ data }) {
                       data={[
                         {
                           name: t("statusCompleted") || "Completed",
-                          value: tlTasks.filter((t) => (t.status || "").toLowerCase() === "completed").length,
+                          value: tlTasks.filter(
+                            (t) =>
+                              (t.status || "").toLowerCase() === "completed",
+                          ).length,
                           fill: "#10b981",
                         },
                         {
@@ -371,7 +386,9 @@ export default function TeamLeaderReportView({ data }) {
                         },
                         {
                           name: t("statusPending") || "Pending",
-                          value: tlTasks.filter((t) => (t.status || "").toLowerCase() === "pending").length,
+                          value: tlTasks.filter(
+                            (t) => (t.status || "").toLowerCase() === "pending",
+                          ).length,
                           fill: "#94a3b8",
                         },
                         {
@@ -401,10 +418,16 @@ export default function TeamLeaderReportView({ data }) {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute flex flex-col items-center pointer-events-none">
-                  <span className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>
+                  <span
+                    className="text-2xl font-black"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {tlCompletionRate}%
                   </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                  <span
+                    className="text-[10px] font-bold uppercase tracking-wider"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {t("completed") || "Success"}
                   </span>
                 </div>
@@ -412,7 +435,10 @@ export default function TeamLeaderReportView({ data }) {
             )}
           </div>
 
-          <div className="w-full rounded-full h-2 overflow-hidden mt-2" style={{ background: "var(--border-surface)" }}>
+          <div
+            className="w-full rounded-full h-2 overflow-hidden mt-2"
+            style={{ background: "var(--border-surface)" }}
+          >
             <div
               className="h-full rounded-full transition-all duration-1000"
               style={{
@@ -446,10 +472,15 @@ export default function TeamLeaderReportView({ data }) {
               >
                 👥
               </span>
-              {t("teamMemberWorkloadTitle") || "Member Task Completion & Workload"}
+              {t("teamMemberWorkloadTitle") ||
+                "Member Task Completion & Workload"}
             </h3>
-            <p className="text-xs mt-1 ml-11" style={{ color: "var(--text-secondary)" }}>
-              {t("teamMemberWorkloadDesc") || "Comparison of total tasks vs completed tasks per team member"}
+            <p
+              className="text-xs mt-1 ml-11"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t("teamMemberWorkloadDesc") ||
+                "Comparison of total tasks vs completed tasks per team member"}
             </p>
           </div>
 
@@ -470,13 +501,16 @@ export default function TeamLeaderReportView({ data }) {
 
               const memberData = Object.values(memberMap).map((m) => ({
                 ...m,
-                displayName: m.name.length > 10 ? `${m.name.slice(0, 8)}...` : m.name,
+                displayName:
+                  m.name.length > 10 ? `${m.name.slice(0, 8)}...` : m.name,
               }));
 
               if (memberData.length === 0) {
                 return (
                   <div className="h-full flex items-center justify-center">
-                    <p className="text-xs text-slate-500 font-bold">No Member Assignment Data</p>
+                    <p className="text-xs text-slate-500 font-bold">
+                      No Member Assignment Data
+                    </p>
                   </div>
                 );
               }
@@ -488,7 +522,11 @@ export default function TeamLeaderReportView({ data }) {
                       data={memberData}
                       margin={{ top: 10, right: 10, left: -20, bottom: 25 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        opacity={0.15}
+                        vertical={false}
+                      />
                       <XAxis
                         dataKey="displayName"
                         stroke="var(--text-secondary)"
@@ -499,9 +537,19 @@ export default function TeamLeaderReportView({ data }) {
                         textAnchor="end"
                         height={40}
                       />
-                      <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize={11} tickLine={false} />
-                      <Tooltip content={<CustomChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-                      <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "6px" }} />
+                      <YAxis
+                        allowDecimals={false}
+                        stroke="var(--text-secondary)"
+                        fontSize={11}
+                        tickLine={false}
+                      />
+                      <Tooltip
+                        content={<CustomChartTooltip />}
+                        cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                      />
+                      <Legend
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "6px" }}
+                      />
                       <Bar
                         dataKey="total"
                         name={t("assignedTasksLabel") || "Assigned"}
@@ -991,11 +1039,18 @@ export default function TeamLeaderReportView({ data }) {
                         {tItem.title || tItem.name || "-"}
                       </h4>
                       <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
-                        <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-white font-bold truncate">
+                        <span
+                          className="px-2 py-0.5 rounded-md text-[11px] font-bold truncate shrink-0 project-badge-pill"
+                          style={{
+                            backgroundColor: "#5c8cd8ff",
+                            color: "#ffffff",
+                          }}
+                        >
                           📁 {tItem.projectName || "-"}
                         </span>
                         <span className="text-slate-300 text-xs">
-                          👤 {tItem.assigned_to_name || tItem.assigneeName || "-"}
+                          👤{" "}
+                          {tItem.assigned_to_name || tItem.assigneeName || "-"}
                         </span>
                       </div>
                     </div>

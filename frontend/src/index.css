@@ -82,6 +82,8 @@
   outline: none !important;
   box-shadow: none !important;
   -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
 /* Dynamic 60-30-10 Utility Classes */
@@ -907,4 +909,13 @@ html, body {
     padding: 1px 3px !important;
     margin-bottom: 2px !important;
   }
+}
+
+/* Mobile project badge pill: Force dark background and pure white text in all themes */
+.project-badge-pill,
+.light .project-badge-pill,
+:root.light .project-badge-pill,
+html.light .project-badge-pill {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
 }

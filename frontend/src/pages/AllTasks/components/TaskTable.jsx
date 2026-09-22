@@ -13,7 +13,8 @@ const TaskTable = ({
   totalItems,
   onManageClick,
 }) => {
-  const startEntry = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const startEntry =
+    totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endEntry = Math.min(currentPage * itemsPerPage, totalItems);
   return (
     <div className="glass-panel rounded-3xl p-6 overflow-hidden border-0 bg-white/5 backdrop-blur-lg shadow-2xl mb-6">
@@ -35,8 +36,19 @@ const TaskTable = ({
               <option value={50}>50</option>
             </select>
             <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none text-white">
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path>
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M19 9l-7 7-7-7"
+                ></path>
               </svg>
             </div>
           </div>
@@ -49,13 +61,27 @@ const TaskTable = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider">
-              <th className="py-4 px-6">{language === "th" ? "ชื่องาน" : "Task Name"}</th>
-              <th className="py-4 px-6">{language === "th" ? "โปรเจกต์" : "Project"}</th>
-              <th className="py-4 px-6">{language === "th" ? "ผู้รับผิดชอบ" : "Assignee"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "ความสำคัญ" : "Priority"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "สถานะ" : "Status"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "วันส่งมอบ" : "Due Date"}</th>
-              <th className="py-4 px-6 text-center">{language === "th" ? "จัดการ" : "Action"}</th>
+              <th className="py-4 px-6">
+                {language === "th" ? "ชื่องาน" : "Task Name"}
+              </th>
+              <th className="py-4 px-6">
+                {language === "th" ? "โปรเจกต์" : "Project"}
+              </th>
+              <th className="py-4 px-6">
+                {language === "th" ? "ผู้รับผิดชอบ" : "Assignee"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "ความสำคัญ" : "Priority"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "สถานะ" : "Status"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "วันส่งมอบ" : "Due Date"}
+              </th>
+              <th className="py-4 px-6 text-center">
+                {language === "th" ? "จัดการ" : "Action"}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-sm">
@@ -68,13 +94,13 @@ const TaskTable = ({
                   const end = new Date(task.dueDate);
                   const endDay = new Date(end);
                   endDay.setHours(23, 59, 59, 999);
-                  
+
                   if (now > endDay) {
                     return {
                       backgroundColor: "rgba(244, 63, 94, 0.15)", // light red
                     };
                   }
-                  
+
                   const diffTime = endDay.getTime() - now.getTime();
                   const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
                   if (diffTime >= 0 && diffTime <= threeDaysMs) {
@@ -86,22 +112,38 @@ const TaskTable = ({
                 })();
 
                 return (
-                  <tr key={task.id} className="hover:bg-white/5 transition-colors duration-200">
-                    <td className="py-4 px-6 font-semibold text-white rounded-l-2xl" style={deadlineStyle}>{task.title}</td>
-                    <td className="py-4 px-6 text-slate-300" style={deadlineStyle}>
+                  <tr
+                    key={task.id}
+                    className="hover:bg-white/5 transition-colors duration-200"
+                  >
+                    <td
+                      className="py-4 px-6 font-semibold text-white rounded-l-2xl"
+                      style={deadlineStyle}
+                    >
+                      {task.title}
+                    </td>
+                    <td
+                      className="py-4 px-6 text-slate-300"
+                      style={deadlineStyle}
+                    >
                       <span className="bg-[#1e293b]/60 px-2.5 py-1 rounded-lg text-xs whitespace-nowrap">
                         {task.project}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-slate-300 whitespace-nowrap" style={deadlineStyle}>{task.assignee}</td>
+                    <td
+                      className="py-4 px-6 text-slate-300 whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
+                      {task.assignee}
+                    </td>
                     <td className="py-4 px-6 text-center" style={deadlineStyle}>
                       <span
                         className={`inline-block px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
                           task.priority === "High"
                             ? "bg-red-500/20 text-red-300"
                             : task.priority === "Medium"
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-blue-500/20 text-blue-300"
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-blue-500/20 text-blue-300"
                         }`}
                       >
                         {task.priority}
@@ -113,17 +155,26 @@ const TaskTable = ({
                           task.status === "Completed"
                             ? "badge-status-completed"
                             : task.status === "In Progress"
-                            ? "badge-status-in-progress"
-                            : task.status === "Reviewing" || task.status === "In Review"
-                            ? "badge-status-in-review"
-                            : "badge-status-todo"
+                              ? "badge-status-in-progress"
+                              : task.status === "Reviewing" ||
+                                  task.status === "In Review"
+                                ? "badge-status-in-review"
+                                : "badge-status-todo"
                         }`}
                       >
                         {task.status}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-center text-slate-400 font-mono whitespace-nowrap" style={deadlineStyle}>{formatDate(task.dueDate, language)}</td>
-                    <td className="py-4 px-6 text-center whitespace-nowrap rounded-r-2xl" style={deadlineStyle}>
+                    <td
+                      className="py-4 px-6 text-center text-slate-400 font-mono whitespace-nowrap"
+                      style={deadlineStyle}
+                    >
+                      {formatDate(task.dueDate, language)}
+                    </td>
+                    <td
+                      className="py-4 px-6 text-center whitespace-nowrap rounded-r-2xl"
+                      style={deadlineStyle}
+                    >
                       <button
                         className="px-4 py-1.5 text-xs font-bold rounded-2xl transition-all cursor-pointer shadow-sm hover:shadow-md"
                         style={{
@@ -142,7 +193,9 @@ const TaskTable = ({
             ) : (
               <tr>
                 <td colSpan="7" className="py-8 text-center text-slate-500">
-                  {language === "th" ? "ไม่พบข้อมูลงานที่ค้นหา" : "No tasks found matching current filters."}
+                  {language === "th"
+                    ? "ไม่พบข้อมูลงานที่ค้นหา"
+                    : "No tasks found matching current filters."}
                 </td>
               </tr>
             )}
@@ -159,10 +212,10 @@ const TaskTable = ({
               task.status === "Completed"
                 ? "badge-status-completed"
                 : task.status === "In Progress"
-                ? "badge-status-in-progress"
-                : task.status === "Reviewing" || task.status === "In Review"
-                ? "badge-status-in-review"
-                : "badge-status-todo";
+                  ? "badge-status-in-progress"
+                  : task.status === "Reviewing" || task.status === "In Review"
+                    ? "badge-status-in-review"
+                    : "badge-status-todo";
 
             return (
               <div
@@ -176,7 +229,13 @@ const TaskTable = ({
                       {task.title}
                     </h4>
                     <div className="flex items-center gap-2 mt-1 flex-wrap text-xs text-slate-300">
-                      <span className="bg-[#1e293b]/80 px-2 py-0.5 rounded-md text-[11px] text-white font-bold truncate">
+                      <span
+                        className="px-2 py-0.5 rounded-md text-[11px] font-bold truncate shrink-0 project-badge-pill"
+                        style={{
+                          backgroundColor: "#5c8cd8ff",
+                          color: "#ffffff",
+                        }}
+                      >
                         📁 {task.project}
                       </span>
                       <span className="text-slate-300 text-xs">
@@ -205,13 +264,15 @@ const TaskTable = ({
                         task.priority === "High"
                           ? "bg-red-500/20 text-red-300"
                           : task.priority === "Medium"
-                          ? "bg-amber-500/20 text-amber-300"
-                          : "bg-blue-500/20 text-blue-300"
+                            ? "bg-amber-500/20 text-amber-300"
+                            : "bg-blue-500/20 text-blue-300"
                       }`}
                     >
                       {task.priority}
                     </span>
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusClass}`}>
+                    <span
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusClass}`}
+                    >
                       {task.status}
                     </span>
                   </div>
@@ -224,7 +285,9 @@ const TaskTable = ({
           })
         ) : (
           <div className="py-8 text-center text-slate-500 text-sm">
-            {language === "th" ? "ไม่พบข้อมูลงานที่ค้นหา" : "No tasks found matching current filters."}
+            {language === "th"
+              ? "ไม่พบข้อมูลงานที่ค้นหา"
+              : "No tasks found matching current filters."}
           </div>
         )}
       </div>
@@ -233,8 +296,8 @@ const TaskTable = ({
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-white/5 text-xs text-slate-400">
         <span>
           {t("showingText") || "Showing"} {totalItems === 0 ? 0 : startEntry}{" "}
-          {t("toText") || "to"} {endEntry} {t("ofText") || "of"}{" "}
-          {totalItems} {t("entriesText") || "Entries"}
+          {t("toText") || "to"} {endEntry} {t("ofText") || "of"} {totalItems}{" "}
+          {t("entriesText") || "Entries"}
         </span>
 
         {totalPages > 1 && (
