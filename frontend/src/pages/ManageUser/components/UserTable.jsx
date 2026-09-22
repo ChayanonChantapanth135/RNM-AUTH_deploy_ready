@@ -225,7 +225,7 @@ const UserTable = ({
           return (
             <div
               key={user.id}
-              className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all flex flex-col gap-3"
+              className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-3"
             >
               {/* User Header: Avatar + Name + Badges + Actions */}
               <div className="flex items-start justify-between gap-2">
