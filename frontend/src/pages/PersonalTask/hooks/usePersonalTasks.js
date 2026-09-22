@@ -547,7 +547,7 @@ export const usePersonalTasks = () => {
 
       const Toast = Swal.mixin({
         toast: true,
-        position: "top-end",
+        position: window.innerWidth < 640 ? "top" : "top-end",
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
@@ -612,7 +612,7 @@ export const usePersonalTasks = () => {
 
       const Toast = Swal.mixin({
         toast: true,
-        position: "top-end",
+        position: window.innerWidth < 640 ? "top" : "top-end",
         showConfirmButton: false,
         timer: 1500,
         showCloseButton: false,
