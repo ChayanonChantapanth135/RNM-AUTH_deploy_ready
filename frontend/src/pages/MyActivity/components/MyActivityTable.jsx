@@ -46,7 +46,9 @@ const MyActivityTable = ({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+          {/* Desktop Table View (Hidden on mobile) */}
+          <div className="hidden md:block overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr 
