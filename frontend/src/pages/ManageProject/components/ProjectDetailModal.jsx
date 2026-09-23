@@ -407,18 +407,20 @@ const ProjectDetailModal = ({
                             )}
                           </div>
 
-                          {/* Row 3: Full-width Mobile Action Button */}
+                          {/* Row 3: Right-aligned compact Mobile Action Button */}
                           {canViewDetail && (
-                            <button
-                              className="btn btn-sm btn-primary rounded-lg text-xs w-100 py-1.5 mt-1"
-                              onClick={() => {
-                                setSelectedTask(task);
-                                setTempStatus(task.status || "Pending");
-                                setShowViewTaskModal(true);
-                              }}
-                            >
-                              {t("viewTaskDetail")}
-                            </button>
+                            <div className="d-flex justify-content-end mt-1">
+                              <button
+                                className="btn btn-sm btn-primary rounded-lg text-xs px-3 py-1"
+                                onClick={() => {
+                                  setSelectedTask(task);
+                                  setTempStatus(task.status || "Pending");
+                                  setShowViewTaskModal(true);
+                                }}
+                              >
+                                {t("viewTaskDetail")}
+                              </button>
+                            </div>
                           )}
                         </div>
                       </React.Fragment>
