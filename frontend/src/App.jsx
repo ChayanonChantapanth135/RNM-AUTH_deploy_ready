@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home/HomePage";
 import Dashboard from "./pages/Dashboard/DashboardPage";
 import Login from "./pages/Login/LoginPage";
-// import Register from './pages/Register'
 import { LanguageProvider } from "./lib/LanguageContext";
 import { ThemeProvider } from "./lib/ThemeContext";
 import Profile from "./pages/Profile/ProfilePage";
@@ -59,7 +58,6 @@ function App() {
               path="/reset-password-first-time"
               element={<ResetPasswordFirstTime />}
             />
-            {/* <Route path='/register' element={<Register />} /> */}
 
             {/* Protected Routes */}
             <Route

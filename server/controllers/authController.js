@@ -1609,7 +1609,7 @@ export const updateTaskStatus = async (req, res) => {
     const { status, userId } = req.body;
     try {
         const db = await connectToDatabase();
-        const [taskRows] = await db.query('SELECT t.title, t.project_id, t.status AS old_status, p.name AS project_name, p.created_by AS project_creator FROM tasks t JOIN projects p ON t.project_id = p.id WHERE t.id = ?', [id]);
+        const [taskRows] = await db.query('SELECT t.title, t.project_id, p.name AS project_name FROM tasks t JOIN projects p ON t.project_id = p.id WHERE t.id = ?', [id]);
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
@@ -2580,7 +2580,7 @@ export const sendOtp = async (req, res) => {
             [userId, otpCode, expiresAt]
         );
 
-        console.log(`[OTP Sent] Email: ${email}, Code: ${otpCode}`);
+        console.log(`[OTP Sent] Email: ${email}`);
 
         // Send OTP email via emailService
         await sendOtpEmail({
