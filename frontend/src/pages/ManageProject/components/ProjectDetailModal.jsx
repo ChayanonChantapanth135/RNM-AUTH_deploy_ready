@@ -285,9 +285,7 @@ const ProjectDetailModal = ({
                       Number(task.assigned_to) === currentUid ||
                       Number(task.assignedTo) === currentUid;
                     const canViewDetail =
-                      canManageProject ||
-                      isTeamLeaderOfProject ||
-                      isAssigned;
+                      canManageProject || isTeamLeaderOfProject || isAssigned;
 
                     return (
                       <React.Fragment key={task.id}>
@@ -397,12 +395,15 @@ const ProjectDetailModal = ({
 
                           {/* Row 2: Assignee & Due Date */}
                           <div className="d-flex flex-wrap justify-content-between align-items-center text-muted small gap-1 mb-2">
-                            <span className="text-truncate" style={{ maxWidth: "58%" }}>
+                            <span
+                              className="text-truncate"
+                              style={{ maxWidth: "58%" }}
+                            >
                               👤 {task.assigned_to_name || t("unassigned")}
                             </span>
                             {task.dueDate && (
                               <span className="shrink-0">
-                                📅 {formatDate(task.dueDate, language)}
+                                {formatDate(task.dueDate, language)}
                               </span>
                             )}
                           </div>
