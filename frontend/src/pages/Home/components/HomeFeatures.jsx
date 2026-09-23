@@ -60,7 +60,9 @@ const HomeFeatures = ({ t, containerVariants, itemVariants }) => {
           variants={itemVariants}
           className="glass-card rounded-3xl p-8 cursor-pointer"
         >
-          <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-6 shadow-inner"></div>
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/20 flex items-center justify-center text-3xl mb-6 shadow-inner">
+            📅
+          </div>
           <h3 className="text-xl font-bold text-white mb-3">
             {t("featureCalTitle") || "ปฏิทินส่งงาน"}
           </h3>
