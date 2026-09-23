@@ -275,83 +275,142 @@ const ProjectDetailModal = ({
                 style={{
                   maxHeight: "380px",
                   overflowY: "auto",
+                  overflowX: "hidden",
                   paddingRight: "4px",
                 }}
               >
                 {displayTasks && displayTasks.length > 0 ? (
-                  displayTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="list-group-item d-flex align-items-center justify-content-between py-3 rounded-2xl mb-1 border-0"
-                      style={getTaskStyle(task)}
-                    >
-                      {/* Left: Task Title */}
-                      <div
-                        className="d-flex flex-column justify-content-center"
-                        style={{ flex: 1, minWidth: "150px" }}
-                      >
-                        <span className="text-dark fw-medium">
-                          {task.title}
-                        </span>
-                      </div>
+                  displayTasks.map((task) => {
+                    const isAssigned =
+                      Number(task.assigned_to) === currentUid ||
+                      Number(task.assignedTo) === currentUid;
+                    const canViewDetail =
+                      canManageProject ||
+                      isTeamLeaderOfProject ||
+                      isAssigned;
 
-                      {/* Middle: Assignee & Due Date */}
-                      <div
-                        className="d-flex flex-column gap-1 text-muted small"
-                        style={{
-                          flex: 1,
-                          minWidth: "180px",
-                          paddingLeft: "15px",
-                        }}
-                      >
-                        <span className="d-block">
-                          👤 {task.assigned_to_name || t("unassigned")}
-                        </span>
-                        {task.dueDate && (
-                          <span className="d-block">
-                            📅 {formatDate(task.dueDate, language)}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Middle-Right: Status Badge */}
-                      <div className="ms-3" style={{ minWidth: "110px" }}>
-                        <span
-                          className={`badge text-xs ${
-                            task.status === "Completed"
-                              ? "bg-success"
-                              : task.status === "Reviewing"
-                                ? "bg-warning text-dark"
-                                : task.status === "In Progress"
-                                  ? "bg-info text-dark"
-                                  : "bg-secondary"
-                          }`}
+                    return (
+                      <React.Fragment key={task.id}>
+                        {/* Desktop View (Visible on PC / Laptops: md and up) */}
+                        <div
+                          className="list-group-item d-none d-md-flex align-items-center justify-content-between py-3 rounded-2xl mb-1 border-0"
+                          style={getTaskStyle(task)}
                         >
-                          {task.status || "Pending"}
-                        </span>
-                      </div>
+                          {/* Left: Task Title */}
+                          <div
+                            className="d-flex flex-column justify-content-center"
+                            style={{ flex: 1, minWidth: "150px" }}
+                          >
+                            <span className="text-dark fw-medium">
+                              {task.title}
+                            </span>
+                          </div>
 
-                      {/* Right: View Task Detail Button (Fixed width container to keep alignment) */}
-                      <div
-                        className="ms-3 d-flex justify-content-end"
-                        style={{ width: "125px", minWidth: "125px" }}
-                      >
-                        {(() => {
-                          const isAssigned =
-                            Number(task.assigned_to) === currentUid ||
-                            Number(task.assignedTo) === currentUid;
-                          const canViewDetail =
-                            canManageProject ||
-                            isTeamLeaderOfProject ||
-                            isAssigned;
+                          {/* Middle: Assignee & Due Date */}
+                          <div
+                            className="d-flex flex-column gap-1 text-muted small"
+                            style={{
+                              flex: 1,
+                              minWidth: "180px",
+                              paddingLeft: "15px",
+                            }}
+                          >
+                            <span className="d-block">
+                              👤 {task.assigned_to_name || t("unassigned")}
+                            </span>
+                            {task.dueDate && (
+                              <span className="d-block">
+                                📅 {formatDate(task.dueDate, language)}
+                              </span>
+                            )}
+                          </div>
 
-                          if (!canViewDetail) {
-                            return null;
-                          }
+                          {/* Middle-Right: Status Badge */}
+                          <div className="ms-3" style={{ minWidth: "110px" }}>
+                            <span
+                              className={`badge text-xs ${
+                                task.status === "Completed"
+                                  ? "bg-success"
+                                  : task.status === "Reviewing"
+                                    ? "bg-warning text-dark"
+                                    : task.status === "In Progress"
+                                      ? "bg-info text-dark"
+                                      : "bg-secondary"
+                              }`}
+                            >
+                              {task.status || "Pending"}
+                            </span>
+                          </div>
 
-                          return (
+                          {/* Right: View Task Detail Button (Fixed width container on PC) */}
+                          <div
+                            className="ms-3 d-flex justify-content-end"
+                            style={{ width: "125px", minWidth: "125px" }}
+                          >
+                            {canViewDetail && (
+                              <button
+                                className="btn btn-sm btn-primary rounded-lg text-xs w-100"
+                                onClick={() => {
+                                  setSelectedTask(task);
+                                  setTempStatus(task.status || "Pending");
+                                  setShowViewTaskModal(true);
+                                }}
+                              >
+                                {t("viewTaskDetail")}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Mobile View (Visible on Mobile screens only: < md) */}
+                        <div
+                          className="list-group-item d-flex d-md-none flex-column p-3 rounded-2xl mb-2 border-0 shadow-xs"
+                          style={{
+                            ...getTaskStyle(task),
+                            width: "100%",
+                            maxWidth: "100%",
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          {/* Row 1: Title & Status Badge */}
+                          <div className="d-flex justify-content-between align-items-center mb-2 gap-2">
+                            <span
+                              className="text-dark fw-bold text-truncate"
+                              style={{ flex: 1, minWidth: 0 }}
+                            >
+                              {task.title}
+                            </span>
+                            <span
+                              className={`badge text-xs shrink-0 ${
+                                task.status === "Completed"
+                                  ? "bg-success"
+                                  : task.status === "Reviewing"
+                                    ? "bg-warning text-dark"
+                                    : task.status === "In Progress"
+                                      ? "bg-info text-dark"
+                                      : "bg-secondary"
+                              }`}
+                            >
+                              {task.status || "Pending"}
+                            </span>
+                          </div>
+
+                          {/* Row 2: Assignee & Due Date */}
+                          <div className="d-flex flex-wrap justify-content-between align-items-center text-muted small gap-1 mb-2">
+                            <span className="text-truncate" style={{ maxWidth: "58%" }}>
+                              👤 {task.assigned_to_name || t("unassigned")}
+                            </span>
+                            {task.dueDate && (
+                              <span className="shrink-0">
+                                📅 {formatDate(task.dueDate, language)}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Row 3: Full-width Mobile Action Button */}
+                          {canViewDetail && (
                             <button
-                              className="btn btn-sm btn-primary rounded-lg text-xs w-100"
+                              className="btn btn-sm btn-primary rounded-lg text-xs w-100 py-1.5 mt-1"
                               onClick={() => {
                                 setSelectedTask(task);
                                 setTempStatus(task.status || "Pending");
@@ -360,11 +419,11 @@ const ProjectDetailModal = ({
                             >
                               {t("viewTaskDetail")}
                             </button>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  ))
+                          )}
+                        </div>
+                      </React.Fragment>
+                    );
+                  })
                 ) : (
                   <div className="list-group-item text-center py-3 text-muted text-xs">
                     {t("projectDetailsNoTasks")}
