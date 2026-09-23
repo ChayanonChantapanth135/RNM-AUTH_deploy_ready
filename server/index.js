@@ -9,12 +9,19 @@ import authRoutes from './routes/authRoutes.js'
 import { initializeDatabase } from './lib/initDb.js'
 import { initSocket } from './lib/socket.js'
 import { startTaskScheduler } from './utils/taskScheduler.js'
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 // กำหนดตัวแปรและตั้งค่าที่อยู่ไฟล์/โฟลเดอร์สำหรับบริการไฟล์ Static (เช่น ไฟล์อัปโหลด Avatar)
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+// ตรวจสอบและสร้างโฟลเดอร์ uploads อัตโนมัติหากยังไม่มี (ป้องกันปัญหา ENOENT บน Production ที่ clone มาใหม่)
+const uploadsDir = path.join(__dirname, 'uploads')
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true })
+}
 
 import helmet from 'helmet'
 
@@ -97,6 +104,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // เรียกใช้เราเตอร์จัดการระบบสมาชิกและโครงการภายใต้เส้นทาง /auth
 app.use('/auth', authRoutes)
+
+// จัดการข้อผิดพลาดส่วนกลาง (Global Error Handler) โดยเฉพาะ Multer Upload Error เพื่อส่งกลับเป็น JSON เสมอ
+app.use((err, req, res, next) => {
+  console.error('[Global Error Handler]:', err.message);
+  if (err.name === 'MulterError') {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ message: 'ไฟล์มีขนาดใหญ่เกินกว่าที่ระบบกำหนด (สูงสุด 5MB สำหรับรูปโปรไฟล์ หรือ 25MB สำหรับไฟล์แนบงาน)' });
+    }
+    return res.status(400).json({ message: `ข้อผิดพลาดในการอัปโหลดไฟล์: ${err.message}` });
+  }
+  return res.status(err.status || 400).json({ message: err.message || 'เกิดข้อผิดพลาดในการประมวลผลคำขอ' });
+});
 
 // ทำการตั้งค่าและตรวจสอบฐานข้อมูลเบื้องต้นขณะรันเซิร์ฟเวอร์ (แบบ non-blocking)
 initializeDatabase().then(() => {

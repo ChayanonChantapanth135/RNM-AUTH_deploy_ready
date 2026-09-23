@@ -23,7 +23,12 @@ const MyActivityTable = ({
         <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
           <span>{t("showText") || "Show"}</span>
           <select
-            className="bg-slate-900/80 rounded-xl px-3 py-1.5 text-white text-xs focus:outline-none cursor-pointer"
+            className="rounded-xl px-3 py-1.5 text-xs focus:outline-none cursor-pointer shadow-sm"
+            style={{
+              background: "var(--bg-surface-hover)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-surface)",
+            }}
             value={entriesPerPage}
             onChange={(e) => {
               setEntriesPerPage(Number(e.target.value));
@@ -75,7 +80,7 @@ const MyActivityTable = ({
               >
                 {currentEntries.length > 0 ? (
                   currentEntries.map((log, index) => {
-                    const act = log.action.toLowerCase();
+                    const act = (log.action || "").toLowerCase();
                     let badgeStyle = {
                       backgroundColor: "rgba(100, 116, 139, 0.15)",
                       color: "var(--text-secondary)",
@@ -117,7 +122,7 @@ const MyActivityTable = ({
 
                     return (
                       <tr
-                        key={index}
+                        key={log.id || index}
                         className="transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                         style={{
                           borderBottom: "1px solid var(--border-surface)",
@@ -164,7 +169,7 @@ const MyActivityTable = ({
           <div className="md:hidden flex flex-col gap-3">
             {currentEntries.length > 0 ? (
               currentEntries.map((log, index) => {
-                const act = log.action.toLowerCase();
+                const act = (log.action || "").toLowerCase();
                 let badgeStyle = {
                   backgroundColor: "rgba(100, 116, 139, 0.15)",
                   color: "var(--text-secondary)",
@@ -203,8 +208,12 @@ const MyActivityTable = ({
 
                 return (
                   <div
-                    key={index}
-                    className="p-4 rounded-2xl bg-white/[0.04] transition-all flex flex-col gap-2"
+                    key={log.id || index}
+                    className="p-4 rounded-2xl transition-all flex flex-col gap-2 shadow-sm"
+                    style={{
+                      background: "var(--bg-surface-hover)",
+                      border: "1px solid var(--border-surface)",
+                    }}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span

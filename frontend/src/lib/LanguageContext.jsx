@@ -727,6 +727,20 @@ const translations = {
     ต้องทำ: "To Do",
     กำลังทำ: "In Progress",
     เสร็จสิ้น: "Completed",
+
+    // Activity & Logs
+    activityLogsTitle: "System Activity Logs",
+    activityLogsSubtitle: "Track system operations, actions, and project updates",
+    searchActivityPlaceholder: "Search activities or details...",
+    allActivities: "All Activities",
+    aboutProjects: "Projects & Tasks",
+    aboutUsers: "Users",
+    aboutSystem: "System",
+    colAction: "Action",
+    colDetails: "Details",
+    colTime: "Time",
+    loadingActivities: "Loading activity logs...",
+    noActivitiesFound: "No activity logs found",
   },
 
   th: {
@@ -1452,6 +1466,20 @@ const translations = {
     ต้องทำ: "ต้องทำ",
     กำลังทำ: "กำลังทำ",
     เสร็จสิ้น: "เสร็จสิ้น",
+
+    // Activity & Logs
+    activityLogsTitle: "บันทึกประวัติกิจกรรม",
+    activityLogsSubtitle: "ตรวจสอบและติดตามกิจกรรมการทำงาน การกระทำ และการอัปเดตในระบบ",
+    searchActivityPlaceholder: "ค้นหากิจกรรมหรือรายละเอียด...",
+    allActivities: "กิจกรรมทั้งหมด",
+    aboutProjects: "โปรเจกต์และงาน",
+    aboutUsers: "ผู้ใช้งาน",
+    aboutSystem: "ระบบ",
+    colAction: "การกระทำ",
+    colDetails: "รายละเอียด",
+    colTime: "เวลา",
+    loadingActivities: "กำลังโหลดประวัติกิจกรรม...",
+    noActivitiesFound: "ไม่พบประวัติกิจกรรม",
   },
 };
 

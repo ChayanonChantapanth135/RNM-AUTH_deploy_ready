@@ -33,11 +33,12 @@ axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: หากได้รับสถานะ 401 (Token หมดอายุหรือไม่ถูกต้อง) ให้เคลียร์เซสชัน
+// Response interceptor: หากได้รับสถานะ 401 หรือ 403 (Token หมดอายุหรือไม่ถูกต้อง) ให้เคลียร์เซสชัน ยกเว้นหน้าเข้าสู่ระบบ (/login หรือ /send-otp)
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    const isAuthEndpoint = error.config?.url?.includes('/login') || error.config?.url?.includes('/send-otp');
+    if (error.response && (error.response.status === 401 || error.response.status === 403) && !isAuthEndpoint) {
       await signOut();
     }
     return Promise.reject(error);

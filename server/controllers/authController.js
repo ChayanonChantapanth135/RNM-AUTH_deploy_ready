@@ -18,6 +18,14 @@ const __dirname = path.dirname(__filename);
 // ==========================================
 
 /**
+ * ดึงวันที่ปัจจุบันตาม Timezone กรุงเทพฯ (Asia/Bangkok) ในรูปแบบ YYYY-MM-DD
+ * เพื่อให้การตรวจสอบวันเริ่มงานและวันหมดอายุแม่นยำ ไม่เพี้ยนตาม UTC
+ */
+function getBangkokDateString() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
+}
+
+/**
  * Helper ดึง URL ของไฟล์ที่อัปโหลด (รองรับทั้ง Cloudinary URL และ Local Path)
  */
 function getUploadedFileUrl(file) {
@@ -259,7 +267,7 @@ export const login = async (req, res) => {
             return res.status(403).json({ code: 'ACCOUNT_SUSPENDED', message: 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ' });
         }
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = getBangkokDateString();
         if (rows[0].start_date) {
             const startDateStr = new Date(rows[0].start_date).toISOString().split('T')[0];
             if (startDateStr > today) {
@@ -335,7 +343,7 @@ export const refresh = async (req, res) => {
         if (rows[0].status === 'suspended') {
             return res.status(403).json({ message: 'บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ' });
         }
-        const today = new Date().toISOString().split('T')[0];
+        const today = getBangkokDateString();
         if (rows[0].start_date) {
             const startDateStr = new Date(rows[0].start_date).toISOString().split('T')[0];
             if (startDateStr > today) {
@@ -2582,8 +2590,7 @@ export const sendOtp = async (req, res) => {
         });
 
         res.status(200).json({ 
-            message: 'ส่งรหัส OTP เรียบร้อยแล้ว (OTP sent successfully)',
-            otpCode: otpCode 
+            message: 'ส่งรหัส OTP เรียบร้อยแล้ว (OTP sent successfully)'
         });
     } catch (error) {
         console.error('Error sending OTP:', error.message);

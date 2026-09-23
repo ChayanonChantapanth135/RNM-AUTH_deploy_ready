@@ -101,11 +101,11 @@ export const initializeDatabase = async () => {
         `, [defaultPassword, roleId])
         console.log('Seeded default admin user (admin@example.com / Admin@1234).')
       } else {
-        // Ensure admin@example.com password and active status are up to date
+        // Ensure admin user has admin role and is active, without overwriting custom passwords
         await connection.query(`
-          UPDATE users SET password = ?, role = 'admin', role_id = ?, status = 'active', deleted_at = NULL WHERE email = 'admin@example.com'
-        `, [defaultPassword, roleId])
-        console.log('Verified & updated default admin user credentials (admin@example.com).')
+          UPDATE users SET role = 'admin', role_id = ?, status = 'active', deleted_at = NULL WHERE email = 'admin@example.com'
+        `, [roleId])
+        console.log('Verified default admin user status (admin@example.com).')
       }
     } catch (adminErr) {
       console.error('Error seeding default admin:', adminErr.message)
@@ -293,8 +293,8 @@ export const initializeDatabase = async () => {
       try {
         const [cols] = await connection.query(`
           SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-          WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?
-        `, [process.env.DB_NAME, table, column]);
+          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+        `, [table, column]);
         if (cols.length === 0) {
           await connection.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
         }
