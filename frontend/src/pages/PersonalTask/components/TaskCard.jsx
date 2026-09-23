@@ -7,10 +7,27 @@ const TaskCard = ({ task, column, index, onEdit, onDelete }) => {
 
   if (!task) return null;
 
+  // แปลงสตริงวันที่ (YYYY-MM-DD หรือ ISO) เป็น Date object แบบ Local Time เพื่อเลี่ยงบั๊ก Timezone Shift
+  const parseLocalDate = (dateStr) => {
+    if (!dateStr) return null;
+    const cleanDate = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
+    const parts = cleanDate.split("-");
+    if (parts.length === 3) {
+      const year = Number(parts[0]);
+      const month = Number(parts[1]) - 1;
+      const day = Number(parts[2]);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        return new Date(year, month, day);
+      }
+    }
+    return new Date(dateStr);
+  };
+
   // ฟังก์ชันแปลงวันที่ตามภาษา (ไทย = วัน เดือน พ.ศ. / อังกฤษ = วัน เดือน ค.ศ.)
   const formatTaskDate = (dateStr) => {
     if (!dateStr) return "";
-    const d = new Date(dateStr);
+    const d = parseLocalDate(dateStr);
+    if (!d || isNaN(d.getTime())) return "";
 
     if (language === "th") {
       // รูปแบบไทย: 20 ส.ค. 2569
@@ -31,14 +48,18 @@ const TaskCard = ({ task, column, index, onEdit, onDelete }) => {
 
   // ตรวจสอบสถานะวันครบกำหนด (Due Date Urgency)
   const getDateStatus = () => {
-    if (!task.task_date || task.is_completed || task.status === "completed") {
+    const isCompleted =
+      task.is_completed ||
+      (task.status && task.status.toLowerCase().includes("complete"));
+    if (!task.task_date || isCompleted) {
       return null;
     }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const dueDate = new Date(task.task_date);
+    const dueDate = parseLocalDate(task.task_date);
+    if (!dueDate || isNaN(dueDate.getTime())) return null;
     dueDate.setHours(0, 0, 0, 0);
 
     const diffTime = dueDate.getTime() - today.getTime();

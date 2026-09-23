@@ -55,7 +55,8 @@ const PersonalTaskCalendar = ({
           ? task.task_date.split("T")[0]
           : task.task_date;
 
-        const statusConf = STATUS_CONFIG[task.status] || STATUS_CONFIG["todo"];
+        const normalizedStatus = (task.status || "todo").toLowerCase();
+        const statusConf = STATUS_CONFIG[normalizedStatus] || STATUS_CONFIG["todo"];
 
         evts.push({
           id: String(task.dbId),
@@ -67,8 +68,8 @@ const PersonalTaskCalendar = ({
           textColor: "#f8fafc",
           extendedProps: {
             task,
-            status: task.status,
-            isCompleted: task.is_completed === 1 || task.status === "completed",
+            status: normalizedStatus,
+            isCompleted: Boolean(task.is_completed) || normalizedStatus === "completed",
           },
         });
       } else {
