@@ -286,97 +286,97 @@ const ImportPreviewModal = ({
       centered
       backdrop="static"
       keyboard={false}
+      dialogClassName="!max-w-6xl my-2 sm:my-8 px-2 sm:px-0"
     >
       <Modal.Body
-        className="p-0 overflow-hidden"
+        className="!p-0 p-0 overflow-hidden"
         style={{
           borderRadius: "1.25rem",
           backgroundColor: "#FFFFFF",
           color: "#0F172A",
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+          padding: 0,
         }}
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/80">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-bold border border-indigo-100 shadow-sm">
-                📥
-              </div>
-              <div>
-                <h4 className="text-xl font-extrabold text-slate-900 mb-0.5 tracking-tight flex items-center gap-2">
-                  {t("importPreviewTitle") || "ตรวจสอบข้อมูลก่อนนำเข้า"}
-                </h4>
-                <p className="text-xs text-slate-500 mb-0">
-                  {t("importPreviewSub") || "ไฟล์:"}{" "}
-                  <span className="text-indigo-600 font-semibold">
-                    {fileName}
-                  </span>
-                  {" • "}
-                  {t("importPreviewTotal") || "ทั้งหมด"}{" "}
-                  <span className="font-bold text-slate-800">
-                    {stats.total}
-                  </span>{" "}
-                  {t("entriesText") || "รายการ"}
-                </p>
-              </div>
+        <div className="p-4 sm:p-6 border-b border-slate-200 flex items-center justify-between gap-3 bg-slate-50/80">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl sm:text-2xl font-bold border border-indigo-100 shadow-sm shrink-0">
+              📥
+            </div>
+            <div className="min-w-0">
+              <h4 className="text-base sm:text-xl font-extrabold text-slate-900 mb-0.5 tracking-tight truncate">
+                {t("importPreviewTitle") || "ตรวจสอบข้อมูลก่อนนำเข้า"}
+              </h4>
+              <p className="text-[11px] sm:text-xs text-slate-500 mb-0 truncate">
+                {t("importPreviewSub") || "ไฟล์:"}{" "}
+                <span className="text-indigo-600 font-semibold">
+                  {fileName}
+                </span>
+                {" • "}
+                {t("importPreviewTotal") || "ทั้งหมด"}{" "}
+                <span className="font-bold text-slate-800">
+                  {stats.total}
+                </span>{" "}
+                {t("entriesText") || "รายการ"}
+              </p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onHide}
-            className="self-end md:self-auto text-slate-500 hover:text-slate-800 px-3.5 py-1.5 rounded-xl bg-slate-200/70 hover:bg-slate-200 text-xs font-bold transition-all"
+            className="shrink-0 text-slate-500 hover:text-slate-800 px-3 py-1.5 rounded-xl bg-slate-200/70 hover:bg-slate-200 text-xs font-bold transition-all"
           >
             ✕ {t("cancelBtn") || "ยกเลิก"}
           </button>
         </div>
 
         {/* Quick Stats Banner */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 bg-slate-100/60 border-b border-slate-200">
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
-            <span className="text-[11px] sm:text-xs font-bold text-slate-500">
+        <div className="px-3.5 sm:px-6 py-3 sm:py-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 bg-slate-100/60 border-b border-slate-200">
+          <div className="p-2.5 sm:p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col">
+            <span className="text-[11px] sm:text-xs font-bold text-slate-500 truncate">
               {t("importTotalCount") || "รายการทั้งหมด"}
             </span>
-            <span className="text-xl sm:text-2xl font-black text-slate-800 mt-0.5">
+            <span className="text-lg sm:text-2xl font-black text-slate-800 mt-0.5">
               {stats.total}
             </span>
           </div>
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm flex flex-col">
-            <span className="text-[11px] sm:text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-emerald-500"></span>
+          <div className="p-2.5 sm:p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm flex flex-col">
+            <span className="text-[11px] sm:text-xs font-bold text-emerald-700 flex items-center gap-1.5 truncate">
+              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
               {t("importNewUsers") || "เพิ่มผู้ใช้ใหม่"}
             </span>
-            <span className="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">
+            <span className="text-lg sm:text-2xl font-black text-emerald-600 mt-0.5">
               +{stats.newCount}
             </span>
           </div>
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-200 shadow-sm flex flex-col">
-            <span className="text-[11px] sm:text-xs font-bold text-amber-700 flex items-center gap-1.5">
-              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-amber-500"></span>
+          <div className="p-2.5 sm:p-3.5 rounded-2xl bg-amber-50 border border-amber-200 shadow-sm flex flex-col">
+            <span className="text-[11px] sm:text-xs font-bold text-amber-700 flex items-center gap-1.5 truncate">
+              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-amber-500 shrink-0"></span>
               {t("importChangedUsers") || "ข้อมูลเปลี่ยนแปลง"}
             </span>
-            <span className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">
+            <span className="text-lg sm:text-2xl font-black text-amber-600 mt-0.5">
               {stats.changedCount}
             </span>
           </div>
-          <div className="p-3 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-300 shadow-sm flex flex-col">
-            <span className="text-[11px] sm:text-xs font-bold text-slate-600 flex items-center gap-1.5">
-              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-400"></span>
+          <div className="p-2.5 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-300 shadow-sm flex flex-col">
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 flex items-center gap-1.5 truncate">
+              <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-slate-400 shrink-0"></span>
               {t("importUnchangedUsers") || "ไม่มีการแก้ไข"}
             </span>
-            <span className="text-xl sm:text-2xl font-black text-slate-600 mt-0.5">
+            <span className="text-lg sm:text-2xl font-black text-slate-600 mt-0.5">
               {stats.unchangedCount}
             </span>
           </div>
         </div>
 
         {/* Filter / Search Bar */}
-        <div className="p-4 sm:p-6 pb-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="p-3.5 sm:p-6 pb-2 flex flex-col sm:flex-row justify-between items-center gap-2.5 sm:gap-3">
           <div className="relative w-full sm:w-80">
             <input
               type="text"
-              className="w-full rounded-2xl py-2.5 pl-9 pr-4 text-xs font-medium focus:outline-none transition-all placeholder:text-slate-400"
+              className="w-full rounded-2xl py-2 sm:py-2.5 pl-9 pr-4 text-xs font-medium focus:outline-none transition-all placeholder:text-slate-400"
               style={{
                 backgroundColor: "#FFFFFF",
                 color: "#0F172A",
@@ -391,10 +391,10 @@ const ImportPreviewModal = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1">
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-center whitespace-nowrap transition-all ${
                 statusFilter === "all"
                   ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -404,7 +404,7 @@ const ImportPreviewModal = ({
             </button>
             <button
               onClick={() => setStatusFilter("changed")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-center whitespace-nowrap transition-all ${
                 statusFilter === "changed"
                   ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
                   : "bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700"
@@ -414,7 +414,7 @@ const ImportPreviewModal = ({
             </button>
             <button
               onClick={() => setStatusFilter("new")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-center whitespace-nowrap transition-all ${
                 statusFilter === "new"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
                   : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
@@ -424,7 +424,7 @@ const ImportPreviewModal = ({
             </button>
             <button
               onClick={() => setStatusFilter("unchanged")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-center whitespace-nowrap transition-all ${
                 statusFilter === "unchanged"
                   ? "bg-slate-700 text-white shadow-md"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -435,7 +435,7 @@ const ImportPreviewModal = ({
             {stats.invalidCount > 0 && (
               <button
                 onClick={() => setStatusFilter("invalid")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold text-center whitespace-nowrap transition-all ${
                   statusFilter === "invalid"
                     ? "bg-rose-600 text-white shadow-md shadow-rose-600/20"
                     : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-700"
@@ -448,9 +448,9 @@ const ImportPreviewModal = ({
         </div>
 
         {/* Notice Info */}
-        <div className="px-4 sm:px-6 py-1">
+        <div className="px-3.5 sm:px-6 py-1">
           <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 flex items-center gap-2">
-            <span>⚡</span>
+            <span className="shrink-0">⚡</span>
             <span>
               {t("importChangedOnlyNotice") ||
                 "ระบบจะบันทึกเฉพาะรายการใหม่และรายการที่มีการเปลี่ยนแปลง เพื่อความรวดเร็วและลดโหลดฐานข้อมูล"}
@@ -458,10 +458,11 @@ const ImportPreviewModal = ({
           </div>
         </div>
 
-        {/* Table Preview */}
-        <div className="px-4 sm:px-6 py-2">
+        {/* Table & Mobile Cards Container */}
+        <div className="px-3.5 sm:px-6 py-2">
+          {/* Desktop Table View (Hidden on mobile) */}
           <div
-            className="overflow-x-auto rounded-2xl border border-slate-200 bg-white light-scrollbar"
+            className="hidden md:block overflow-x-auto rounded-2xl border border-slate-200 bg-white light-scrollbar"
             style={{ maxHeight: "360px", overflowY: "auto" }}
           >
             <table className="w-full border-collapse">
@@ -650,11 +651,209 @@ const ImportPreviewModal = ({
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Card View (Shown on mobile only, eliminates horizontal scrolling) */}
+          <div
+            className="md:hidden flex flex-col gap-2.5 overflow-y-auto light-scrollbar pr-0.5"
+            style={{ maxHeight: "380px" }}
+          >
+            {filteredList.map((user) => {
+              const isChangedRow = user.importType === "changed";
+              const fields = user.changedFields || [];
+
+              return (
+                <div
+                  key={user.idx}
+                  className={`p-3.5 rounded-2xl border transition-all flex flex-col gap-2 ${
+                    user.importType === "new"
+                      ? "bg-emerald-50/40 border-emerald-200/90 shadow-sm"
+                      : user.importType === "changed"
+                      ? "bg-amber-50/50 border-amber-200/90 shadow-sm"
+                      : user.importType === "invalid"
+                      ? "bg-rose-50/40 border-rose-200/90 shadow-sm"
+                      : "bg-white border-slate-200 opacity-80"
+                  }`}
+                >
+                  {/* Card Header: # + Avatar + Full Name + Import Action Badge */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span className="text-[11px] font-bold text-slate-400 shrink-0">
+                        #{user.idx}
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-200 text-indigo-700 font-black flex items-center justify-center text-xs shrink-0">
+                        {user.fullname
+                          ? user.fullname[0]?.toUpperCase()
+                          : "U"}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span
+                            className={`font-bold text-xs truncate ${
+                              isChangedRow && fields.includes("fullname")
+                                ? "text-amber-900"
+                                : "text-slate-900"
+                            }`}
+                          >
+                            {user.fullname}
+                          </span>
+                          {isChangedRow && fields.includes("fullname") && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200 text-amber-800 font-bold">
+                              ✏️ แก้ไข
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-500 truncate font-medium">
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Badge */}
+                    <div className="shrink-0">
+                      {user.importType === "new" && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[10px]">
+                          {t("importActionCreate") || "New"}
+                        </span>
+                      )}
+                      {user.importType === "changed" && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 border border-amber-300 font-bold text-[10px]">
+                          {t("importActionChanged") || "Update"}
+                        </span>
+                      )}
+                      {user.importType === "unchanged" && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 font-medium text-[10px]">
+                          {t("importActionUnchanged") || "Skip"}
+                        </span>
+                      )}
+                      {user.importType === "invalid" && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-rose-100 text-rose-700 border border-rose-300 font-bold text-[10px]">
+                          {t("importActionInvalid") || "Skip"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Details: Role, Status, Phone */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
+                    {/* Role */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-400 text-[11px] shrink-0">
+                        {t("colRole") || "บทบาท"}:
+                      </span>
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-lg text-[10px] font-bold ${getRoleBadgeStyle(
+                          user.role,
+                        )}`}
+                      >
+                        {formatRole(user.role)}
+                      </span>
+                      {isChangedRow && fields.includes("role") && (
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          ✏️
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Status */}
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <span className="text-slate-400 text-[11px] shrink-0">
+                        {t("colStatus") || "สถานะ"}:
+                      </span>
+                      {user.status === "suspended" ? (
+                        <span className="inline-block px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[10px]">
+                          {t("suspendedLabel") || "Suspended"}
+                        </span>
+                      ) : (
+                        <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                          {t("activeLabel") || "Active"}
+                        </span>
+                      )}
+                      {isChangedRow && fields.includes("status") && (
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          ✏️
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Phone */}
+                    <div className="flex items-center gap-1.5 col-span-2">
+                      <span className="text-slate-400 text-[11px] shrink-0">
+                        {t("modalPhoneLabel") || "เบอร์โทร"}:
+                      </span>
+                      <span
+                        className={`text-[11px] text-slate-700 font-medium ${
+                          isChangedRow && fields.includes("phone")
+                            ? "bg-amber-100 text-amber-900 px-1 rounded font-bold"
+                            : ""
+                        }`}
+                      >
+                        {user.phone || "-"}
+                      </span>
+                      {isChangedRow && fields.includes("phone") && (
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          ✏️
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Dates Row */}
+                  <div className="flex items-center justify-between text-[11px] bg-slate-50/80 px-2.5 py-1.5 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">
+                        {t("modalStartDateLabel") || "วันเริ่ม"}:
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          isChangedRow && fields.includes("startDate")
+                            ? "text-amber-800 font-bold"
+                            : "text-slate-700"
+                        }`}
+                      >
+                        {user.startDate || "-"}
+                      </span>
+                      {isChangedRow && fields.includes("startDate") && (
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          ✏️
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-slate-300">→</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">
+                        {t("modalExpireDateLabel") || "วันหมด"}:
+                      </span>
+                      <span
+                        className={`font-medium ${
+                          isChangedRow && fields.includes("expireDate")
+                            ? "text-amber-800 font-bold"
+                            : "text-slate-700"
+                        }`}
+                      >
+                        {user.expireDate || "-"}
+                      </span>
+                      {isChangedRow && fields.includes("expireDate") && (
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          ✏️
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredList.length === 0 && (
+              <div className="text-center text-slate-400 py-8 text-xs font-semibold bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                {t("noUsersText") || "ไม่พบข้อมูลที่ค้นหา"}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 sm:p-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/80 mt-2">
-          <div className="text-xs text-slate-600 text-center sm:text-left font-medium">
+        <div className="p-4 sm:p-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 bg-slate-50/80 mt-2">
+          <div className="text-xs text-slate-600 text-center sm:text-left font-medium w-full sm:w-auto">
             <span>
               {t("importConfirmSummary") || "พร้อมนำเข้า/อัปเดต"}{" "}
               <strong className="text-emerald-700 font-black">
@@ -663,25 +862,25 @@ const ImportPreviewModal = ({
               {t("entriesText") || "รายการ"}
             </span>
             {stats.unchangedCount > 0 && (
-              <span className="text-slate-500 ml-2">
+              <span className="text-slate-500 block sm:inline sm:ml-2">
                 ({t("importUnchangedUsers") || "ข้อมูลเหมือนเดิม"}{" "}
                 {stats.unchangedCount} {t("entriesText") || "รายการ ข้ามอัตโนมัติ"})
               </span>
             )}
             {stats.invalidCount > 0 && (
-              <span className="text-rose-600 ml-2 font-semibold">
+              <span className="text-rose-600 block sm:inline sm:ml-2 font-semibold">
                 ({t("importInvalidSkipped") || "ระบบจะข้ามรายการที่ไม่สมบูรณ์"}{" "}
                 {stats.invalidCount} {t("entriesText") || "รายการ"})
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div className="grid grid-cols-2 gap-2.5 w-full sm:w-auto sm:flex sm:items-center sm:gap-3">
             <button
               type="button"
               disabled={loading}
               onClick={onHide}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition-all disabled:opacity-50"
+              className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold transition-all disabled:opacity-50 text-center"
             >
               {t("cancelBtn") || "ยกเลิก"}
             </button>
@@ -689,7 +888,7 @@ const ImportPreviewModal = ({
               type="button"
               disabled={loading || actionableCount === 0}
               onClick={handleConfirmSync}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/30 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-center"
             >
               {loading ? (
                 <>
