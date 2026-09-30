@@ -36,7 +36,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                 {t("whoIsWorkingOnProject") ||
                   "Who is working on this project?"}
               </span>
-              <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
+              <span className="text-sm font-bold text-sky-400">
                 {nonCompletedProjects.length}
               </span>
             </h3>
