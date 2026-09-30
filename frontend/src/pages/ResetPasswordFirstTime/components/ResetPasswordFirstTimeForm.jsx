@@ -31,9 +31,9 @@ const ResetPasswordFirstTimeForm = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors text-sm"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors text-base flex items-center justify-center"
           >
-            {showPassword ? "🙈" : "👁️"}
+            <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
           </button>
         </div>
       </div>
