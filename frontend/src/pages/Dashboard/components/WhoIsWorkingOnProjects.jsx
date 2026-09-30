@@ -49,7 +49,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
 
         <Link
           to="/Projects"
-          className="px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-slate-300 no-underline flex items-center gap-1.5 self-end sm:self-auto"
+          className="px-4 py-2 text-xs font-semibold rounded-xl transition-colors text-slate-300 no-underline flex items-center gap-1.5 self-end sm:self-auto"
         >
           <span>{t("allProjects") || "โปรเจกต์ทั้งหมด"}</span>
           <span>&rarr;</span>
