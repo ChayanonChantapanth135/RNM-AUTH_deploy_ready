@@ -894,7 +894,7 @@ const translations = {
     loggedIn: "เข้าสู่ระบบ",
     minuteAgo: "1 นาทีที่แล้ว",
     viewAll: "ดูทั้งหมด",
-    whoIsWorkingOnProject: "ใครกำลังปฏิบัติงานในโปรเจค?",
+    whoIsWorkingOnProject: "ใครกำลังปฏิบัติงานในโปรเจคบ้าง?",
     whoIsWorkingDesc:
       "โครงการที่กำลังดำเนินงานและสมาชิกที่กำลังทำภารกิจอยู่ขณะนี้",
     noActiveProjectsWithWorkers: "ยังไม่มีโครงการที่กำลังดำเนินงานอยู่ขณะนี้",
