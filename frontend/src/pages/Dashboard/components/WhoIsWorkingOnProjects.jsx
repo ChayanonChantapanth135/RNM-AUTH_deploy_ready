@@ -25,7 +25,10 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
   return (
     <div className="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl mt-8 relative overflow-hidden">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-white/10 pb-4">
+      <div
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b pb-4"
+        style={{ borderColor: "var(--border-surface)" }}
+      >
         <div className="flex items-center gap-3">
           {/* <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/30 border border-sky-400/30 flex items-center justify-center text-xl shadow-inner">
             <span role="img" aria-label="workers">⚡</span>
@@ -36,17 +39,17 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                 {t("whoIsWorkingOnProject") ||
                   "Who is working on this project?"}
               </span>
-              <span
+              {/* <span
                 className="px-2.5 py-0.5 text-xs font-bold rounded-full text-sky-400"
                 style={{
                   backgroundColor: "rgba(56, 189, 248, 0.15)",
-                  border: "1px solid #38bdf8",
+                  border: "none",
                   boxShadow: "none",
                   outline: "none",
                 }}
               >
                 {nonCompletedProjects.length}
-              </span>
+              </span> */}
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
               {t("whoIsWorkingDesc") ||

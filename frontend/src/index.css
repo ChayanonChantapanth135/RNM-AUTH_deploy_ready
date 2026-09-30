@@ -581,6 +581,19 @@ html:not(.light) option,
   background-color: #E2E8F0 !important;
 }
 
+/* Light mode Divider & Border Normalization */
+.light .border-white\/5,
+.light .border-white\/10,
+.light .border-white\/15,
+.light .border-white\/20 {
+  border-color: #E2E8F0 !important;
+}
+
+.light hr {
+  border-color: #E2E8F0 !important;
+  opacity: 1 !important;
+}
+
 /* FullCalendar Icon & Navigation Arrow Normalization */
 .fc .fc-button .fc-icon {
   font-family: 'fcicons', system-ui, -apple-system, sans-serif !important;
