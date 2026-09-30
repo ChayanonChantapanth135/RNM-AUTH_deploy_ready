@@ -53,14 +53,13 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             </p>
           </div>
         </div>
-
-        <Link
+        {/* <Link
           to="/Projects"
           className="px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-slate-300 no-underline flex items-center gap-1.5 self-end sm:self-auto"
         >
           <span>{t("allProjects") || "โปรเจกต์ทั้งหมด"}</span>
           <span>&rarr;</span>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Content Section */}
@@ -158,7 +157,8 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                                   // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
                                   e.currentTarget.style.display = "none";
                                   if (e.currentTarget.nextSibling) {
-                                    e.currentTarget.nextSibling.style.display = "flex";
+                                    e.currentTarget.nextSibling.style.display =
+                                      "flex";
                                   }
                                 }}
                               />
@@ -166,7 +166,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                             <div
                               className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
                               style={{
-                                display: tItem.assigned_to_avatar ? "none" : "flex",
+                                display: tItem.assigned_to_avatar
+                                  ? "none"
+                                  : "flex",
                               }}
                             >
                               {workerName.charAt(0).toUpperCase()}
