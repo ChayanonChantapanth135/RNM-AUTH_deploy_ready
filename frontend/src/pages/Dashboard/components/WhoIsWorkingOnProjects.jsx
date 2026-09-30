@@ -34,24 +34,19 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             <span role="img" aria-label="workers">⚡</span>
           </div> */}
           <div>
-            <h3 className="text-xl font-black text-white tracking-wide flex items-center gap-2">
+            <h3
+              className="text-xl font-black tracking-wide flex items-center gap-2"
+              style={{ color: "var(--text-primary)" }}
+            >
               <span>
                 {t("whoIsWorkingOnProject") ||
                   "Who is working on this project?"}
               </span>
-              {/* <span
-                className="px-2.5 py-0.5 text-xs font-bold rounded-full text-sky-400"
-                style={{
-                  backgroundColor: "rgba(56, 189, 248, 0.15)",
-                  border: "none",
-                  boxShadow: "none",
-                  outline: "none",
-                }}
-              >
-                {nonCompletedProjects.length}
-              </span> */}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p
+              className="text-xs mt-0.5"
+              style={{ color: "var(--text-secondary)" }}
+            >
               {t("whoIsWorkingDesc") ||
                 "Active projects and assignees currently working on tasks"}
             </p>
@@ -85,7 +80,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {nonCompletedProjects.map((project) => {
             const allTasks = project.tasks || [];
             // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
@@ -96,153 +91,82 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
               );
             });
 
-            const statusLower = (project.status || "").toLowerCase().trim();
-            const badgeClass =
-              statusLower === "in_progress" || statusLower === "in progress"
-                ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/30"
-                : statusLower === "review" || statusLower === "reviewing"
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                  : "bg-slate-700/40 text-slate-300 border-slate-600/30";
-
             return (
               <div
                 key={project.id}
-                className="glass-card rounded-2xl p-5 flex flex-col justify-between border border-white/10 hover:border-sky-500/40 transition-all duration-300 group hover:-translate-y-1 shadow-lg relative overflow-hidden"
+                className="glass-card rounded-2xl p-5 flex flex-col justify-between border hover:border-sky-500/50 transition-all duration-300 group shadow-md"
+                style={{ borderColor: "var(--border-surface)" }}
               >
-                {/* Background Ambient Glow */}
-                <div className="absolute -right-8 -top-8 w-24 h-24 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all pointer-events-none" />
-
                 <div>
-                  {/* Top Bar: Status & Priority */}
-                  <div className="flex justify-between items-center mb-3">
-                    <span
-                      className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold border ${badgeClass} inline-flex items-center gap-1.5`}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                      {project.status || "Pending"}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${
-                        project.priority === "High"
-                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                          : project.priority === "Medium"
-                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                            : "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                      }`}
-                    >
-                      {project.priority || "Medium"}
-                    </span>
-                  </div>
-
-                  {/* Project Name */}
+                  {/* ชื่อโปรเจกต์ (Project Name) */}
                   <h4
                     onClick={() =>
                       navigate(`/Projects?projectId=${project.id}`)
                     }
-                    className="text-base font-bold text-white group-hover:text-sky-400 transition-colors cursor-pointer line-clamp-1 mb-2 tracking-tight"
+                    className="text-base font-bold transition-colors cursor-pointer truncate mb-3 flex items-center gap-2 group-hover:text-sky-500"
+                    style={{ color: "var(--text-primary)" }}
                     title={project.name}
                   >
-                    📁 {project.name}
+                    <span className="text-xl">📁</span>
+                    <span className="truncate">{project.name}</span>
                   </h4>
 
-                  {/* Team Leader & Due Date info */}
-                  <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-[11px] text-slate-400 mb-4 pb-3 border-b border-white/5">
-                    {project.teamLeaderName && (
-                      <span className="inline-flex items-center gap-1 text-slate-300">
-                        <span className="text-slate-500">TL:</span>
-                        <b className="text-white/90">
-                          {project.teamLeaderName}
-                        </b>
-                      </span>
-                    )}
-                    {project.end_date && (
-                      <span className="inline-flex items-center gap-1">
-                        <span className="text-slate-500">📅</span>
-                        <span>{formatDate(project.end_date, language)}</span>
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Who is working (In-Progress Tasks) */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                        <span className="text-amber-400">⚡</span>
-                        <span>{t("currentlyWorking") || "กำลังทำภารกิจ:"}</span>
-                      </span>
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-white/5 text-slate-300">
-                        {inProgressTasks.length}{" "}
-                        {t("tasksInProgressCount") || "งาน"}
-                      </span>
-                    </div>
-
+                  {/* รายการคนที่กำลังทำและชื่องาน (Who is working & Task name) */}
+                  <div className="space-y-2.5">
                     {inProgressTasks.length === 0 ? (
-                      <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
-                        <p className="text-[11px] text-slate-400 italic">
-                          {t("noOneWorkingCurrently") ||
-                            "ยังไม่มีใคร In Progress งานในโครงการนี้"}
-                        </p>
-                      </div>
+                      <p
+                        className="text-xs italic py-2"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        {language === "th"
+                          ? "ไม่มีคนกำลังทำ"
+                          : "No active tasks in progress"}
+                      </p>
                     ) : (
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        {inProgressTasks.map((tItem) => {
-                          const workerName =
-                            tItem.assigned_to_name ||
-                            tItem.assignee_name ||
-                            tItem.assignee ||
-                            (language === "th"
-                              ? "ไม่ระบุผู้รับผิดชอบ"
-                              : "Unassigned");
+                      inProgressTasks.map((tItem) => {
+                        const workerName =
+                          tItem.assigned_to_name ||
+                          tItem.assignee_name ||
+                          tItem.assignee ||
+                          (language === "th"
+                            ? "ไม่ระบุผู้รับผิดชอบ"
+                            : "Unassigned");
 
-                          return (
-                            <div
-                              key={tItem.id}
-                              className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.07] border border-white/5 transition-all flex items-start justify-between gap-2"
-                            >
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-1.5 mb-1">
-                                  <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0 shadow-sm">
-                                    {workerName.charAt(0).toUpperCase()}
-                                  </div>
-                                  <span className="text-xs font-bold text-sky-200 truncate">
-                                    {workerName}
-                                  </span>
-                                </div>
-                                <p
-                                  className="text-[11px] text-slate-300 font-medium truncate pl-6"
-                                  title={tItem.title}
-                                >
-                                  {tItem.title}
-                                </p>
-                              </div>
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/30 text-indigo-200 shrink-0 border border-indigo-400/30">
-                                In Progress
-                              </span>
+                        return (
+                          <div
+                            key={tItem.id}
+                            className="p-3 rounded-xl border flex items-center gap-3 transition-colors"
+                            style={{
+                              backgroundColor: "var(--bg-surface-hover)",
+                              borderColor: "var(--border-surface)",
+                            }}
+                          >
+                            {/* Avatar ตัวอักษรชื่อคนทำ */}
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm">
+                              {workerName.charAt(0).toUpperCase()}
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
 
-                {/* Progress bar footer */}
-                <div className="mt-5 pt-3 border-t border-white/5">
-                  <div className="flex justify-between items-center text-[11px] text-slate-400 font-medium mb-1.5">
-                    <span>
-                      {language === "th" ? "ความคืบหน้า" : "Progress"}
-                    </span>
-                    <span className="text-white font-bold">
-                      {project.progress || 0}%
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full transition-all duration-500"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, project.progress || 0))}%`,
-                      }}
-                    />
+                            <div className="min-w-0 flex-1">
+                              {/* ชื่อคนทำ */}
+                              <p
+                                className="text-xs font-bold truncate leading-tight mb-1"
+                                style={{ color: "var(--text-primary)" }}
+                              >
+                                {workerName}
+                              </p>
+                              {/* ชื่องาน (Task) */}
+                              <p
+                                className="text-xs truncate"
+                                style={{ color: "var(--text-secondary)" }}
+                                title={tItem.title}
+                              >
+                                {tItem.title}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
