@@ -251,7 +251,7 @@ const ProjectTable = ({
                             </button>
                             <button
                               className="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-medium transition-colors"
-                              onClick={() => handleDelete(project)}
+                              onClick={() => handleOpenDelete(project)}
                               title="ลบโครงการ"
                             >
                               🗑️
@@ -339,7 +339,7 @@ const ProjectTable = ({
                         </button>
                         <button
                           className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-colors"
-                          onClick={() => handleDelete(project)}
+                          onClick={() => handleOpenDelete(project)}
                           title="ลบโครงการ"
                         >
                           🗑️
