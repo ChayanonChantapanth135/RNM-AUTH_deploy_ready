@@ -186,7 +186,7 @@ const Header = () => {
                     className="p-0 border-0 flex items-center no-underline focus:ring-0 after:hidden shadow-none flex-shrink-0"
                     id="dropdown-profile"
                   >
-                    <div 
+                    <div
                       className="p-0.5 rounded-full hover:scale-105 transition-transform flex-shrink-0 overflow-hidden flex items-center justify-center"
                       style={{
                         backgroundColor: "var(--brand-color)",
@@ -195,7 +195,7 @@ const Header = () => {
                         minWidth: "38px",
                         minHeight: "38px",
                         borderRadius: "50%",
-                        aspectRatio: "1 / 1"
+                        aspectRatio: "1 / 1",
                       }}
                     >
                       {user?.avatar ? (
@@ -207,20 +207,20 @@ const Header = () => {
                           }
                           alt="Profile"
                           className="w-full h-full object-cover flex-shrink-0"
-                          style={{ 
-                            borderRadius: "50%", 
+                          style={{
+                            borderRadius: "50%",
                             aspectRatio: "1 / 1",
-                            objectFit: "cover" 
+                            objectFit: "cover",
                           }}
                         />
                       ) : (
-                        <div 
+                        <div
                           className="w-full h-full flex items-center justify-center font-bold text-sm"
                           style={{
                             backgroundColor: "var(--bg-surface-hover)",
                             color: "var(--brand-color)",
                             borderRadius: "50%",
-                            aspectRatio: "1 / 1"
+                            aspectRatio: "1 / 1",
                           }}
                         >
                           {user?.name?.[0]?.toUpperCase() || "U"}
@@ -228,7 +228,7 @@ const Header = () => {
                       )}
                     </div>
                   </Dropdown.Toggle>
-                  <Dropdown.Menu 
+                  <Dropdown.Menu
                     className="shadow-2xl p-2 mt-2 min-w-[210px] rounded-2xl border"
                     style={{
                       backgroundColor: "var(--bg-surface)",
@@ -237,10 +237,16 @@ const Header = () => {
                     }}
                   >
                     <Dropdown.Header className="px-3 py-2 bg-transparent">
-                      <strong className="text-base block" style={{ color: "var(--text-primary)" }}>
+                      <strong
+                        className="text-base block"
+                        style={{ color: "var(--text-primary)" }}
+                      >
                         {user?.name || "User"}
                       </strong>
-                      <small className="text-xs block truncate" style={{ color: "var(--text-secondary)" }}>
+                      <small
+                        className="text-xs block truncate"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
                         {user?.email}
                       </small>
                       {user?.role && (
@@ -265,7 +271,10 @@ const Header = () => {
                         </span>
                       )}
                     </Dropdown.Header>
-                    <Dropdown.Divider className="my-1" style={{ borderColor: "var(--border-surface)" }} />
+                    <Dropdown.Divider
+                      className="my-1"
+                      style={{ borderColor: "var(--border-surface)" }}
+                    />
                     <Dropdown.Item
                       as={Link}
                       to="/Profile"
@@ -330,7 +339,10 @@ const Header = () => {
                       ></ion-icon>
                       <span>{t("themes") || "Themes"}</span>
                     </Dropdown.Item>
-                    <Dropdown.Divider className="my-1" style={{ borderColor: "var(--border-surface)" }} />
+                    <Dropdown.Divider
+                      className="my-1"
+                      style={{ borderColor: "var(--border-surface)" }}
+                    />
                     <Dropdown.Item
                       as="button"
                       onClick={handleSignOut}
@@ -387,7 +399,7 @@ const Header = () => {
                   </svg>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu 
+                <Dropdown.Menu
                   className="shadow-2xl p-2 mt-2 min-w-[220px] rounded-2xl border"
                   style={{
                     backgroundColor: "var(--bg-surface)",
@@ -403,7 +415,6 @@ const Header = () => {
                         : "header-nav-link"
                     }`}
                   >
-                    <span className="text-base">📊</span>
                     <span className="whitespace-nowrap">{t("dashboard")}</span>
                   </Dropdown.Item>
 
@@ -417,7 +428,6 @@ const Header = () => {
                           : "header-nav-link"
                       }`}
                     >
-                      <span className="text-base">👥</span>
                       <span className="whitespace-nowrap">
                         {t("manageUsers")}
                       </span>
@@ -434,7 +444,6 @@ const Header = () => {
                           : "header-nav-link"
                       }`}
                     >
-                      <span className="text-base">📝</span>
                       <span className="whitespace-nowrap">
                         {t("personalTask")}
                       </span>
@@ -450,7 +459,6 @@ const Header = () => {
                         : "header-nav-link"
                     }`}
                   >
-                    <span className="text-base">📂</span>
                     <span className="whitespace-nowrap">{t("projects")}</span>
                   </Dropdown.Item>
 
@@ -465,7 +473,6 @@ const Header = () => {
                         : "header-nav-link"
                     }`}
                   >
-                    <span className="text-base">📋</span>
                     <span className="whitespace-nowrap">
                       {user?.role === "admin" ? t("allTasks") : t("myTask")}
                     </span>
@@ -480,7 +487,6 @@ const Header = () => {
                         : "header-nav-link"
                     }`}
                   >
-                    <span className="text-base">📈</span>
                     <span className="whitespace-nowrap">{t("reports")}</span>
                   </Dropdown.Item>
                 </Dropdown.Menu>
