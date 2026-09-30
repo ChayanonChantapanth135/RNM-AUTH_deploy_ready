@@ -53,13 +53,13 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             </p>
           </div>
         </div>
-        {/* <Link
+        <Link
           to="/Projects"
           className="px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-slate-300 no-underline flex items-center gap-1.5 self-end sm:self-auto"
         >
           <span>{t("allProjects") || "โปรเจกต์ทั้งหมด"}</span>
           <span>&rarr;</span>
-        </Link> */}
+        </Link>
       </div>
 
       {/* Content Section */}
@@ -102,9 +102,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                 <div>
                   {/* ชื่อโปรเจกต์ (Project Name) */}
                   <h4
-                    onClick={() =>
-                      navigate(`/Projects?projectId=${project.id}`)
-                    }
+                    // onClick={() =>
+                    //   navigate(`/Projects?projectId=${project.id}`)
+                    // }
                     className="text-sm font-bold transition-colors cursor-pointer truncate mb-2.5 flex items-center gap-1.5 group-hover:text-sky-500"
                     style={{ color: "var(--text-primary)" }}
                     title={project.name}
