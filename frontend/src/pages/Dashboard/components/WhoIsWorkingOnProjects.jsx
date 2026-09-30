@@ -95,8 +95,10 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             return (
               <div
                 key={project.id}
-                className="glass-card rounded-2xl p-4 flex flex-col justify-between border hover:border-sky-500/50 transition-all duration-300 group shadow-sm hover:shadow-md"
-                style={{ borderColor: "var(--border-surface)" }}
+                className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:border-sky-500/50 transition-all duration-300 group shadow-sm hover:shadow-md"
+                style={{
+                  border: "1px solid var(--border-surface)",
+                }}
               >
                 <div>
                   {/* ชื่อโปรเจกต์ (Project Name) */}
@@ -134,11 +136,12 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                             : "Unassigned");
 
                         return (
-                            <div
+                          <div
                             key={tItem.id}
-                            className="p-2.5 rounded-xl border border-transparent light:border-[var(--border-surface)] flex items-center gap-2.5 transition-colors"
+                            className="p-2.5 rounded-xl flex items-center gap-2.5 transition-colors"
                             style={{
                               backgroundColor: "var(--bg-surface-hover)",
+                              border: "none",
                             }}
                           >
                             {/* รูปโปรไฟล์ / Avatar ของคนทำ */}
@@ -150,8 +153,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                                     : `${API_URL}${tItem.assigned_to_avatar}`
                                 }
                                 alt={workerName}
-                                className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm border"
-                                style={{ borderColor: "var(--border-surface)" }}
+                                className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm"
                                 onError={(e) => {
                                   // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
                                   e.currentTarget.style.display = "none";
