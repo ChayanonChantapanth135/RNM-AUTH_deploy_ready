@@ -27,18 +27,22 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/30 border border-sky-400/30 flex items-center justify-center text-xl shadow-inner">
+          {/* <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500/20 to-indigo-500/30 border border-sky-400/30 flex items-center justify-center text-xl shadow-inner">
             <span role="img" aria-label="workers">⚡</span>
-          </div>
+          </div> */}
           <div>
             <h3 className="text-xl font-black text-white tracking-wide flex items-center gap-2">
-              <span>{t("whoIsWorkingOnProject") || "Who is working on this project?"}</span>
+              <span>
+                {t("whoIsWorkingOnProject") ||
+                  "Who is working on this project?"}
+              </span>
               <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
                 {nonCompletedProjects.length}
               </span>
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              {t("whoIsWorkingDesc") || "Active projects and assignees currently working on tasks"}
+              {t("whoIsWorkingDesc") ||
+                "Active projects and assignees currently working on tasks"}
             </p>
           </div>
         </div>
@@ -59,9 +63,10 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
         </div>
       ) : nonCompletedProjects.length === 0 ? (
         <div className="text-center py-12 px-4 rounded-2xl bg-white/[0.02] border border-dashed border-white/10">
-          <span className="text-4xl block mb-2 opacity-60">🎉</span>
+          {/* <span className="text-4xl block mb-2 opacity-60">🎉</span> */}
           <p className="text-sm font-semibold text-slate-300">
-            {t("noActiveProjectsWithWorkers") || "ไม่มีโครงการที่ค้างอยู่ หรือทุกโครงการเสร็จสมบูรณ์เรียบร้อยแล้ว"}
+            {t("noActiveProjectsWithWorkers") ||
+              "ไม่มีโครงการที่ค้างอยู่ หรือทุกโครงการเสร็จสมบูรณ์เรียบร้อยแล้ว"}
           </p>
           <p className="text-xs text-slate-500 mt-1">
             {language === "th"
@@ -76,7 +81,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
             const inProgressTasks = allTasks.filter((tItem) => {
               const s = (tItem.status || "").toLowerCase().trim();
-              return s === "in progress" || s === "in_progress" || s === "กำลังทำ";
+              return (
+                s === "in progress" || s === "in_progress" || s === "กำลังทำ"
+              );
             });
 
             const statusLower = (project.status || "").toLowerCase().trim();
@@ -119,7 +126,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
 
                   {/* Project Name */}
                   <h4
-                    onClick={() => navigate(`/Projects?projectId=${project.id}`)}
+                    onClick={() =>
+                      navigate(`/Projects?projectId=${project.id}`)
+                    }
                     className="text-base font-bold text-white group-hover:text-sky-400 transition-colors cursor-pointer line-clamp-1 mb-2 tracking-tight"
                     title={project.name}
                   >
@@ -131,7 +140,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                     {project.teamLeaderName && (
                       <span className="inline-flex items-center gap-1 text-slate-300">
                         <span className="text-slate-500">TL:</span>
-                        <b className="text-white/90">{project.teamLeaderName}</b>
+                        <b className="text-white/90">
+                          {project.teamLeaderName}
+                        </b>
                       </span>
                     )}
                     {project.end_date && (
@@ -150,14 +161,16 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                         <span>{t("currentlyWorking") || "กำลังทำภารกิจ:"}</span>
                       </span>
                       <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-white/5 text-slate-300">
-                        {inProgressTasks.length} {t("tasksInProgressCount") || "งาน"}
+                        {inProgressTasks.length}{" "}
+                        {t("tasksInProgressCount") || "งาน"}
                       </span>
                     </div>
 
                     {inProgressTasks.length === 0 ? (
                       <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-center">
                         <p className="text-[11px] text-slate-400 italic">
-                          {t("noOneWorkingCurrently") || "ยังไม่มีใคร In Progress งานในโครงการนี้"}
+                          {t("noOneWorkingCurrently") ||
+                            "ยังไม่มีใคร In Progress งานในโครงการนี้"}
                         </p>
                       </div>
                     ) : (
@@ -167,7 +180,9 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                             tItem.assigned_to_name ||
                             tItem.assignee_name ||
                             tItem.assignee ||
-                            (language === "th" ? "ไม่ระบุผู้รับผิดชอบ" : "Unassigned");
+                            (language === "th"
+                              ? "ไม่ระบุผู้รับผิดชอบ"
+                              : "Unassigned");
 
                           return (
                             <div
@@ -204,13 +219,19 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                 {/* Progress bar footer */}
                 <div className="mt-5 pt-3 border-t border-white/5">
                   <div className="flex justify-between items-center text-[11px] text-slate-400 font-medium mb-1.5">
-                    <span>{language === "th" ? "ความคืบหน้า" : "Progress"}</span>
-                    <span className="text-white font-bold">{project.progress || 0}%</span>
+                    <span>
+                      {language === "th" ? "ความคืบหน้า" : "Progress"}
+                    </span>
+                    <span className="text-white font-bold">
+                      {project.progress || 0}%
+                    </span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-sky-400 to-indigo-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(0, project.progress || 0))}%` }}
+                      style={{
+                        width: `${Math.min(100, Math.max(0, project.progress || 0))}%`,
+                      }}
                     />
                   </div>
                 </div>
