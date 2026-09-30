@@ -881,32 +881,40 @@ const TaskDetailModal = ({
 
         {/* Modal Footer at the bottom of Modal.Body (spans full width) */}
         <div className="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-2.5 pt-3 border-top mt-4">
-          {currentUser?.role === "admin" && selectedTask ? (
-            <button
-              type="button"
-              className="w-full sm:w-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 hover:text-red-300 rounded-full text-xs font-bold whitespace-nowrap border border-red-500/30 transition-all shadow-sm inline-flex items-center justify-center gap-1 cursor-pointer"
-              onClick={async () => {
-                const result = await Swal.fire({
-                  title: language === "th" ? "ยืนยันการลบงาน?" : "Delete Task?",
-                  text: language === "th" ? "คุณต้องการลบงานนี้จริงหรือไม่?" : "Are you sure you want to delete this task?",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#ef4444",
-                  cancelButtonColor: "#64748b",
-                  confirmButtonText: language === "th" ? "ลบงาน" : "Delete",
-                  cancelButtonText: language === "th" ? "ยกเลิก" : "Cancel",
-                });
-                if (result.isConfirmed) {
-                  handleDeleteTask(selectedTask.id);
-                }
-              }}
-            >
-              <ion-icon name="trash-outline" style={{ fontSize: "15px" }}></ion-icon>
-              <span>{language === "th" ? "ลบงาน" : "Delete Task"}</span>
-            </button>
-          ) : (
-            <div className="hidden sm:block" />
-          )}
+          {(() => {
+            const taskProj = projects.find((p) => Number(p.id) === Number(selectedTask?.project_id || selectedTask?.projectId));
+            const isAdmin = currentUser?.role === "admin";
+            const isProjectManager = Number(taskProj?.created_by) === Number(currentUser?.id) || Number(taskProj?.project_manager_id) === Number(currentUser?.id);
+            const isTeamLeader = Number(taskProj?.team_leader_id) === Number(currentUser?.id) || Number(taskProj?.teamLeaderId) === Number(currentUser?.id);
+            const canDelete = (isAdmin || isProjectManager || isTeamLeader) && selectedTask;
+
+            if (!canDelete) return <div className="hidden sm:block" />;
+
+            return (
+              <button
+                type="button"
+                className="w-full sm:w-auto px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 hover:text-red-300 rounded-full text-xs font-bold whitespace-nowrap border border-red-500/30 transition-all shadow-sm inline-flex items-center justify-center gap-1 cursor-pointer"
+                onClick={async () => {
+                  const result = await Swal.fire({
+                    title: language === "th" ? "ยืนยันการลบงาน?" : "Delete Task?",
+                    text: language === "th" ? "คุณต้องการลบงานนี้จริงหรือไม่?" : "Are you sure you want to delete this task?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#ef4444",
+                    cancelButtonColor: "#64748b",
+                    confirmButtonText: language === "th" ? "ลบงาน" : "Delete",
+                    cancelButtonText: language === "th" ? "ยกเลิก" : "Cancel",
+                  });
+                  if (result.isConfirmed) {
+                    handleDeleteTask(selectedTask.id);
+                  }
+                }}
+              >
+                <ion-icon name="trash-outline" style={{ fontSize: "15px" }}></ion-icon>
+                <span>{language === "th" ? "ลบงาน" : "Delete Task"}</span>
+              </button>
+            );
+          })()}
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             {isEditing ? (

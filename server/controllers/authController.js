@@ -1852,11 +1852,30 @@ export const deleteTask = async (req, res) => {
     const { userId } = req.query;
     try {
         const db = await connectToDatabase();
-        const [taskRows] = await db.query('SELECT title, project_id FROM tasks WHERE id = ?', [id]);
+        const [taskRows] = await db.query(`
+            SELECT t.title, t.project_id, p.created_by, ptl.user_id AS team_leader_id
+            FROM tasks t
+            JOIN projects p ON t.project_id = p.id
+            LEFT JOIN project_team_leaders ptl ON p.id = ptl.project_id
+            WHERE t.id = ?
+        `, [id]);
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
-        const { title, project_id } = taskRows[0];
+        const { title, project_id, created_by, team_leader_id } = taskRows[0];
+
+        // ตรวจสอบสิทธิ์: Admin หรือ ผู้สร้างโครงการ (Project Manager) หรือ Team Leader ของโครงการ สามารถลบงานได้
+        if (userId) {
+            const [userRows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
+            const role = userRows[0]?.role;
+            const isAdmin = role === 'admin';
+            const isProjectManager = Number(created_by) === Number(userId);
+            const isTeamLeader = Number(team_leader_id) === Number(userId);
+
+            if (!isAdmin && !isProjectManager && !isTeamLeader) {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบงานนี้ (เฉพาะ Admin, Project Manager หรือ Team Leader ของโครงการเท่านั้น)' });
+            }
+        }
 
         await db.query('UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
         await checkAndUpdateProjectStatus(db, project_id);
