@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../lib/LanguageContext";
 import { formatDate } from "../../../lib/dateUtils";
+import { API_URL } from "../../../config";
 
 /**
  * คอมโพเนนต์ Who is working on this project?
@@ -141,8 +142,32 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                               borderColor: "var(--border-surface)",
                             }}
                           >
-                            {/* Avatar ตัวอักษรชื่อคนทำ */}
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm">
+                            {/* รูปโปรไฟล์ / Avatar ของคนทำ */}
+                            {tItem.assigned_to_avatar ? (
+                              <img
+                                src={
+                                  tItem.assigned_to_avatar.startsWith("http")
+                                    ? tItem.assigned_to_avatar
+                                    : `${API_URL}${tItem.assigned_to_avatar}`
+                                }
+                                alt={workerName}
+                                className="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border"
+                                style={{ borderColor: "var(--border-surface)" }}
+                                onError={(e) => {
+                                  // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
+                                  e.currentTarget.style.display = "none";
+                                  if (e.currentTarget.nextSibling) {
+                                    e.currentTarget.nextSibling.style.display = "flex";
+                                  }
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
+                              style={{
+                                display: tItem.assigned_to_avatar ? "none" : "flex",
+                              }}
+                            >
                               {workerName.charAt(0).toUpperCase()}
                             </div>
 

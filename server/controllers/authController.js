@@ -1152,7 +1152,7 @@ export const getProjects = async (req, res) => {
 
         const projectIds = projects.map(p => p.id);
         const [allTasks] = await db.query(`
-            SELECT t.id, t.project_id, t.title, t.status, t.due_date, t.assigned_to, t.description, t.task_type, t.priority, u.fullname AS assigned_to_name
+            SELECT t.id, t.project_id, t.title, t.status, t.due_date, t.assigned_to, t.description, t.task_type, t.priority, u.fullname AS assigned_to_name, u.avatar AS assigned_to_avatar
             FROM tasks t
             LEFT JOIN users u ON t.assigned_to = u.id
             WHERE t.project_id IN (?) AND t.deleted_at IS NULL
