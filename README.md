@@ -11,6 +11,8 @@
 
 ระบบบริหารจัดการโครงการและติดตามภารกิจในองค์กรแบบครบวงจร (Production-Ready Enterprise Solution) พัฒนาด้วยสถาปัตยกรรม **Modern Modular Frontend & High-Performance RESTful Backend** ภายใต้ระบบดีไซน์ **Multi-Accent Theme & Solid Contrast Design System** ที่ทันสมัย ลื่นไหล ปลอดภัย พร้อมระบบคำนวณความคืบหน้าโครงการอัตโนมัติ การจัดการสิทธิ์ผู้ใช้งานตามบทบาท (RBAC) ปฏิทินกำหนดส่งงานแบบลากวางสองทิศทาง (Bidirectional Drag & Drop) ระบบ Personal Kanban Board ระบบนำเข้าข้อมูลผู้ใช้พร้อมหน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal) ระบบแคชความเร็วสูง (In-Memory Caching) การจัดเก็บไฟล์ขึ้น Cloudinary และระบบแจ้งเตือนงานเกินกำหนดอัตโนมัติผ่านอีเมลและ In-App WebSockets
 
+> 🌐 **Production Backend URL**: `https://rnm-authdeployready-production.up.railway.app`
+
 ---
 
 ## 📑 สารบัญ (Table of Contents)
@@ -54,6 +56,19 @@
   - มี **หน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal)** แสดงจำนวนผู้ใช้ที่จะเพิ่มใหม่ (Create), อัปเดตข้อมูลเดิม (Update), และแจ้งเตือนข้อมูลที่ไม่สมบูรณ์ก่อนกดยืนยันบันทึกจริง
 - **User Export**: ส่งออกรายชื่อผู้ใช้ทั้งหมดเป็นไฟล์ Excel ครบถ้วนทุกฟิลด์
 - **Avatar & Profile Management**: อัปโหลดเปลี่ยนรูปโปรไฟล์ รองรับทั้งบันทึกลง **Cloudinary** หรือ Local Disk พร้อมระบบลบรูปเดิมอัตโนมัติ
+
+#### 📊 ตารางเปรียบเทียบสิทธิ์ผู้ใช้งาน (Role Permission Matrix)
+
+| ความสามารถ / บทบาท | Admin (`admin`) | Manager (`manager`) | Team Leader | Member / Staff |
+| :---------------- | :-------------: | :-----------------: | :---------: | :------------: |
+| จัดการบัญชีผู้ใช้ / กำหนดบทบาท / นำเข้า Excel | ✅ | ❌ | ❌ | ❌ |
+| สร้าง / แก้ไข / ลบ โครงการ | ✅ | ✅ | ❌ | ❌ |
+| สร้างงาน / มอบหมายงานในโครงการ | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ❌ |
+| เปลี่ยนสถานะงานในโครงการ | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ✅ (เฉพาะงานที่ได้รับมอบหมาย) |
+| แนบไฟล์ / คอมเมนต์งานแบบเรียลไทม์ | ✅ | ✅ | ✅ | ✅ |
+| บอร์ดส่วนตัว & ปฏิทิน (Personal Kanban & Calendar) | ✅ | ✅ | ✅ | ✅ |
+| สิทธิ์การดูรายงานสรุป (Reports) | ภาพรวมทั้งระบบ | โครงการในความดูแล | ทีมในโครงการ | สถิติตนเอง |
+| ประวัติกิจกรรมระบบ (System Activity Logs) | ✅ | ❌ | ❌ | ❌ |
 
 ### 3. การบริหารโครงการ (Project Management)
 
@@ -240,8 +255,12 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `JWT_KEY`               | `random_secret_string`   | คีย์เข้ารหัส JWT Session Token               |
 | `FRONTEND_URL`          | `http://localhost:5173`  | โดเมนของ Frontend (สำหรับ CORS)              |
 | `BASE_URL`              | `http://localhost:3000`  | โดเมนของ Backend Server                      |
+| `BREVO_API_KEY`         | `xkeysib-...`            | API Key จาก Brevo (แนะนำสำหรับ Railway/Render ฟรี 300 ฉบับ/วัน) |
+| `BREVO_SENDER_EMAIL`    | `your_email@gmail.com`   | อีเมลผู้ส่งผ่าน Brevo                        |
 | `RESEND_API_KEY`        | `re_...`                 | API Key จาก Resend                           |
-| `RESEND_FROM`           | `support@yourdomain.com` | อีเมลผู้ส่งผ่าน Resend                       |
+| `RESEND_FROM`           | `support@yourdomain.com` | อีเมลผู้ส่งผ่าน Resend (ต้องใช้โดเมนตนเอง)   |
+| `EMAIL_USER`            | `your_email@gmail.com`   | อีเมลสำหรับ SMTP (กรณีใช้ Gmail)             |
+| `EMAIL_PASS`            | `xxxx xxxx xxxx xxxx`    | App Password 16 หลักจาก Google Account       |
 | `CLOUDINARY_CLOUD_NAME` | `your_cloud_name`        | Cloudinary Name สำหรับบันทึกไฟล์ถาวรบนคลาวด์ |
 | `CLOUDINARY_API_KEY`    | `your_api_key`           | Cloudinary API Key                           |
 | `CLOUDINARY_API_SECRET` | `your_api_secret`        | Cloudinary API Secret                        |
@@ -318,17 +337,23 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `POST`   | `/auth/send-otp`                  |  Public (Rate Limited)  | ส่งรหัส OTP ไปยังอีเมลเพื่อกู้คืนรหัสผ่าน (Zero-Leak) |
 | `POST`   | `/auth/reset-password`            |         Public          | ตั้งรหัสผ่านใหม่ด้วยรหัส OTP                          |
 | `POST`   | `/auth/reset-password-first-time` |         Public          | บังคับเปลี่ยนรหัสผ่านเมื่อเข้าใช้งานครั้งแรก          |
+| `POST`   | `/auth/change-password`           |     Token Required      | เปลี่ยนรหัสผ่านจากหน้า Profile                        |
+| `POST`   | `/auth/contact`                   |  Public (Rate Limited)  | ส่งข้อความติดต่อสอบถามผ่านฟอร์ม Contact               |
 | `GET`    | `/auth/users`                     |     Token Required      | ดึงรายชื่อผู้ใช้งานทั้งหมด (รองรับ Cache)             |
 | `POST`   | `/auth/users`                     | Token Required (Admin)  | สร้างผู้ใช้งานใหม่ พร้อมอัปโหลด Avatar                |
 | `PUT`    | `/auth/users/:id`                 |     Token Required      | แก้ไขข้อมูลผู้ใช้ / เปลี่ยนบทบาท                      |
 | `DELETE` | `/auth/users/:id`                 | Token Required (Admin)  | ลบผู้ใช้แบบ Soft Delete                               |
+| `POST`   | `/auth/users/:id/restore`         | Token Required (Admin)  | กู้คืนผู้ใช้ที่ถูก Soft Delete กลับมา                 |
 | `POST`   | `/auth/users/import`              | Token Required (Admin)  | นำเข้าผู้ใช้งานแบบ Batch จาก Excel/CSV                |
+| `GET`    | `/auth/team-leaders`              |     Token Required      | ดึงรายชื่อผู้ใช้ที่สามารถแต่งตั้งเป็น Team Leader ได้ |
 | `GET`    | `/auth/projects`                  |     Token Required      | ดึงรายการโครงการทั้งหมด พร้อม Progress คำนวณอัตโนมัติ |
 | `POST`   | `/auth/projects`                  |     Token Required      | สร้างโครงการใหม่และมอบหมาย Team Leader                |
 | `PUT`    | `/auth/projects/:id`              |     Token Required      | แก้ไขข้อมูลโครงการ                                    |
 | `DELETE` | `/auth/projects/:id`              |     Token Required      | ลบโครงการพร้อมงานทั้งหมด                              |
 | `POST`   | `/auth/tasks`                     |     Token Required      | สร้างงานใหม่ภายใต้โครงการ                             |
+| `PUT`    | `/auth/tasks/:id`                 |     Token Required      | แก้ไขรายละเอียดงาน                                   |
 | `PUT`    | `/auth/tasks/:id/status`          |     Token Required      | อัปเดตสถานะงาน (Sync เรียลไทม์ผ่าน WebSockets)        |
+| `DELETE` | `/auth/tasks/:id`                 |     Token Required      | ลบงานออกจากโครงการ                                    |
 | `GET`    | `/auth/tasks/:id/status-history`  |     Token Required      | ดึงประวัติ Timeline การเปลี่ยนสถานะงาน                |
 | `GET`    | `/auth/tasks/:id/comments`        |     Token Required      | ดึงรายการความคิดเห็นในงาน                             |
 | `POST`   | `/auth/tasks/:id/comments`        |     Token Required      | ส่งความคิดเห็นใหม่ในงาน                               |
@@ -337,11 +362,15 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `GET`    | `/auth/personal-tasks`            |     Token Required      | ดึงรายการงานส่วนตัวของผู้ใช้งาน                       |
 | `POST`   | `/auth/personal-tasks`            |     Token Required      | สร้างงานส่วนตัวใหม่                                   |
 | `PUT`    | `/auth/personal-tasks/reorder`    |     Token Required      | อัปเดตลำดับและสถานะการลากวางบน Kanban                 |
+| `PUT`    | `/auth/personal-tasks/:id`        |     Token Required      | แก้ไขรายละเอียดงานส่วนตัว                            |
 | `DELETE` | `/auth/personal-tasks/:id`        |     Token Required      | ลบงานส่วนตัวออกจากบอร์ดและปฏิทิน                      |
+| `GET`    | `/auth/calendar-events`           |     Token Required      | ดึงข้อมูลกำหนดการสำหรับแสดงผลบน FullCalendar          |
 | `GET`    | `/auth/notifications`             |     Token Required      | ดึงรายการแจ้งเตือน In-App ของตนเอง                    |
 | `PUT`    | `/auth/notifications/read-all`    |     Token Required      | ทำเครื่องหมายว่าอ่านแจ้งเตือนแล้วทั้งหมด              |
+| `PUT`    | `/auth/notifications/:id/read`    |     Token Required      | ทำเครื่องหมายอ่านแจ้งเตือนทีละรายการ                  |
+| `DELETE` | `/auth/notifications/:id`         |     Token Required      | ลบรายการแจ้งเตือน                                     |
 | `GET`    | `/auth/dashboard-stats`           |     Token Required      | ดึงข้อมูลสถิติและผลรวมสำหรับแดชบอร์ด                  |
-| `GET`    | `/auth/activity-logs`             |     Token Required      | ดึงบันทึกประวัติกิจกรรมในระบบ                         |
+| `GET`    | `/auth/activity-logs`             | Token Required (Admin)  | ดึงบันทึกประวัติกิจกรรมในระบบ                         |
 
 ---
 
