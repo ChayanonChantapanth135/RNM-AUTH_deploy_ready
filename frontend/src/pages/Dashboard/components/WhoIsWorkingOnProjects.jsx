@@ -134,12 +134,11 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                             : "Unassigned");
 
                         return (
-                          <div
+                            <div
                             key={tItem.id}
-                            className="p-2.5 rounded-xl border flex items-center gap-2.5 transition-colors"
+                            className="p-2.5 rounded-xl border border-transparent light:border-[var(--border-surface)] flex items-center gap-2.5 transition-colors"
                             style={{
                               backgroundColor: "var(--bg-surface-hover)",
-                              borderColor: "var(--border-surface)",
                             }}
                           >
                             {/* รูปโปรไฟล์ / Avatar ของคนทำ */}
