@@ -308,6 +308,7 @@ export const initializeDatabase = async () => {
     await addColumnIfNotExists('users', 'expire_date', 'DATE NULL DEFAULT NULL');
     await addColumnIfNotExists('users', 'leader_id', 'INT NULL');
     await addColumnIfNotExists('users', 'deleted_at', 'TIMESTAMP NULL DEFAULT NULL');
+    await addColumnIfNotExists('users', 'last_login_at', 'TIMESTAMP NULL DEFAULT NULL');
     await addColumnIfNotExists('tasks', 'task_type', 'VARCHAR(50) DEFAULT NULL');
     await addColumnIfNotExists('tasks', 'priority', "ENUM('Low', 'Medium', 'High') DEFAULT 'Medium'");
     await addColumnIfNotExists('tasks', 'due_date', 'DATE DEFAULT NULL');

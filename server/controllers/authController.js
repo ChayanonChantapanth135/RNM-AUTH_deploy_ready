@@ -285,6 +285,8 @@ export const login = async (req, res) => {
         const tokenExpiresInSeconds = 40 * 60;
         const token = jwt.sign({ id: rows[0].id }, jwtSecret, { expiresIn: tokenExpiresIn });
 
+        // บันทึกเวลาเข้าสู่ระบบล่าสุด (Last Login) และ Activity Log
+        await db.query('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?', [rows[0].id]);
         await logActivity(db, rows[0].id, 'Login', `User logged in: ${rows[0].fullname}`);
 
         if (rows[0].is_force_reset === 1) {
@@ -409,7 +411,7 @@ export const getUsers = async (req, res) => {
         const db = await connectToDatabase();
         const whereClause = includeDeleted === 'true' ? '' : 'WHERE u.deleted_at IS NULL';
         const query = `
-            SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.deleted_at,
+            SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.last_login_at, u.deleted_at,
                    l.fullname AS leader_name,
                    COALESCE(sub.leader_count, 0) AS leader_count
             FROM users u
@@ -439,7 +441,7 @@ export const getUserById = async (req, res) => {
     try {
         const db = await connectToDatabase();
         const [rows] = await db.query(`
-            SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.deleted_at,
+            SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.last_login_at, u.deleted_at,
                    l.fullname AS leader_name,
                    COALESCE(sub.leader_count, 0) AS leader_count
             FROM users u

@@ -92,8 +92,8 @@ export const useUserManagement = (t, language = "en") => {
           leaderId: u.leader_id || null,
           leaderName: u.leader_name || null,
           isLeader: isLeader,
-          lastLogin: u.created_at
-            ? formatDate(u.created_at, language)
+          lastLogin: u.last_login_at
+            ? formatDate(u.last_login_at, language)
             : "-",
           initials: initials,
         };
