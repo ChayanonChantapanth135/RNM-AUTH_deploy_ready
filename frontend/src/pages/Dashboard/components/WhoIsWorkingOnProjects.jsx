@@ -81,7 +81,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {nonCompletedProjects.map((project) => {
             const allTasks = project.tasks || [];
             // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
@@ -95,7 +95,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
             return (
               <div
                 key={project.id}
-                className="glass-card rounded-2xl p-5 flex flex-col justify-between border hover:border-sky-500/50 transition-all duration-300 group shadow-md"
+                className="glass-card rounded-2xl p-4 flex flex-col justify-between border hover:border-sky-500/50 transition-all duration-300 group shadow-sm hover:shadow-md"
                 style={{ borderColor: "var(--border-surface)" }}
               >
                 <div>
@@ -104,19 +104,19 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                     onClick={() =>
                       navigate(`/Projects?projectId=${project.id}`)
                     }
-                    className="text-base font-bold transition-colors cursor-pointer truncate mb-3 flex items-center gap-2 group-hover:text-sky-500"
+                    className="text-sm font-bold transition-colors cursor-pointer truncate mb-2.5 flex items-center gap-1.5 group-hover:text-sky-500"
                     style={{ color: "var(--text-primary)" }}
                     title={project.name}
                   >
-                    <span className="text-xl">📁</span>
+                    <span className="text-base">📁</span>
                     <span className="truncate">{project.name}</span>
                   </h4>
 
                   {/* รายการคนที่กำลังทำและชื่องาน (Who is working & Task name) */}
-                  <div className="space-y-2.5">
+                  <div className="space-y-2">
                     {inProgressTasks.length === 0 ? (
                       <p
-                        className="text-xs italic py-2"
+                        className="text-xs italic py-1.5"
                         style={{ color: "var(--text-secondary)" }}
                       >
                         {language === "th"
@@ -136,7 +136,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                         return (
                           <div
                             key={tItem.id}
-                            className="p-3 rounded-xl border flex items-center gap-3 transition-colors"
+                            className="p-2.5 rounded-xl border flex items-center gap-2.5 transition-colors"
                             style={{
                               backgroundColor: "var(--bg-surface-hover)",
                               borderColor: "var(--border-surface)",
@@ -151,7 +151,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                                     : `${API_URL}${tItem.assigned_to_avatar}`
                                 }
                                 alt={workerName}
-                                className="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm border"
+                                className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm border"
                                 style={{ borderColor: "var(--border-surface)" }}
                                 onError={(e) => {
                                   // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
@@ -163,7 +163,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                               />
                             ) : null}
                             <div
-                              className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm"
+                              className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
                               style={{
                                 display: tItem.assigned_to_avatar ? "none" : "flex",
                               }}
@@ -174,14 +174,14 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
                             <div className="min-w-0 flex-1">
                               {/* ชื่อคนทำ */}
                               <p
-                                className="text-xs font-bold truncate leading-tight mb-1"
+                                className="text-xs font-semibold truncate leading-tight mb-0.5"
                                 style={{ color: "var(--text-primary)" }}
                               >
                                 {workerName}
                               </p>
                               {/* ชื่องาน (Task) */}
                               <p
-                                className="text-xs truncate"
+                                className="text-[11px] truncate leading-tight"
                                 style={{ color: "var(--text-secondary)" }}
                                 title={tItem.title}
                               >
