@@ -144,7 +144,8 @@ const translations = {
     minuteAgo: "1 Minute Ago",
     viewAll: "View All",
     whoIsWorkingOnProject: "Who is working on this project?",
-    whoIsWorkingDesc: "Active projects and assignees currently working on tasks",
+    whoIsWorkingDesc:
+      "Active projects and assignees currently working on tasks",
     noActiveProjectsWithWorkers: "No active tasks in progress at the moment",
     currentlyWorking: "Currently working on:",
     noOneWorkingCurrently: "No one is actively working on a task right now",
@@ -209,7 +210,8 @@ const translations = {
     importActionUnchanged: "No Change (Skip)",
     importActionInvalid: "Skip (Missing data)",
     importConfirmSummary: "Ready to import",
-    importChangedOnlyNotice: "Only new and changed records will be updated to optimize performance.",
+    importChangedOnlyNotice:
+      "Only new and changed records will be updated to optimize performance.",
     importInvalidSkipped: "Incomplete rows skipped:",
     importingProgress: "Importing users...",
     exportUsersBtn: "Export Users",
@@ -736,7 +738,8 @@ const translations = {
 
     // Activity & Logs
     activityLogsTitle: "System Activity Logs",
-    activityLogsSubtitle: "Track system operations, actions, and project updates",
+    activityLogsSubtitle:
+      "Track system operations, actions, and project updates",
     searchActivityPlaceholder: "Search activities or details...",
     allActivities: "All Activities",
     aboutProjects: "Projects & Tasks",
@@ -891,11 +894,13 @@ const translations = {
     loggedIn: "เข้าสู่ระบบ",
     minuteAgo: "1 นาทีที่แล้ว",
     viewAll: "ดูทั้งหมด",
-    whoIsWorkingOnProject: "Who is working on this project?",
-    whoIsWorkingDesc: "โครงการที่กำลังดำเนินงานและสมาชิกที่กำลังทำภารกิจอยู่ขณะนี้",
+    whoIsWorkingOnProject: "ใครกำลังปฏิบัติงานในโปรเจค?",
+    whoIsWorkingDesc:
+      "โครงการที่กำลังดำเนินงานและสมาชิกที่กำลังทำภารกิจอยู่ขณะนี้",
     noActiveProjectsWithWorkers: "ยังไม่มีโครงการที่กำลังดำเนินงานอยู่ขณะนี้",
     currentlyWorking: "กำลังทำภารกิจ:",
-    noOneWorkingCurrently: "ขณะนี้ยังไม่มีผู้ใช้ที่กำลัง In Progress งานใดๆ ในโครงการนี้",
+    noOneWorkingCurrently:
+      "ขณะนี้ยังไม่มีผู้ใช้ที่กำลัง In Progress งานใดๆ ในโครงการนี้",
     tasksInProgressCount: "งานที่กำลังทำอยู่",
 
     // Dashboard Cards
@@ -962,7 +967,8 @@ const translations = {
     importActionUnchanged: "ข้อมูลเดิม (ข้าม)",
     importActionInvalid: "ข้าม / ไม่สมบูรณ์",
     importConfirmSummary: "พร้อมนำเข้าทั้งหมด",
-    importChangedOnlyNotice: "ระบบจะบันทึกเฉพาะรายการใหม่และรายการที่มีการเปลี่ยนแปลง เพื่อความรวดเร็วและลดโหลดฐานข้อมูล",
+    importChangedOnlyNotice:
+      "ระบบจะบันทึกเฉพาะรายการใหม่และรายการที่มีการเปลี่ยนแปลง เพื่อความรวดเร็วและลดโหลดฐานข้อมูล",
     importInvalidSkipped: "ระบบจะข้ามรายการที่ไม่สมบูรณ์",
     importingProgress: "กำลังนำเข้าข้อมูล...",
     exportUsersBtn: "ส่งออกผู้ใช้งาน",
@@ -1481,7 +1487,8 @@ const translations = {
 
     // Activity & Logs
     activityLogsTitle: "บันทึกประวัติกิจกรรม",
-    activityLogsSubtitle: "ตรวจสอบและติดตามกิจกรรมการทำงาน การกระทำ และการอัปเดตในระบบ",
+    activityLogsSubtitle:
+      "ตรวจสอบและติดตามกิจกรรมการทำงาน การกระทำ และการอัปเดตในระบบ",
     searchActivityPlaceholder: "ค้นหากิจกรรมหรือรายละเอียด...",
     allActivities: "กิจกรรมทั้งหมด",
     aboutProjects: "โปรเจกต์และงาน",
