@@ -407,23 +407,22 @@ export const getUsers = async (req, res) => {
     const { includeDeleted } = req.query;
     try {
         const db = await connectToDatabase();
-        let query = `
+        const whereClause = includeDeleted === 'true' ? '' : 'WHERE u.deleted_at IS NULL';
+        const query = `
             SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.deleted_at,
                    l.fullname AS leader_name,
-                   (SELECT COUNT(*) FROM users sub WHERE sub.leader_id = u.id AND sub.deleted_at IS NULL) AS leader_count
+                   COALESCE(sub.leader_count, 0) AS leader_count
             FROM users u
             LEFT JOIN users l ON u.leader_id = l.id
-            WHERE u.deleted_at IS NULL
+            LEFT JOIN (
+                SELECT leader_id, COUNT(*) AS leader_count
+                FROM users
+                WHERE leader_id IS NOT NULL AND deleted_at IS NULL
+                GROUP BY leader_id
+            ) sub ON sub.leader_id = u.id
+            ${whereClause}
+            ORDER BY u.id ASC
         `;
-        if (includeDeleted === 'true') {
-            query = `
-                SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.deleted_at,
-                       l.fullname AS leader_name,
-                       (SELECT COUNT(*) FROM users sub WHERE sub.leader_id = u.id AND sub.deleted_at IS NULL) AS leader_count
-                FROM users u
-                LEFT JOIN users l ON u.leader_id = l.id
-            `;
-        }
         const [rows] = await db.query(query);
         res.status(200).json(rows);
     } catch (error) {
@@ -442,11 +441,17 @@ export const getUserById = async (req, res) => {
         const [rows] = await db.query(`
             SELECT u.id, u.fullname, u.email, u.phone, u.role, u.avatar, u.status, u.start_date, u.expire_date, u.leader_id, u.created_at, u.deleted_at,
                    l.fullname AS leader_name,
-                   (SELECT COUNT(*) FROM users sub WHERE sub.leader_id = u.id AND sub.deleted_at IS NULL) AS leader_count
+                   COALESCE(sub.leader_count, 0) AS leader_count
             FROM users u
             LEFT JOIN users l ON u.leader_id = l.id
+            LEFT JOIN (
+                SELECT leader_id, COUNT(*) AS leader_count
+                FROM users
+                WHERE leader_id = ? AND deleted_at IS NULL
+                GROUP BY leader_id
+            ) sub ON sub.leader_id = u.id
             WHERE u.id = ? AND u.deleted_at IS NULL
-        `, [id]);
+        `, [id, id]);
         if (rows.length === 0) return res.status(404).json({ message: 'User not found' });
         res.status(200).json(rows[0]);
     } catch (error) {

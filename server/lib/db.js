@@ -11,7 +11,15 @@ export const connectToDatabase = async () => {
   if (!pool) {
     const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL;
     if (dbUrl) {
-      pool = mysql.createPool(dbUrl);
+      pool = mysql.createPool({
+        uri: dbUrl,
+        waitForConnections: true,
+        connectionLimit: 15,
+        queueLimit: 0,
+        dateStrings: true,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000
+      });
     } else {
       pool = mysql.createPool({
         host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
@@ -22,7 +30,9 @@ export const connectToDatabase = async () => {
         waitForConnections: true,
         connectionLimit: 15,
         queueLimit: 0,
-        dateStrings: true
+        dateStrings: true,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000
       });
     }
   }
