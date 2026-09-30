@@ -62,8 +62,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           <div className="animate-spin rounded-full h-9 w-9 border-3 border-sky-500 border-t-transparent"></div>
         </div>
       ) : nonCompletedProjects.length === 0 ? (
-        <div className="text-center py-12 px-4 rounded-2xl bg-white/[0.02] border border-dashed border-white/10">
-          {/* <span className="text-4xl block mb-2 opacity-60">🎉</span> */}
+        <div className="text-center py-12 px-4">
           <p className="text-sm font-semibold text-slate-300">
             {t("noActiveProjectsWithWorkers") ||
               "ไม่มีโครงการที่ค้างอยู่ หรือทุกโครงการเสร็จสมบูรณ์เรียบร้อยแล้ว"}
