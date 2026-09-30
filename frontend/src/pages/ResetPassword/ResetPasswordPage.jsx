@@ -29,24 +29,27 @@ const ResetPasswordPage = () => {
     handleSubmit,
   } = useResetPassword(language, t);
 
-  useGSAP(() => {
-    gsap.to(orb1Ref.current, {
-      x: 40,
-      y: -40,
-      duration: 6,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-    gsap.to(orb2Ref.current, {
-      x: -40,
-      y: 40,
-      duration: 8,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    });
-  }, { scope: containerRef });
+  useGSAP(
+    () => {
+      gsap.to(orb1Ref.current, {
+        x: 40,
+        y: -40,
+        duration: 6,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+      gsap.to(orb2Ref.current, {
+        x: -40,
+        y: 40,
+        duration: 8,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+    },
+    { scope: containerRef },
+  );
 
   return (
     <div
