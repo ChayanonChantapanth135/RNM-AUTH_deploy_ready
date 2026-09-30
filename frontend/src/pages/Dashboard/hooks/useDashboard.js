@@ -19,6 +19,9 @@ export const useDashboard = () => {
   const [calendarEvents, setCalendarEvents] = useState([]);
   const [calendarRange, setCalendarRange] = useState({ start: null, end: null });
 
+  const [activeProjects, setActiveProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+
   // 1. Initial User Fetch
   useEffect(() => {
     const fetchUser = async () => {
@@ -43,13 +46,14 @@ export const useDashboard = () => {
   const isTeamLeader = userRole === "team_leader";
   const isManager = userRole === "manager" || userRole === "project_manager";
 
-  // 2. Fetch Stats & Activity Logs based on User & Role
+  // 2. Fetch Stats, Activity Logs & Projects based on User & Role
   useEffect(() => {
     if (!currentUser) return;
 
     const fetchStatsAndActivities = async () => {
+      setProjectsLoading(true);
       try {
-        const [statsRes, actRes] = await Promise.all([
+        const [statsRes, actRes, projectsRes] = await Promise.all([
           axios.get("/auth/dashboard-stats", {
             params: {
               role: currentUser.role,
@@ -63,11 +67,15 @@ export const useDashboard = () => {
               userId: currentUser.id,
             },
           }),
+          axios.get("/auth/projects"),
         ]);
         setStats(statsRes.data);
         setRecentActivities(actRes.data.slice(0, 20));
+        setActiveProjects(projectsRes.data || []);
       } catch (error) {
-        console.error("Error fetching dashboard stats/activities:", error);
+        console.error("Error fetching dashboard stats/activities/projects:", error);
+      } finally {
+        setProjectsLoading(false);
       }
     };
 
@@ -305,5 +313,7 @@ export const useDashboard = () => {
     projectAndTaskActivities,
     calendarEvents,
     onDatesSet,
+    activeProjects,
+    projectsLoading,
   };
 };

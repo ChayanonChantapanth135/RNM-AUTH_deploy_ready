@@ -143,6 +143,12 @@ const translations = {
     loggedIn: "Logged In",
     minuteAgo: "1 Minute Ago",
     viewAll: "View All",
+    whoIsWorkingOnProject: "Who is working on this project?",
+    whoIsWorkingDesc: "Active projects and assignees currently working on tasks",
+    noActiveProjectsWithWorkers: "No active tasks in progress at the moment",
+    currentlyWorking: "Currently working on:",
+    noOneWorkingCurrently: "No one is actively working on a task right now",
+    tasksInProgressCount: "In-Progress Tasks",
 
     // Dashboard Cards
     manageUsersBtn: "Manage Users",
@@ -885,6 +891,12 @@ const translations = {
     loggedIn: "เข้าสู่ระบบ",
     minuteAgo: "1 นาทีที่แล้ว",
     viewAll: "ดูทั้งหมด",
+    whoIsWorkingOnProject: "Who is working on this project?",
+    whoIsWorkingDesc: "โครงการที่กำลังดำเนินงานและสมาชิกที่กำลังทำภารกิจอยู่ขณะนี้",
+    noActiveProjectsWithWorkers: "ยังไม่มีโครงการที่กำลังดำเนินงานอยู่ขณะนี้",
+    currentlyWorking: "กำลังทำภารกิจ:",
+    noOneWorkingCurrently: "ขณะนี้ยังไม่มีผู้ใช้ที่กำลัง In Progress งานใดๆ ในโครงการนี้",
+    tasksInProgressCount: "งานที่กำลังทำอยู่",
 
     // Dashboard Cards
     manageUsersBtn: "จัดการผู้ใช้งาน",

@@ -281,13 +281,15 @@ const TaskDetailModal = ({
       });
     } catch (err) {
       console.error("Failed to update status:", err);
+      const serverMsg = err.response?.data?.message;
       Swal.fire({
         toast: true,
         position: "bottom-end",
         icon: "error",
-        title: language === "th" ? "ไม่สามารถอัปเดตสถานะได้" : "Failed to update status",
+        title: serverMsg || (language === "th" ? "ไม่สามารถอัปเดตสถานะได้" : "Failed to update status"),
         showConfirmButton: false,
-        timer: 3000,
+        timer: 4500,
+        timerProgressBar: true,
         background: "#1e293b",
         color: "#ffffff",
       });
@@ -358,13 +360,15 @@ const TaskDetailModal = ({
       });
     } catch (err) {
       console.error("Failed to update task details:", err);
+      const serverMsg = err.response?.data?.message;
       Swal.fire({
         toast: true,
         position: "bottom-end",
         icon: "error",
-        title: language === "th" ? "ไม่สามารถบันทึกข้อมูลงานได้" : "Failed to save changes",
+        title: serverMsg || (language === "th" ? "ไม่สามารถบันทึกข้อมูลงานได้" : "Failed to save changes"),
         showConfirmButton: false,
-        timer: 3000,
+        timer: 4500,
+        timerProgressBar: true,
         background: "#1e293b",
         color: "#ffffff",
       });

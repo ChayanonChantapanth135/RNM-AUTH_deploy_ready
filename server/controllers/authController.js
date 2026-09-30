@@ -1609,11 +1609,40 @@ export const updateTaskStatus = async (req, res) => {
     const { status, userId } = req.body;
     try {
         const db = await connectToDatabase();
-        const [taskRows] = await db.query('SELECT t.title, t.project_id, p.name AS project_name FROM tasks t JOIN projects p ON t.project_id = p.id WHERE t.id = ?', [id]);
+        const [taskRows] = await db.query('SELECT t.title, t.project_id, t.assigned_to, t.status AS current_status, p.name AS project_name FROM tasks t JOIN projects p ON t.project_id = p.id WHERE t.id = ?', [id]);
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
-        const { title, project_id, project_name } = taskRows[0];
+        const { title, project_id, project_name, assigned_to, current_status } = taskRows[0];
+
+        // ตรวจสอบกฎ: 1 คนสามารถมีงาน In Progress ได้ทีละ 1 งานเท่านั้น
+        const isTargetInProgress = status && (status.toLowerCase() === 'in progress' || status.toLowerCase() === 'in_progress');
+        const isCurrentInProgress = current_status && (current_status.toLowerCase() === 'in progress' || current_status.toLowerCase() === 'in_progress');
+        const effectiveAssignee = assigned_to || userId;
+
+        if (isTargetInProgress && !isCurrentInProgress && effectiveAssignee) {
+            const [activeTasks] = await db.query(
+                `SELECT t.id, t.title, p.name AS project_name 
+                 FROM tasks t 
+                 JOIN projects p ON t.project_id = p.id 
+                 WHERE t.assigned_to = ? 
+                   AND LOWER(t.status) IN ('in progress', 'in_progress') 
+                   AND t.deleted_at IS NULL 
+                   AND p.deleted_at IS NULL 
+                   AND t.id != ? 
+                 LIMIT 1`,
+                [Number(effectiveAssignee), id]
+            );
+
+            if (activeTasks.length > 0) {
+                const active = activeTasks[0];
+                return res.status(400).json({
+                    message: `คุณมีงาน "${active.title}" (ในโปรเจกต์ ${active.project_name}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่`,
+                    code: 'ACTIVE_TASK_IN_PROGRESS',
+                    activeTask: active
+                });
+            }
+        }
 
         await db.query('UPDATE tasks SET status = ? WHERE id = ?', [status, id]);
         await checkAndUpdateProjectStatus(db, project_id, userId, id);
@@ -1666,8 +1695,42 @@ export const updateTask = async (req, res) => {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
         const oldTask = oldTaskRows[0];
+        const oldTitle = oldTask.title || '';
+        const oldStatus = oldTask.status || 'Pending';
         const oldAssignee = oldTask.assigned_to;
         const targetProjectId = projectId ? Number(projectId) : oldTask.project_id;
+        const targetAssignee = assignedTo !== undefined ? (assignedTo ? Number(assignedTo) : null) : oldAssignee;
+        const targetStatus = status !== undefined ? status : oldStatus;
+
+        // ตรวจสอบกฎ: 1 คนสามารถมีงาน In Progress ได้ทีละ 1 งานเท่านั้น
+        const isTargetInProgress = targetStatus && (targetStatus.toLowerCase() === 'in progress' || targetStatus.toLowerCase() === 'in_progress');
+        const isOldInProgress = oldStatus && (oldStatus.toLowerCase() === 'in progress' || oldStatus.toLowerCase() === 'in_progress');
+        const effectiveAssignee = targetAssignee || userId;
+
+        if (isTargetInProgress && (!isOldInProgress || (targetAssignee && Number(targetAssignee) !== Number(oldAssignee))) && effectiveAssignee) {
+            const [activeTasks] = await db.query(
+                `SELECT t.id, t.title, p.name AS project_name 
+                 FROM tasks t 
+                 JOIN projects p ON t.project_id = p.id 
+                 WHERE t.assigned_to = ? 
+                   AND LOWER(t.status) IN ('in progress', 'in_progress') 
+                   AND t.deleted_at IS NULL 
+                   AND p.deleted_at IS NULL 
+                   AND t.id != ? 
+                 LIMIT 1`,
+                [Number(effectiveAssignee), id]
+            );
+
+            if (activeTasks.length > 0) {
+                const active = activeTasks[0];
+                return res.status(400).json({
+                    message: `ผู้ใช้นี้มีงาน "${active.title}" (ในโปรเจกต์ ${active.project_name}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่`,
+                    code: 'ACTIVE_TASK_IN_PROGRESS',
+                    activeTask: active
+                });
+            }
+        }
+
         let finalTitle = title || oldTitle;
         if (title && title.trim() !== oldTitle.trim()) {
             finalTitle = await resolveUniqueTaskTitle(db, targetProjectId, title, id);

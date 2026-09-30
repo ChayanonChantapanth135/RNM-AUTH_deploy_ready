@@ -394,10 +394,23 @@ const ViewTaskModal = ({
       }
     } catch (err) {
       console.error("Failed to update task:", err);
-      setErrorMessage(
-        language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task"
-      );
-      setTimeout(() => setErrorMessage(""), 5000);
+      const serverMsg = err.response?.data?.message;
+      const displayMsg = serverMsg || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+      if (typeof setErrorMessage === "function") {
+        setErrorMessage(displayMsg);
+        setTimeout(() => setErrorMessage(""), 6000);
+      }
+      Swal.fire({
+        toast: true,
+        position: "bottom-end",
+        icon: "error",
+        title: displayMsg,
+        showConfirmButton: false,
+        timer: 4500,
+        timerProgressBar: true,
+        background: "#1e293b",
+        color: "#ffffff",
+      });
     } finally {
       setSubmittingTask(false);
     }

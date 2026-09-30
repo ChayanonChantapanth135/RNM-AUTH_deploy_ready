@@ -5,6 +5,7 @@ import Footer from "../../components/Footer";
 import { useLanguage } from "../../lib/LanguageContext";
 import StatCard from "./components/StatCard";
 import RecentActivity from "./components/RecentActivity";
+import WhoIsWorkingOnProjects from "./components/WhoIsWorkingOnProjects";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -30,6 +31,8 @@ const DashboardPage = () => {
     projectAndTaskActivities,
     calendarEvents,
     onDatesSet,
+    activeProjects,
+    projectsLoading,
   } = useDashboard();
 
   return (
@@ -123,6 +126,12 @@ const DashboardPage = () => {
             />
           </div>
         )}
+
+        {/* Who is working on this project? Section */}
+        <WhoIsWorkingOnProjects
+          projects={activeProjects}
+          loading={projectsLoading}
+        />
 
         {/* Project Calendar */}
         <div className="mt-8 glass-panel rounded-3xl p-6 md:p-8 shadow-2xl">
