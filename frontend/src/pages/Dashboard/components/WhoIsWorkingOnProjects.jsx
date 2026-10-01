@@ -80,127 +80,127 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           </p>
         </div>
       ) : (
-        <div className="max-h-[640px] sm:max-h-[580px] md:max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
+        <div className="max-h-[700px] sm:max-h-[580px] md:max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {nonCompletedProjects.map((project) => {
-            const allTasks = project.tasks || [];
-            // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
-            const inProgressTasks = allTasks.filter((tItem) => {
-              const s = (tItem.status || "").toLowerCase().trim();
+            {nonCompletedProjects.map((project) => {
+              const allTasks = project.tasks || [];
+              // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
+              const inProgressTasks = allTasks.filter((tItem) => {
+                const s = (tItem.status || "").toLowerCase().trim();
+                return (
+                  s === "in progress" || s === "in_progress" || s === "กำลังทำ"
+                );
+              });
+
               return (
-                s === "in progress" || s === "in_progress" || s === "กำลังทำ"
-              );
-            });
+                <div
+                  key={project.id}
+                  className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:border-sky-500/50 transition-all duration-300 group shadow-sm hover:shadow-md"
+                  style={{
+                    border: "1px solid var(--border-surface)",
+                  }}
+                >
+                  <div>
+                    {/* ชื่อโปรเจกต์ (Project Name) */}
+                    <h4
+                      // onClick={() =>
+                      //   navigate(`/Projects?projectId=${project.id}`)
+                      // }
+                      className="text-sm font-bold transition-colors cursor-pointer truncate mb-2.5 flex items-center gap-1.5 group-hover:text-sky-500"
+                      style={{ color: "var(--text-primary)" }}
+                      title={project.name}
+                    >
+                      <span className="text-base">📁</span>
+                      <span className="truncate">{project.name}</span>
+                    </h4>
 
-            return (
-              <div
-                key={project.id}
-                className="glass-card rounded-2xl p-4 flex flex-col justify-between hover:border-sky-500/50 transition-all duration-300 group shadow-sm hover:shadow-md"
-                style={{
-                  border: "1px solid var(--border-surface)",
-                }}
-              >
-                <div>
-                  {/* ชื่อโปรเจกต์ (Project Name) */}
-                  <h4
-                    // onClick={() =>
-                    //   navigate(`/Projects?projectId=${project.id}`)
-                    // }
-                    className="text-sm font-bold transition-colors cursor-pointer truncate mb-2.5 flex items-center gap-1.5 group-hover:text-sky-500"
-                    style={{ color: "var(--text-primary)" }}
-                    title={project.name}
-                  >
-                    <span className="text-base">📁</span>
-                    <span className="truncate">{project.name}</span>
-                  </h4>
+                    {/* รายการคนที่กำลังทำและชื่องาน (Who is working & Task name) */}
+                    <div className="space-y-2">
+                      {inProgressTasks.length === 0 ? (
+                        <p
+                          className="text-xs italic py-1.5"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          {language === "th"
+                            ? "ไม่มีคนกำลังทำ"
+                            : "No active tasks in progress"}
+                        </p>
+                      ) : (
+                        inProgressTasks.map((tItem) => {
+                          const workerName =
+                            tItem.assigned_to_name ||
+                            tItem.assignee_name ||
+                            tItem.assignee ||
+                            (language === "th"
+                              ? "ไม่ระบุผู้รับผิดชอบ"
+                              : "Unassigned");
 
-                  {/* รายการคนที่กำลังทำและชื่องาน (Who is working & Task name) */}
-                  <div className="space-y-2">
-                    {inProgressTasks.length === 0 ? (
-                      <p
-                        className="text-xs italic py-1.5"
-                        style={{ color: "var(--text-secondary)" }}
-                      >
-                        {language === "th"
-                          ? "ไม่มีคนกำลังทำ"
-                          : "No active tasks in progress"}
-                      </p>
-                    ) : (
-                      inProgressTasks.map((tItem) => {
-                        const workerName =
-                          tItem.assigned_to_name ||
-                          tItem.assignee_name ||
-                          tItem.assignee ||
-                          (language === "th"
-                            ? "ไม่ระบุผู้รับผิดชอบ"
-                            : "Unassigned");
-
-                        return (
-                          <div
-                            key={tItem.id}
-                            className="p-2.5 rounded-xl flex items-center gap-2.5 transition-colors"
-                            style={{
-                              backgroundColor: "var(--bg-surface-hover)",
-                              border: "none",
-                            }}
-                          >
-                            {/* รูปโปรไฟล์ / Avatar ของคนทำ */}
-                            {tItem.assigned_to_avatar ? (
-                              <img
-                                src={
-                                  tItem.assigned_to_avatar.startsWith("http")
-                                    ? tItem.assigned_to_avatar
-                                    : `${API_URL}${tItem.assigned_to_avatar}`
-                                }
-                                alt={workerName}
-                                className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm"
-                                onError={(e) => {
-                                  // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
-                                  e.currentTarget.style.display = "none";
-                                  if (e.currentTarget.nextSibling) {
-                                    e.currentTarget.nextSibling.style.display =
-                                      "flex";
-                                  }
-                                }}
-                              />
-                            ) : null}
+                          return (
                             <div
-                              className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
+                              key={tItem.id}
+                              className="p-2.5 rounded-xl flex items-center gap-2.5 transition-colors"
                               style={{
-                                display: tItem.assigned_to_avatar
-                                  ? "none"
-                                  : "flex",
+                                backgroundColor: "var(--bg-surface-hover)",
+                                border: "none",
                               }}
                             >
-                              {workerName.charAt(0).toUpperCase()}
-                            </div>
+                              {/* รูปโปรไฟล์ / Avatar ของคนทำ */}
+                              {tItem.assigned_to_avatar ? (
+                                <img
+                                  src={
+                                    tItem.assigned_to_avatar.startsWith("http")
+                                      ? tItem.assigned_to_avatar
+                                      : `${API_URL}${tItem.assigned_to_avatar}`
+                                  }
+                                  alt={workerName}
+                                  className="w-7 h-7 rounded-full object-cover shrink-0 shadow-sm"
+                                  onError={(e) => {
+                                    // Fallback ซ่อนรูปแล้วแสดง fallback text เมื่อรูปโหลดไม่สำเร็จ
+                                    e.currentTarget.style.display = "none";
+                                    if (e.currentTarget.nextSibling) {
+                                      e.currentTarget.nextSibling.style.display =
+                                        "flex";
+                                    }
+                                  }}
+                                />
+                              ) : null}
+                              <div
+                                className="w-7 h-7 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 items-center justify-center text-[11px] font-bold text-white shrink-0 shadow-sm"
+                                style={{
+                                  display: tItem.assigned_to_avatar
+                                    ? "none"
+                                    : "flex",
+                                }}
+                              >
+                                {workerName.charAt(0).toUpperCase()}
+                              </div>
 
-                            <div className="min-w-0 flex-1">
-                              {/* ชื่อคนทำ */}
-                              <p
-                                className="text-xs font-semibold truncate leading-tight mb-0.5"
-                                style={{ color: "var(--text-primary)" }}
-                              >
-                                {workerName}
-                              </p>
-                              {/* ชื่องาน (Task) */}
-                              <p
-                                className="text-[11px] truncate leading-tight"
-                                style={{ color: "var(--text-secondary)" }}
-                                title={tItem.title}
-                              >
-                                {tItem.title}
-                              </p>
+                              <div className="min-w-0 flex-1">
+                                {/* ชื่อคนทำ */}
+                                <p
+                                  className="text-xs font-semibold truncate leading-tight mb-0.5"
+                                  style={{ color: "var(--text-primary)" }}
+                                >
+                                  {workerName}
+                                </p>
+                                {/* ชื่องาน (Task) */}
+                                <p
+                                  className="text-[11px] truncate leading-tight"
+                                  style={{ color: "var(--text-secondary)" }}
+                                  title={tItem.title}
+                                >
+                                  {tItem.title}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })
-                    )}
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </div>
       )}
