@@ -75,6 +75,42 @@ async function deleteOldAvatar(avatarPath) {
 }
 
 /**
+ * ลบไฟล์แนบ (Task File) ออกจาก Cloudinary หรือโฟลเดอร์ uploads
+ * @param {string} filePathUrl - พาธหรือ URL ของไฟล์
+ */
+async function deleteFileStorage(filePathUrl) {
+    if (!filePathUrl) return;
+    try {
+        if (filePathUrl.includes('cloudinary.com')) {
+            await deleteFromCloudinary(filePathUrl);
+            return;
+        }
+
+        let fileName = '';
+        if (filePathUrl.startsWith('http')) {
+            const parts = filePathUrl.split('/uploads/');
+            if (parts.length > 1) {
+                fileName = parts[1];
+            }
+        } else if (filePathUrl.startsWith('/uploads/')) {
+            fileName = filePathUrl.replace('/uploads/', '');
+        } else {
+            fileName = filePathUrl;
+        }
+
+        if (fileName) {
+            const localPath = path.join(__dirname, '../uploads', fileName);
+            if (fs.existsSync(localPath)) {
+                fs.unlinkSync(localPath);
+                console.log(`[File Cleanup] Deleted local file: ${localPath}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting file from storage:', error.message);
+    }
+}
+
+/**
  * บันทึกประวัติกิจกรรมการทำงานของผู้ใช้ลงตาราง activity_logs (ป้องกันการบันทึกซ้ำซ้อนภายใน 10 วินาที)
  * @param {object} db - Database connection
  * @param {number|null} userId - รหัสผู้ใช้งานที่ทำรายการ
@@ -1405,7 +1441,30 @@ export const deleteProject = async (req, res) => {
         // 1. Soft-delete project
         await db.query('UPDATE projects SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
 
-        // 2. Soft-delete all tasks associated with this project
+        // 2. หา task ทั้งหมดที่สังกัดโปรเจกต์นี้
+        const [tasksInProject] = await db.query('SELECT id FROM tasks WHERE project_id = ?', [id]);
+        const taskIds = tasksInProject.map((t) => t.id);
+
+        if (taskIds.length > 0) {
+            const placeholders = taskIds.map(() => '?').join(',');
+
+            // 3. ดึงไฟล์แนบทั้งหมดของงานในโปรเจกต์นี้เพื่อลบออกจาก Storage (Cloudinary / Local)
+            const [fileRows] = await db.query(
+                `SELECT filepath FROM files WHERE task_id IN (${placeholders})`,
+                taskIds
+            );
+            for (const fileItem of fileRows) {
+                if (fileItem.filepath) {
+                    await deleteFileStorage(fileItem.filepath);
+                }
+            }
+
+            // 4. ลบข้อมูลไฟล์แนบ (files) และความคิดเห็น (comments) ออกจากฐานข้อมูล
+            await db.query(`DELETE FROM files WHERE task_id IN (${placeholders})`, taskIds);
+            await db.query(`DELETE FROM comments WHERE task_id IN (${placeholders})`, taskIds);
+        }
+
+        // 5. Soft-delete all tasks associated with this project
         await db.query('UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE project_id = ?', [id]);
 
         await logActivity(db, userId, 'Delete Project', `Soft deleted project: ${projName}`);
@@ -1876,6 +1935,18 @@ export const deleteTask = async (req, res) => {
                 return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบงานนี้ (เฉพาะ Admin, Project Manager หรือ Team Leader ของโครงการเท่านั้น)' });
             }
         }
+
+        // ลบไฟล์แนบของงานนี้ออกจาก Storage (Cloudinary / Local)
+        const [fileRows] = await db.query('SELECT filepath FROM files WHERE task_id = ?', [id]);
+        for (const fileItem of fileRows) {
+            if (fileItem.filepath) {
+                await deleteFileStorage(fileItem.filepath);
+            }
+        }
+
+        // ลบข้อมูลไฟล์แนบ (files) และความคิดเห็น (comments) ของงานออกจากฐานข้อมูล
+        await db.query('DELETE FROM files WHERE task_id = ?', [id]);
+        await db.query('DELETE FROM comments WHERE task_id = ?', [id]);
 
         await db.query('UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
         await checkAndUpdateProjectStatus(db, project_id);
