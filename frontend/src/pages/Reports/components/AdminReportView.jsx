@@ -267,6 +267,43 @@ export default function AdminReportView({ data }) {
     projects,
   } = data;
 
+  // Flatten all tasks to compute system-wide task status metrics for the pie chart
+  const allAdminTasks = React.useMemo(() => {
+    const list = [];
+    (projects || []).forEach((p) => {
+      if (Array.isArray(p.tasks)) {
+        p.tasks.forEach((t) => list.push(t));
+      }
+    });
+    return list;
+  }, [projects]);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const adminCompletedTasks = data.completedTasksCount || allAdminTasks.filter(
+    (t) => (t.status || "").toLowerCase() === "completed"
+  ).length;
+
+  const adminInProgressTasks = allAdminTasks.filter((t) => {
+    const s = (t.status || "").toLowerCase();
+    return s === "in progress" || s === "in_progress";
+  }).length;
+
+  const adminPendingTasks = allAdminTasks.filter(
+    (t) => (t.status || "").toLowerCase() === "pending"
+  ).length;
+
+  const adminOverdueTasks = allAdminTasks.filter((t) => {
+    const s = (t.status || "").toLowerCase();
+    if (s === "completed") return false;
+    const due = t.due_date || t.dueDate;
+    if (!due) return false;
+    const dueDateObj = new Date(due);
+    dueDateObj.setHours(0, 0, 0, 0);
+    return dueDateObj < today;
+  }).length;
+
   // Table state similar to ManageUserPage
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -410,13 +447,82 @@ export default function AdminReportView({ data }) {
               title={t("systemDeliveryEfficiency")}
               desc={t("systemDeliveryDesc")}
             />
-            <div className="my-6 flex justify-center">
-              <CompletionRing
-                rate={overallCompletionRate}
-                label="admin"
-                gradientFrom="#14b8a6"
-                gradientTo="#10b981"
-              />
+            <div className="h-56 w-full flex items-center justify-center relative my-2">
+              {totalTasks === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-1">
+                  <span className="text-2xl opacity-40">📊</span>
+                  <p className="text-xs text-slate-500 font-semibold">
+                    {t("noTaskData") || t("noData") || "No Task Data"}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip content={<CustomChartTooltip />} />
+                      <Pie
+                        data={[
+                          {
+                            name: t("statusCompleted") || "Completed",
+                            value: adminCompletedTasks,
+                            fill: "#10b981",
+                          },
+                          {
+                            name: t("statusInProgress") || "In Progress",
+                            value: adminInProgressTasks,
+                            fill: "#6366f1",
+                          },
+                          {
+                            name: t("statusPending") || "Pending",
+                            value: adminPendingTasks,
+                            fill: "#94a3b8",
+                          },
+                          {
+                            name: t("overdueTasks") || "Overdue",
+                            value: adminOverdueTasks,
+                            fill: "#ef4444",
+                          },
+                        ].filter((d) => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={80}
+                        paddingAngle={4}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {[
+                          { fill: "#10b981" },
+                          { fill: "#6366f1" },
+                          { fill: "#94a3b8" },
+                          { fill: "#ef4444" },
+                        ].map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.fill}
+                            stroke="none"
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Center percentage badge */}
+                  <div className="absolute flex flex-col items-center pointer-events-none">
+                    <span
+                      className="text-2xl font-black"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {overallCompletionRate}%
+                    </span>
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {t("completed") || "Rate"}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
