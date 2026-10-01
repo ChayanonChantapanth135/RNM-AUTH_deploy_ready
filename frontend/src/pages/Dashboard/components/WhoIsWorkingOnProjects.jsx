@@ -80,7 +80,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           </p>
         </div>
       ) : (
-        <div className="max-h-[700px] sm:max-h-[580px] md:max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
+        <div className="max-h-[720px] sm:max-h-[580px] md:max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {nonCompletedProjects.map((project) => {
               const allTasks = project.tasks || [];
