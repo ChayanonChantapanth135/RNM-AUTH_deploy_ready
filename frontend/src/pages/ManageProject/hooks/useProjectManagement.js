@@ -371,7 +371,7 @@ export const useProjectManagement = (t) => {
       Swal.fire({
         icon: "success",
         title: t("projectCreatedSuccess") || "สร้างโปรเจกต์สำเร็จ!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       fetchProjects();
@@ -456,7 +456,7 @@ export const useProjectManagement = (t) => {
       Swal.fire({
         icon: "success",
         title: t("projectUpdatedSuccess") || "อัปเดตโปรเจกต์สำเร็จ!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       fetchProjects();
@@ -500,7 +500,7 @@ export const useProjectManagement = (t) => {
       Swal.fire({
         icon: "success",
         title: t("projectDeletedSuccess") || "ลบโปรเจกต์สำเร็จ!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       fetchProjects();
@@ -549,7 +549,7 @@ export const useProjectManagement = (t) => {
       Swal.fire({
         icon: "success",
         title: "Create Task Success!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
 

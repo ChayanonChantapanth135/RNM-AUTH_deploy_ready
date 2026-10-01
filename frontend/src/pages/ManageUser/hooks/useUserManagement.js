@@ -281,7 +281,7 @@ export const useUserManagement = (t, language = "en") => {
         Swal.fire({
           icon: "success",
           title: t("userUpdatedSuccess") || "บันทึกการแก้ไขเรียบร้อยแล้ว!",
-          timer: 1500,
+          timer: 1000,
           showConfirmButton: false,
         });
       } else {
@@ -291,7 +291,7 @@ export const useUserManagement = (t, language = "en") => {
         Swal.fire({
           icon: "success",
           title: t("userCreatedSuccess") || "สร้างบัญชีผู้ใช้ใหม่เรียบร้อยแล้ว!",
-          timer: 1500,
+          timer: 1000,
           showConfirmButton: false,
         });
       }
@@ -325,7 +325,7 @@ export const useUserManagement = (t, language = "en") => {
       Swal.fire({
         icon: "success",
         title: language === "th" ? "เปลี่ยนสถานะผู้ใช้สำเร็จ" : "Status updated successfully",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
     } catch (err) {
@@ -353,7 +353,7 @@ export const useUserManagement = (t, language = "en") => {
       Swal.fire({
         icon: "success",
         title: t("deleteUserSuccess") || "ลบผู้ใช้สำเร็จ",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
     } catch (err) {

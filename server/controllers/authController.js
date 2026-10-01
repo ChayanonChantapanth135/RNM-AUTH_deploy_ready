@@ -1652,29 +1652,8 @@ export const updateTaskStatus = async (req, res) => {
         }
 
         await db.query('UPDATE tasks SET status = ? WHERE id = ?', [status, id]);
-        await checkAndUpdateProjectStatus(db, project_id, userId, id);
-        await db.query(
-            "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'status_change', ?, ?)",
-            [id, `เปลี่ยนสถานะเป็น "${status}"`, userId || null]
-        );
-        await db.query(
-            "INSERT INTO task_status_history (task_id, status, changed_by) VALUES (?, ?, ?)",
-            [id, status, userId || null]
-        );
-        await logActivity(db, userId || null, 'Update Task Status', `Updated task "${title}" status to "${status}"`);
 
-        await notifyProjectMembers({
-            db,
-            projectId: project_id,
-            taskId: id,
-            title: 'อัปเดตสถานะงาน',
-            message: `งาน "${title}" ในโปรเจกต์ "${project_name}" ถูกอัปเดตสถานะเป็น "${status}"`,
-            type: 'task',
-            link: `/Projects?projectId=${project_id}`,
-            excludeUserId: userId
-        });
-
-        // Real-time broadcast task status update to all connected clients
+        // Real-time broadcast task status update to all connected clients immediately
         emitTaskEvent('task:status:updated', {
             taskId: Number(id),
             projectId: project_id,
@@ -1682,10 +1661,42 @@ export const updateTaskStatus = async (req, res) => {
             updatedBy: userId,
         });
 
+        // Fast Response to client immediately without blocking UI
         res.status(200).json({ message: 'อัปเดตสถานะสำเร็จ / Status updated successfully' });
+
+        // Run background tasks: status check, logs, history, and notifications
+        (async () => {
+            try {
+                await checkAndUpdateProjectStatus(db, project_id, userId, id);
+                await db.query(
+                    "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'status_change', ?, ?)",
+                    [id, `เปลี่ยนสถานะเป็น "${status}"`, userId || null]
+                );
+                await db.query(
+                    "INSERT INTO task_status_history (task_id, status, changed_by) VALUES (?, ?, ?)",
+                    [id, status, userId || null]
+                );
+                await logActivity(db, userId || null, 'Update Task Status', `Updated task "${title}" status to "${status}"`);
+
+                await notifyProjectMembers({
+                    db,
+                    projectId: project_id,
+                    taskId: id,
+                    title: 'อัปเดตสถานะงาน',
+                    message: `งาน "${title}" ในโปรเจกต์ "${project_name}" ถูกอัปเดตสถานะเป็น "${status}"`,
+                    type: 'task',
+                    link: `/Projects?projectId=${project_id}`,
+                    excludeUserId: userId
+                });
+            } catch (bgErr) {
+                console.error('Error in background updateTaskStatus operations:', bgErr.message);
+            }
+        })();
     } catch (error) {
         console.error('Error updating task status:', error.message);
-        res.status(500).json({ message: error.message });
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
 };
 
@@ -1760,70 +1771,7 @@ export const updateTask = async (req, res) => {
             ]
         );
 
-        // Log assignee change
-        if (Number(assignedTo) !== Number(oldAssignee)) {
-            const [oldUserRows] = oldAssignee ? await db.query('SELECT fullname FROM users WHERE id = ?', [oldAssignee]) : [[]];
-            const [newUserRows] = assignedTo ? await db.query('SELECT fullname FROM users WHERE id = ?', [assignedTo]) : [[]];
-            const oldName = oldUserRows[0]?.fullname || 'ไม่มีผู้รับผิดชอบ';
-            const newName = newUserRows[0]?.fullname || 'ไม่มีผู้รับผิดชอบ';
-            await db.query(
-                "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'assignee_change', ?, ?)",
-                [id, `เปลี่ยนผู้รับผิดชอบจาก "${oldName}" เป็น "${newName}"`, userId || null]
-            );
-        }
-
-        // Log status change
-        if (status && status !== oldStatus) {
-            await db.query(
-                "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'status_change', ?, ?)",
-                [id, `เปลี่ยนสถานะเป็น "${status}"`, userId || null]
-            );
-            await db.query(
-                "INSERT INTO task_status_history (task_id, status, changed_by) VALUES (?, ?, ?)",
-                [id, status, userId || null]
-            );
-        }
-
-        const oldDueDateStr = oldTask.due_date ? parseDueDate(oldTask.due_date) : null;
-        const detailsChanged = (title !== oldTask.title ||
-                                (description || null) !== (oldTask.description || null) ||
-                                taskType !== oldTask.task_type ||
-                                priority !== oldTask.priority ||
-                                formattedDueDate !== oldDueDateStr);
-        if (detailsChanged) {
-            await db.query(
-                "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'edit_details', ?, ?)",
-                [id, `แก้ไขรายละเอียดงาน`, userId || null]
-            );
-        }
-
-        await logActivity(db, userId || null, 'Update Task Details', `Updated task details for "${finalTitle}" (ID: ${id})`);
-
-        if (assignedTo && Number(assignedTo) !== Number(oldAssignee) && Number(assignedTo) !== Number(userId)) {
-            const [projRows] = await db.query('SELECT name FROM projects WHERE id = ?', [projectId || oldTask.project_id]);
-            const projectName = projRows[0]?.name || `ID ${projectId || oldTask.project_id}`;
-            const notifTitle = 'ได้รับมอบหมายงานใหม่';
-            const notifMessage = `คุณได้รับมอบหมายงานใหม่: "${finalTitle}" ในโปรเจกต์ "${projectName}"`;
-            const notifLink = '/MyTasks';
-            const [insertRes] = await db.query(
-                "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
-                [Number(assignedTo), id, notifTitle, notifMessage, 'task', notifLink]
-            );
-            emitNotificationToUser(Number(assignedTo), {
-                id: insertRes.insertId,
-                user_id: Number(assignedTo),
-                task_id: id,
-                project_id: projectId || oldTask.project_id,
-                title: notifTitle,
-                message: notifMessage,
-                type: 'task',
-                link: notifLink,
-            });
-        }
-
-        await checkAndUpdateProjectStatus(db, projectId || oldTask.project_id);
-
-        // Real-time broadcast task update to all connected clients
+        // Real-time broadcast task update to all connected clients immediately
         emitTaskEvent('task:updated', {
             taskId: Number(id),
             projectId: projectId || oldTask.project_id,
@@ -1837,10 +1785,83 @@ export const updateTask = async (req, res) => {
             updatedBy: userId,
         });
 
+        // Fast Response to client immediately without blocking UI
         res.status(200).json({ message: 'อัปเดตข้อมูลงานสำเร็จ / Task updated successfully', title: finalTitle });
+
+        // Run background tasks: logs, history, notifications, and project status
+        (async () => {
+            try {
+                // Log assignee change
+                if (Number(assignedTo) !== Number(oldAssignee)) {
+                    const [oldUserRows] = oldAssignee ? await db.query('SELECT fullname FROM users WHERE id = ?', [oldAssignee]) : [[]];
+                    const [newUserRows] = assignedTo ? await db.query('SELECT fullname FROM users WHERE id = ?', [assignedTo]) : [[]];
+                    const oldName = oldUserRows[0]?.fullname || 'ไม่มีผู้รับผิดชอบ';
+                    const newName = newUserRows[0]?.fullname || 'ไม่มีผู้รับผิดชอบ';
+                    await db.query(
+                        "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'assignee_change', ?, ?)",
+                        [id, `เปลี่ยนผู้รับผิดชอบจาก "${oldName}" เป็น "${newName}"`, userId || null]
+                    );
+                }
+
+                // Log status change
+                if (status && status !== oldStatus) {
+                    await db.query(
+                        "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'status_change', ?, ?)",
+                        [id, `เปลี่ยนสถานะเป็น "${status}"`, userId || null]
+                    );
+                    await db.query(
+                        "INSERT INTO task_status_history (task_id, status, changed_by) VALUES (?, ?, ?)",
+                        [id, status, userId || null]
+                    );
+                }
+
+                const oldDueDateStr = oldTask.due_date ? parseDueDate(oldTask.due_date) : null;
+                const detailsChanged = (title !== oldTask.title ||
+                                        (description || null) !== (oldTask.description || null) ||
+                                        taskType !== oldTask.task_type ||
+                                        priority !== oldTask.priority ||
+                                        formattedDueDate !== oldDueDateStr);
+                if (detailsChanged) {
+                    await db.query(
+                        "INSERT INTO task_history (task_id, action, details, changed_by) VALUES (?, 'edit_details', ?, ?)",
+                        [id, `แก้ไขรายละเอียดงาน`, userId || null]
+                    );
+                }
+
+                await logActivity(db, userId || null, 'Update Task Details', `Updated task details for "${finalTitle}" (ID: ${id})`);
+
+                if (assignedTo && Number(assignedTo) !== Number(oldAssignee) && Number(assignedTo) !== Number(userId)) {
+                    const [projRows] = await db.query('SELECT name FROM projects WHERE id = ?', [projectId || oldTask.project_id]);
+                    const projectName = projRows[0]?.name || `ID ${projectId || oldTask.project_id}`;
+                    const notifTitle = 'ได้รับมอบหมายงานใหม่';
+                    const notifMessage = `คุณได้รับมอบหมายงานใหม่: "${finalTitle}" ในโปรเจกต์ "${projectName}"`;
+                    const notifLink = '/MyTasks';
+                    const [insertRes] = await db.query(
+                        "INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status) VALUES (?, ?, ?, ?, ?, ?, 0, 0)",
+                        [Number(assignedTo), id, notifTitle, notifMessage, 'task', notifLink]
+                    );
+                    emitNotificationToUser(Number(assignedTo), {
+                        id: insertRes.insertId,
+                        user_id: Number(assignedTo),
+                        task_id: id,
+                        project_id: projectId || oldTask.project_id,
+                        title: notifTitle,
+                        message: notifMessage,
+                        type: 'task',
+                        link: notifLink,
+                    });
+                }
+
+                await checkAndUpdateProjectStatus(db, projectId || oldTask.project_id);
+            } catch (bgErr) {
+                console.error('Error in background updateTask operations:', bgErr.message);
+            }
+        })();
     } catch (error) {
         console.error('Error updating task:', error.message);
-        res.status(500).json({ message: error.message });
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
 };
 

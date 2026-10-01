@@ -234,7 +234,7 @@ export const useMyTasks = () => {
       Swal.fire({
         icon: "success",
         title: language === "th" ? "อัปเดตข้อมูลงานสำเร็จ!" : "Task updated successfully!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       setShowViewModal(false);
@@ -256,7 +256,7 @@ export const useMyTasks = () => {
       Swal.fire({
         icon: "success",
         title: language === "th" ? "ลบงานสำเร็จ!" : "Task deleted successfully!",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       setShowViewModal(false);

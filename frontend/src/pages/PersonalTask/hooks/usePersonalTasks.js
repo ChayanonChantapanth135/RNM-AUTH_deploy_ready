@@ -356,7 +356,7 @@ export const usePersonalTasks = () => {
         Swal.fire({
           icon: "success",
           title: isThai ? "เพิ่มงานสำเร็จ" : "Task created",
-          timer: 1500,
+          timer: 1000,
           showConfirmButton: false,
         });
 
@@ -465,7 +465,7 @@ export const usePersonalTasks = () => {
         Swal.fire({
           icon: "success",
           title: isThai ? "แก้ไขงานสำเร็จ" : "Task updated",
-          timer: 1500,
+          timer: 1000,
           showConfirmButton: false,
           returnFocus: false,
           heightAuto: false,
@@ -508,7 +508,7 @@ export const usePersonalTasks = () => {
         Swal.fire({
           icon: "success",
           title: isThai ? "ลบงานสำเร็จ" : "Task deleted",
-          timer: 1200,
+          timer: 1000,
           showConfirmButton: false,
         });
         fetchTasks();
@@ -549,7 +549,7 @@ export const usePersonalTasks = () => {
         toast: true,
         position: window.innerWidth < 640 ? "top" : "top-end",
         showConfirmButton: false,
-        timer: 2000,
+        timer: 1500,
         timerProgressBar: true,
         background: "#1e293b",
         color: "#ffffff",
@@ -657,7 +657,7 @@ export const usePersonalTasks = () => {
       Swal.fire({
         icon: "success",
         title: isThai ? "เพิ่มงานสำเร็จ" : "Task created",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
 
@@ -689,7 +689,7 @@ export const usePersonalTasks = () => {
       Swal.fire({
         icon: "success",
         title: isThai ? "แก้ไขงานสำเร็จ" : "Task updated",
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
 

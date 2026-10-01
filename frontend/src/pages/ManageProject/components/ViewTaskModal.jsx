@@ -340,7 +340,7 @@ const ViewTaskModal = ({
           icon: "success",
           title: language === "th" ? "บันทึกการแก้ไขสำเร็จ" : "Changes saved successfully",
           showConfirmButton: false,
-          timer: 3000,
+          timer: 1500,
           timerProgressBar: true,
           background: "#1e293b",
           color: "#ffffff",
@@ -383,7 +383,7 @@ const ViewTaskModal = ({
           icon: "success",
           title: language === "th" ? "อัปเดตสถานะงานสำเร็จ" : "Status updated successfully",
           showConfirmButton: false,
-          timer: 3000,
+          timer: 1500,
           timerProgressBar: true,
           background: "#1e293b",
           color: "#ffffff",
@@ -398,7 +398,7 @@ const ViewTaskModal = ({
       const displayMsg = serverMsg || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
       if (typeof setErrorMessage === "function") {
         setErrorMessage(displayMsg);
-        setTimeout(() => setErrorMessage(""), 6000);
+        setTimeout(() => setErrorMessage(""), 3000);
       }
       Swal.fire({
         toast: true,
@@ -406,7 +406,7 @@ const ViewTaskModal = ({
         icon: "error",
         title: displayMsg,
         showConfirmButton: false,
-        timer: 4500,
+        timer: 2000,
         timerProgressBar: true,
         background: "#1e293b",
         color: "#ffffff",
@@ -926,7 +926,7 @@ const ViewTaskModal = ({
                     Swal.fire({
                       icon: "success",
                       title: language === "th" ? "ลบงานสำเร็จ!" : "Task deleted successfully!",
-                      timer: 1500,
+                      timer: 1000,
                       showConfirmButton: false,
                     });
                     setShowViewTaskModal(false);

@@ -30,7 +30,7 @@ const ContractPage = () => {
       Swal.fire({
         icon: "success",
         title: t("sendMessageSuccess") || (language === "th" ? "ส่งข้อความสำเร็จแล้ว!" : "Message sent successfully!"),
-        timer: 1500,
+        timer: 1000,
         showConfirmButton: false,
       });
       setFormData({ fullName: "", email: "", subject: "", message: "" });
