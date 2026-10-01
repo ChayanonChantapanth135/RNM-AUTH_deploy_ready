@@ -80,7 +80,8 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="max-h-[640px] sm:max-h-[580px] md:max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {nonCompletedProjects.map((project) => {
             const allTasks = project.tasks || [];
             // ดึงเฉพาะงานที่กำลังทำอยู่ (In Progress)
@@ -200,6 +201,7 @@ const WhoIsWorkingOnProjects = ({ projects = [], loading = false }) => {
               </div>
             );
           })}
+          </div>
         </div>
       )}
     </div>
