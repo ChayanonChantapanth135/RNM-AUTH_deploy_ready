@@ -321,7 +321,7 @@ export default function ManagerReportView({ data }) {
               <div className="flex flex-col items-center justify-center gap-1">
                 <span className="text-2xl opacity-40">📁</span>
                 <p className="text-xs text-slate-500 font-semibold">
-                  {t("noData") || "No Projects"}
+                  {t("noProjectsData") || t("noData") || "No Projects"}
                 </p>
               </div>
             ) : (

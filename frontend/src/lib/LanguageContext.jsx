@@ -608,6 +608,9 @@ const translations = {
     completedCategoryLabel: "Completed",
     allCategoryLabel: "All",
     statusUpdatedSuccess: "Status updated successfully",
+    noData: "No Data",
+    noTaskData: "No Task Data",
+    noProjectsData: "No Projects Data",
     // Report Tables & Performance
     myTaskPerformanceSummaryTitle: "My Task Performance Summary",
     myTaskPerformanceSummaryDesc:
@@ -1361,6 +1364,9 @@ const translations = {
     activeCategoryLabel: "กำลังดำเนินการ",
     completedCategoryLabel: "เสร็จสิ้น",
     allCategoryLabel: "ทั้งหมด",
+    noData: "ไม่มีข้อมูล",
+    noTaskData: "ไม่มีข้อมูลงาน",
+    noProjectsData: "ไม่มีข้อมูลโครงการ",
     // Report Tables & Performance (TH)
     myTaskPerformanceSummaryTitle: "สรุปผลการปฏิบัติงานส่วนตัว",
     myTaskPerformanceSummaryDesc:
