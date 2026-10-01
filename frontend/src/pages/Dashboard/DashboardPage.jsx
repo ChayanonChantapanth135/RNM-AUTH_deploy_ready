@@ -67,7 +67,6 @@ const DashboardPage = () => {
               {/* Project Status */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl"></span>
                   <h3 className="text-xl font-bold text-white">
                     {t("projectStatus")}
                   </h3>
@@ -94,7 +93,6 @@ const DashboardPage = () => {
               {/* Task Status */}
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="text-2xl"></span>
                   <h3 className="text-xl font-bold text-white">
                     {t("taskStatus")}
                   </h3>
@@ -136,7 +134,6 @@ const DashboardPage = () => {
         {/* Project Calendar */}
         <div className="mt-8 glass-panel rounded-3xl p-6 md:p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
-            <span className="text-3xl"></span>
             <div>
               <h3 className="text-xl font-bold text-white">
                 {isAdminOrManager
