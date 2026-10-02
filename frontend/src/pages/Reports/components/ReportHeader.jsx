@@ -124,7 +124,7 @@ export default function ReportHeader({
                 {t("refreshDataBtn")}
               </button>
 
-              <button
+              {/* <button
                 onClick={onExportExcel}
                 className="px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 flex items-center gap-2 shadow-lg cursor-pointer"
                 style={{
@@ -157,7 +157,7 @@ export default function ReportHeader({
                   />
                 </svg>
                 {t("exportExcel")}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -170,7 +170,9 @@ export default function ReportHeader({
           <div className="sm:hidden relative w-full">
             <select
               value={reportViewMode}
-              onChange={(e) => setReportViewMode && setReportViewMode(e.target.value)}
+              onChange={(e) =>
+                setReportViewMode && setReportViewMode(e.target.value)
+              }
               className="w-full px-4 py-3 rounded-2xl text-xs font-bold appearance-none cursor-pointer shadow-md focus:outline-none transition-all"
               style={{
                 background: "var(--bg-surface)",
@@ -227,8 +229,18 @@ export default function ReportHeader({
               className="absolute inset-y-0 right-3.5 flex items-center pointer-events-none"
               style={{ color: "var(--text-secondary)" }}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </div>
           </div>
