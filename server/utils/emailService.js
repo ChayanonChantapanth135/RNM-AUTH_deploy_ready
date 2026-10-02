@@ -201,7 +201,7 @@ export async function sendProjectCreationEmail({ recipientEmail, recipientName, 
           </div>
 
           <div style="text-align: center; margin: 24px 0 16px 0;">
-            <a href="${process.env.APP_URL || 'http://localhost:5173'}/projects" style="background-color: #0284c7; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);">
+            <a href="${process.env.APP_URL || 'http://localhost:5173'}/Projects" style="background-color: #0284c7; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);">
               🔗 View Project
             </a>
           </div>
@@ -285,7 +285,7 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
           </div>
 
           <div style="text-align: center; margin: 24px 0 16px 0;">
-            <a href="${process.env.APP_URL || 'http://localhost:5173'}/my-tasks" style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(13, 148, 136, 0.3);">
+            <a href="${process.env.APP_URL || 'http://localhost:5173'}/MyTasks" style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(13, 148, 136, 0.3);">
               📋 Go to My Tasks
             </a>
           </div>

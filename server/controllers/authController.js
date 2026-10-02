@@ -4,7 +4,7 @@ import { deleteFromCloudinary } from '../lib/cloudinary.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { sendProjectCreationEmail, sendWelcomeUserEmail, sendOtpEmail, sendContactFormEmail } from '../utils/emailService.js';
+import { sendProjectCreationEmail, sendTaskCreationEmail, sendWelcomeUserEmail, sendOtpEmail, sendContactFormEmail } from '../utils/emailService.js';
 import { memoryCache } from '../utils/cacheService.js';
 import path from 'path';
 import fs from 'fs';
@@ -1617,6 +1617,31 @@ export const createTask = async (req, res) => {
                     });
                 }
 
+                // Send email notification to assigned user
+                if (assignedTo) {
+                    try {
+                        const [userRows] = await db.query("SELECT fullname, email, role FROM users WHERE id = ? AND deleted_at IS NULL", [assignedTo]);
+                        const [creatorRows] = createdBy ? await db.query("SELECT fullname FROM users WHERE id = ?", [createdBy]) : [[]];
+
+                        if (userRows.length > 0 && userRows[0].email) {
+                            await sendTaskCreationEmail({
+                                recipientEmail: userRows[0].email,
+                                recipientName: userRows[0].fullname,
+                                taskTitle: finalTitle,
+                                projectName: projectName,
+                                priority: priority || 'Medium',
+                                taskType: taskType || 'General',
+                                dueDate: formattedDueDate,
+                                description: description || '',
+                                creatorName: creatorRows[0]?.fullname || null,
+                                roleLabel: userRows[0].role || 'Member'
+                            });
+                        }
+                    } catch (emailErr) {
+                        console.error('[Task Email Error]', emailErr.message);
+                    }
+                }
+
                 // Notify Project Creator & Team Leaders about the new task
                 const [tlRows] = await db.query('SELECT user_id FROM project_team_leaders WHERE project_id = ?', [projectId]);
                 const leadersToNotify = new Set();
@@ -1878,6 +1903,31 @@ export const updateTask = async (req, res) => {
                 type: 'task',
                 link: notifLink,
             });
+
+            // Send email notification to newly assigned user
+            (async () => {
+                try {
+                    const [userRows] = await db.query("SELECT fullname, email, role FROM users WHERE id = ? AND deleted_at IS NULL", [assignedTo]);
+                    const [updaterRows] = userId ? await db.query("SELECT fullname FROM users WHERE id = ?", [userId]) : [[]];
+
+                    if (userRows.length > 0 && userRows[0].email) {
+                        await sendTaskCreationEmail({
+                            recipientEmail: userRows[0].email,
+                            recipientName: userRows[0].fullname,
+                            taskTitle: finalTitle,
+                            projectName: projectName,
+                            priority: priority || 'Medium',
+                            taskType: taskType || 'General',
+                            dueDate: formattedDueDate,
+                            description: description || '',
+                            creatorName: updaterRows[0]?.fullname || null,
+                            roleLabel: userRows[0].role || 'Member'
+                        });
+                    }
+                } catch (emailErr) {
+                    console.error('[Task Reassignment Email Error]', emailErr.message);
+                }
+            })();
         }
 
         await checkAndUpdateProjectStatus(db, projectId || oldTask.project_id);
