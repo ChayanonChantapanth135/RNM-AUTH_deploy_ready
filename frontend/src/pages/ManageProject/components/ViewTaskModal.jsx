@@ -394,8 +394,19 @@ const ViewTaskModal = ({
       }
     } catch (err) {
       console.error("Failed to update task:", err);
-      const serverMsg = err.response?.data?.message;
-      const displayMsg = serverMsg || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+      let displayMsg = err.response?.data?.message || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+
+      if (err.response?.data?.code === "ACTIVE_TASK_IN_PROGRESS") {
+        const active = err.response?.data?.activeTask;
+        const taskTitle = active?.title || "";
+        const projName = active?.project_name || "";
+        const isSelf = !formData.assignedTo || Number(formData.assignedTo) === Number(currentUser?.id);
+        const transTemplate = isSelf ? t("activeTaskInProgressSelf") : t("activeTaskInProgressUser");
+        displayMsg = transTemplate
+          .replace("{task}", taskTitle)
+          .replace("{project}", projName);
+      }
+
       if (typeof setErrorMessage === "function") {
         setErrorMessage(displayMsg);
         setTimeout(() => setErrorMessage(""), 3000);

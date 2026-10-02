@@ -8,7 +8,7 @@ import { safeDateString } from "../../../lib/dateUtils";
 import { getSocket } from "../../../lib/socket";
 
 export const useMyTasks = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -241,7 +241,19 @@ export const useMyTasks = () => {
       await loadData();
     } catch (err) {
       console.error("Failed to update task:", err);
-      const msg = err.response?.data?.message || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+      let msg = err.response?.data?.message || (language === "th" ? "ไม่สามารถอัปเดตข้อมูลงานได้" : "Failed to update task");
+
+      if (err.response?.data?.code === "ACTIVE_TASK_IN_PROGRESS") {
+        const active = err.response?.data?.activeTask;
+        const taskTitle = active?.title || "";
+        const projName = active?.project_name || "";
+        const isSelf = !updatedDetails.assignedTo || Number(updatedDetails.assignedTo) === Number(currentUser?.id);
+        const transTemplate = isSelf ? t("activeTaskInProgressSelf") : t("activeTaskInProgressUser");
+        msg = transTemplate
+          .replace("{task}", taskTitle)
+          .replace("{project}", projName);
+      }
+
       Swal.fire({
         icon: "error",
         title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",

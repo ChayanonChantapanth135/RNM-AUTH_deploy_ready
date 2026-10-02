@@ -281,12 +281,24 @@ const TaskDetailModal = ({
       });
     } catch (err) {
       console.error("Failed to update status:", err);
-      const serverMsg = err.response?.data?.message;
+      let displayMsg = err.response?.data?.message || (language === "th" ? "ไม่สามารถอัปเดตสถานะได้" : "Failed to update status");
+
+      if (err.response?.data?.code === "ACTIVE_TASK_IN_PROGRESS") {
+        const active = err.response?.data?.activeTask;
+        const taskTitle = active?.title || "";
+        const projName = active?.project_name || "";
+        const isSelf = !selectedTask?.assigned_to || Number(selectedTask?.assigned_to) === Number(currentUser?.id);
+        const transTemplate = isSelf ? t("activeTaskInProgressSelf") : t("activeTaskInProgressUser");
+        displayMsg = transTemplate
+          .replace("{task}", taskTitle)
+          .replace("{project}", projName);
+      }
+
       Swal.fire({
         toast: true,
         position: "bottom-end",
         icon: "error",
-        title: serverMsg || (language === "th" ? "ไม่สามารถอัปเดตสถานะได้" : "Failed to update status"),
+        title: displayMsg,
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
@@ -360,12 +372,24 @@ const TaskDetailModal = ({
       });
     } catch (err) {
       console.error("Failed to update task details:", err);
-      const serverMsg = err.response?.data?.message;
+      let displayMsg = err.response?.data?.message || (language === "th" ? "ไม่สามารถบันทึกข้อมูลงานได้" : "Failed to save changes");
+
+      if (err.response?.data?.code === "ACTIVE_TASK_IN_PROGRESS") {
+        const active = err.response?.data?.activeTask;
+        const taskTitle = active?.title || "";
+        const projName = active?.project_name || "";
+        const isSelf = !formData.assignedTo || Number(formData.assignedTo) === Number(currentUser?.id);
+        const transTemplate = isSelf ? t("activeTaskInProgressSelf") : t("activeTaskInProgressUser");
+        displayMsg = transTemplate
+          .replace("{task}", taskTitle)
+          .replace("{project}", projName);
+      }
+
       Swal.fire({
         toast: true,
         position: "bottom-end",
         icon: "error",
-        title: serverMsg || (language === "th" ? "ไม่สามารถบันทึกข้อมูลงานได้" : "Failed to save changes"),
+        title: displayMsg,
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
