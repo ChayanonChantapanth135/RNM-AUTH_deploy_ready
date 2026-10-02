@@ -94,7 +94,7 @@ const Header = () => {
             className="flex items-center gap-2 no-underline group"
           >
             <span
-              className="text-xl font-black tracking-wider transition-transform group-hover:scale-105"
+              className="text-xl font-black tracking-wider transition-transform group-hover:scale-105 whitespace-nowrap shrink-0"
               style={{ color: "var(--text-primary)" }}
             >
               PROJECT <span className="gradient-text">TASK</span>
