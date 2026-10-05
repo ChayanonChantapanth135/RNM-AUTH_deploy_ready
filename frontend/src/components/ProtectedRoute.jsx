@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { getCurrentUser } from '../lib/auth';
+import { getCurrentUser, syncCurrentUserProfile } from '../lib/auth';
 
 /**
  * คอมโพเนนต์ป้องกันหน้าเว็บ (ProtectedRoute Component)
@@ -19,27 +19,33 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
      * ฟังก์ชันตรวจสอบสถานะล็อกอินของผู้ใช้งานเพื่อความปลอดภัยฝั่ง Client
      */
     const checkAuth = async () => {
-      let user = await getCurrentUser();
-      
-      // ถ้ามี allowedRoles และ role ปัจจุบันในเครื่องยังไม่ตรง ให้ลอง sync กับเซิร์ฟเวอร์ก่อนเผื่อเพิ่งเปลี่ยน role
-      if (user && allowedRoles && allowedRoles.length > 0) {
-        const currentLocalRole = user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null;
-        if (!currentLocalRole || !allowedRoles.includes(currentLocalRole)) {
-          const syncedUser = await syncCurrentUserProfile();
-          if (syncedUser) {
-            user = syncedUser;
+      try {
+        let user = await getCurrentUser();
+        
+        // ถ้ามี allowedRoles และ role ปัจจุบันในเครื่องยังไม่ตรง ให้ลอง sync กับเซิร์ฟเวอร์ก่อนเผื่อเพิ่งเปลี่ยน role
+        if (user && allowedRoles && allowedRoles.length > 0) {
+          const currentLocalRole = user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null;
+          if (!currentLocalRole || !allowedRoles.includes(currentLocalRole)) {
+            const syncedUser = await syncCurrentUserProfile();
+            if (syncedUser) {
+              user = syncedUser;
+            }
           }
         }
-      }
 
-      if (user) {
-        setAuthenticated(true);
-        setIsForceReset(user.is_force_reset === 1);
-        setUserRole(user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null);
-      } else {
+        if (user) {
+          setAuthenticated(true);
+          setIsForceReset(user.is_force_reset === 1);
+          setUserRole(user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null);
+        } else {
+          setAuthenticated(false);
+        }
+      } catch (err) {
+        console.error("ProtectedRoute checkAuth error:", err);
         setAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
