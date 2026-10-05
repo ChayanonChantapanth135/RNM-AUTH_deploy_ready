@@ -15,23 +15,29 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let hasSynced = false;
+
     /**
      * ฟังก์ชันตรวจสอบสถานะล็อกอินของผู้ใช้งานเพื่อความปลอดภัยฝั่ง Client
      */
-    const checkAuth = async () => {
+    const checkAuth = async (shouldSyncRole = false) => {
       try {
         let user = await getCurrentUser();
         
-        // ถ้ามี allowedRoles และ role ปัจจุบันในเครื่องยังไม่ตรง ให้ลอง sync กับเซิร์ฟเวอร์ก่อนเผื่อเพิ่งเปลี่ยน role
-        if (user && allowedRoles && allowedRoles.length > 0) {
+        // ถ้ามี allowedRoles และ role ในเครื่องยังไม่ตรง ให้ลอง sync กับเซิร์ฟเวอร์แค่ครั้งเดียว
+        if (shouldSyncRole && !hasSynced && user && allowedRoles && allowedRoles.length > 0) {
           const currentLocalRole = user.role ? user.role.toLowerCase().trim().replace(/\s+/g, "_") : null;
           if (!currentLocalRole || !allowedRoles.includes(currentLocalRole)) {
+            hasSynced = true;
             const syncedUser = await syncCurrentUserProfile();
             if (syncedUser) {
               user = syncedUser;
             }
           }
         }
+
+        if (!isMounted) return;
 
         if (user) {
           setAuthenticated(true);
@@ -42,21 +48,29 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         }
       } catch (err) {
         console.error("ProtectedRoute checkAuth error:", err);
-        setAuthenticated(false);
+        if (isMounted) setAuthenticated(false);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
-    checkAuth();
-    window.addEventListener("authChanged", checkAuth);
-    window.addEventListener("storage", checkAuth);
+    // ครั้งแรกที่เปิดหน้า ให้ sync ได้ 1 ครั้ง
+    checkAuth(true);
+
+    const onAuthChange = () => {
+      // เมื่อเกิด authChanged จากภายนอก ให้อัปเดตสถานะจาก getCurrentUser อย่างเดียว ไม่ sync ซ้ำ
+      checkAuth(false);
+    };
+
+    window.addEventListener("authChanged", onAuthChange);
+    window.addEventListener("storage", onAuthChange);
 
     return () => {
-      window.removeEventListener("authChanged", checkAuth);
-      window.removeEventListener("storage", checkAuth);
+      isMounted = false;
+      window.removeEventListener("authChanged", onAuthChange);
+      window.removeEventListener("storage", onAuthChange);
     };
-  }, []);
+  }, [allowedRoles]);
 
   if (loading) {
     return (

@@ -33,39 +33,52 @@ const Header = () => {
 
   const [showThemeModal, setShowThemeModal] = useState(false);
   useEffect(() => {
-    const checkUser = async () => {
+    let isMounted = true;
+
+    const checkUser = async (fetchRemote = false) => {
       try {
         const currentUser = await getCurrentUser();
         if (currentUser) {
-          try {
-            const res = await axios.get(`/auth/users/${currentUser.id}`);
-            const updated = {
-              ...currentUser,
-              avatar: res.data.avatar,
-              role: res.data.role,
-              name: res.data.fullname || res.data.name || currentUser.name,
-            };
-            setUser(updated);
-            localStorage.setItem("userData", JSON.stringify(updated));
-          } catch {
-            setUser(currentUser);
+          if (isMounted) setUser(currentUser);
+
+          if (fetchRemote) {
+            try {
+              const res = await axios.get(`/auth/users/${currentUser.id}`);
+              const updated = {
+                ...currentUser,
+                avatar: res.data.avatar,
+                role: res.data.role,
+                name: res.data.fullname || res.data.name || currentUser.name,
+              };
+              if (isMounted) setUser(updated);
+              localStorage.setItem("userData", JSON.stringify(updated));
+            } catch {
+              // keep currentUser
+            }
           }
         } else {
-          setUser(null);
+          if (isMounted) setUser(null);
         }
       } catch (error) {
         console.error("Error checking user:", error);
-        setUser(null);
+        if (isMounted) setUser(null);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
-    checkUser();
-    window.addEventListener("authChanged", checkUser);
-    window.addEventListener("storage", checkUser);
+
+    // ตอน Header mount ให้ดึง remote 1 ครั้ง
+    checkUser(true);
+
+    // เมื่อมี authChanged จากที่อื่น ให้อัปเดตจาก localStorage เท่านั้น ไม่ยิง API ซ้ำ
+    const onAuthChanged = () => checkUser(false);
+
+    window.addEventListener("authChanged", onAuthChanged);
+    window.addEventListener("storage", onAuthChanged);
     return () => {
-      window.removeEventListener("authChanged", checkUser);
-      window.removeEventListener("storage", checkUser);
+      isMounted = false;
+      window.removeEventListener("authChanged", onAuthChanged);
+      window.removeEventListener("storage", onAuthChanged);
     };
   }, []);
 
