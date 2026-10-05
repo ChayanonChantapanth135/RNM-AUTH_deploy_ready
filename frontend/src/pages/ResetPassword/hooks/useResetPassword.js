@@ -48,11 +48,7 @@ export const useResetPassword = (language, t) => {
 
   const handleSendOtp = async () => {
     if (!values.email) {
-      setError(
-        language === "th"
-          ? "กรุณากรอกอีเมลก่อนส่ง OTP"
-          : "Please enter your email first."
-      );
+      setError(t("otpEnterEmailFirst") || (language === "th" ? "กรุณากรอกอีเมลก่อนส่ง OTP" : "Please enter your email first."));
       return;
     }
     setLoading(true);
@@ -67,16 +63,15 @@ export const useResetPassword = (language, t) => {
       localStorage.setItem("otp_expiry", expiryTime.toString());
       setOtpCooldown(180);
 
-      setMessage(
-        language === "th"
-          ? "ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว"
-          : "OTP sent to your email"
-      );
+      setMessage(t("otpSentSuccess") || (language === "th" ? "ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว" : "OTP sent to your email"));
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          (language === "th" ? "ไม่สามารถส่ง OTP ได้" : "Failed to send OTP.")
-      );
+      const errData = err.response?.data;
+      const rawMsg = (errData?.message || "").toLowerCase();
+      if (err.response?.status === 404 || rawMsg.includes("not found") || rawMsg.includes("ไม่พบ")) {
+        setError(t("userNotFound") || (language === "th" ? "ไม่พบอีเมลผู้ใช้ในระบบ" : "User not found"));
+      } else {
+        setError(t("otpSendFailed") || (language === "th" ? "ไม่สามารถส่งรหัส OTP ได้" : "Failed to send OTP."));
+      }
     } finally {
       setLoading(false);
     }
@@ -110,14 +105,31 @@ export const useResetPassword = (language, t) => {
         password: values.password,
       });
 
-      setMessage(response.data.message || t("resetSuccess"));
+      setMessage(t("resetSuccess") || response.data.message || (language === "th" ? "รีเซ็ตรหัสผ่านสำเร็จ!" : "Password reset successfully!"));
       setValues({ email: "", otpCode: "", password: "", confirmPassword: "" });
 
       setTimeout(() => {
         navigate("/login");
       }, 2500);
     } catch (err) {
-      setError(err.response?.data?.message || t("loginFailed"));
+      const errData = err.response?.data;
+      const rawMsg = (errData?.message || "").toLowerCase();
+
+      if (
+        errData?.code === "INVALID_OR_EXPIRED_OTP" ||
+        rawMsg.includes("otp") ||
+        rawMsg.includes("expired")
+      ) {
+        setError(t("invalidOtp") || (language === "th" ? "รหัส OTP ไม่ถูกต้อง หรือหมดอายุแล้ว" : "Invalid or expired OTP code."));
+      } else if (
+        err.response?.status === 404 ||
+        rawMsg.includes("user not found") ||
+        rawMsg.includes("ไม่พบ")
+      ) {
+        setError(t("userNotFound") || (language === "th" ? "ไม่พบอีเมลผู้ใช้ในระบบ" : "User not found"));
+      } else {
+        setError(t("loginFailed") || (language === "th" ? "การรีเซ็ตรหัสผ่านล้มเหลว โปรดลองอีกครั้ง" : "Password reset failed. Please try again."));
+      }
     } finally {
       setLoading(false);
     }

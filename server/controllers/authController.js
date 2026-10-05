@@ -2833,7 +2833,10 @@ export const resetPassword = async (req, res) => {
         `, [userId, otpCode]);
 
         if (otpRows.length === 0) {
-            return res.status(400).json({ message: 'รหัส OTP ไม่ถูกต้อง หรือหมดอายุแล้ว (Invalid or expired OTP)' });
+            return res.status(400).json({ 
+                code: 'INVALID_OR_EXPIRED_OTP',
+                message: 'รหัส OTP ไม่ถูกต้อง หรือหมดอายุแล้ว' 
+            });
         }
 
         const otpRequestId = otpRows[0].id;

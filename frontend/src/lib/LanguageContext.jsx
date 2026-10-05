@@ -116,6 +116,10 @@ const translations = {
     otpCodeLabel: "OTP",
     otpCodePlaceholder: "6-digit OTP code",
     sendOtpBtn: "Send OTP",
+    otpSentSuccess: "OTP sent to your email.",
+    otpSendFailed: "Failed to send OTP.",
+    otpEnterEmailFirst: "Please enter your email first.",
+    invalidOtp: "Invalid or expired OTP code.",
 
     // Home Page
     homeMessage: "Home For Unregistered Users",
@@ -880,6 +884,10 @@ const translations = {
     otpCodeLabel: "รหัส OTP",
     otpCodePlaceholder: "กรอกรหัส OTP 6 หลัก",
     sendOtpBtn: "ส่งรหัส OTP",
+    otpSentSuccess: "ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว",
+    otpSendFailed: "ไม่สามารถส่งรหัส OTP ได้",
+    otpEnterEmailFirst: "กรุณากรอกอีเมลก่อนส่ง OTP",
+    invalidOtp: "รหัส OTP ไม่ถูกต้อง หรือหมดอายุแล้ว",
 
     // Home Page
     homeMessage: "หน้าแรกสำหรับผู้ใช้ทั่วไป",
