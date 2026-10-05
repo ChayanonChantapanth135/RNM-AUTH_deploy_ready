@@ -20,6 +20,7 @@ import SessionTimeoutHandler from "./components/SessionTimeoutHandler";
 import ResetPassword from "./pages/ResetPassword/ResetPasswordPage";
 import ResetPasswordFirstTime from "./pages/ResetPasswordFirstTime/ResetPasswordFirstTimePage";
 import PersonalTask from "./pages/PersonalTask/PersonalTaskPage";
+import NotFound from "./pages/NotFound/NotFoundPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -148,6 +149,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* 404 Catch-All Route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

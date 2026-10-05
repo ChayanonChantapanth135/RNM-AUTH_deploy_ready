@@ -755,6 +755,14 @@ const translations = {
     colTime: "Time",
     loadingActivities: "Loading activity logs...",
     noActivitiesFound: "No activity logs found",
+
+    // 404 Not Found Page
+    notFoundBadge: "404 Error",
+    notFoundTitle: "Page Not Found",
+    notFoundDesc: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    notFoundBackHome: "Back to Home",
+    notFoundDashboard: "Go to Dashboard",
+    notFoundPrevious: "Go Back",
   },
 
   th: {
@@ -1510,6 +1518,14 @@ const translations = {
     colTime: "เวลา",
     loadingActivities: "กำลังโหลดประวัติกิจกรรม...",
     noActivitiesFound: "ไม่พบประวัติกิจกรรม",
+
+    // 404 Not Found Page
+    notFoundBadge: "ข้อผิดพลาด 404",
+    notFoundTitle: "ไม่พบหน้าที่ต้องการ",
+    notFoundDesc: "หน้าที่คุณกำลังค้นหาอาจถูกลบ ย้ายชื่อ หรือไม่สามารถใช้งานได้ชั่วคราว",
+    notFoundBackHome: "กลับสู่หน้าแรก",
+    notFoundDashboard: "ไปที่แดชบอร์ด",
+    notFoundPrevious: "ย้อนกลับหน้าเดิม",
   },
 };
 
