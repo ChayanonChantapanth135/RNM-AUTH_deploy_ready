@@ -31,6 +31,8 @@ const translations = {
     profileUsernameEmpty: "Full name cannot be empty",
     currentPasswordRequired: "Please enter your current password",
     profileUpdateFailed: "Failed to update profile. Please try again.",
+    avatarFileSizeLimit: "Image size exceeds limit (Maximum 5MB)",
+    taskFileSizeLimit: "File size exceeds limit (Maximum 25MB)",
     profileLeaderLabel: "Leader",
     profileLeaderPlaceholder: "-- Select Leader --",
     profileLeaderLockedNotice:
@@ -799,6 +801,8 @@ const translations = {
     currentPasswordRequired: "กรุณากรอกรหัสผ่านปัจจุบัน",
     profileUpdateFailed:
       "เกิดข้อผิดพลาดในการอัปเดตข้อมูลโปรไฟล์ กรุณาลองใหม่อีกครั้ง",
+    avatarFileSizeLimit: "ไฟล์รูปภาพมีขนาดเกินกำหนด (สูงสุด 5MB)",
+    taskFileSizeLimit: "ไฟล์มีขนาดเกินกำหนด (สูงสุด 25MB)",
     profileLeaderLabel: "หัวหน้า",
     profileLeaderPlaceholder: "-- เลือกหัวหน้า --",
     profileLeaderLockedNotice:

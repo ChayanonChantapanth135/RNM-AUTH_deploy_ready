@@ -88,6 +88,16 @@ export const useProfile = () => {
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
+      if (file.size > MAX_AVATAR_SIZE) {
+        Swal.fire({
+          icon: "warning",
+          title: language === "th" ? "ไฟล์เกินขนาดกำหนด" : "File Size Exceeded",
+          text: t("avatarFileSizeLimit") || (language === "th" ? "ไฟล์รูปภาพมีขนาดเกินกำหนด (สูงสุด 5MB)" : "Image size exceeds limit (Maximum 5MB)"),
+        });
+        e.target.value = "";
+        return;
+      }
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
       setSuccessMsg("");

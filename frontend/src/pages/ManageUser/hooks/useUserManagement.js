@@ -180,6 +180,16 @@ export const useUserManagement = (t, language = "en") => {
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
+      if (file.size > MAX_AVATAR_SIZE) {
+        Swal.fire({
+          icon: "warning",
+          title: language === "th" ? "ไฟล์เกินขนาดกำหนด" : "File Size Exceeded",
+          text: t("avatarFileSizeLimit") || (language === "th" ? "ไฟล์รูปภาพมีขนาดเกินกำหนด (สูงสุด 5MB)" : "Image size exceeds limit (Maximum 5MB)"),
+        });
+        e.target.value = "";
+        return;
+      }
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
     }
@@ -368,6 +378,16 @@ export const useUserManagement = (t, language = "en") => {
   // ฟังก์ชันอ่านและตรวจสอบไฟล์ CSV หรือ Excel ก่อนนำเข้า
   const handleImportFile = async (file) => {
     if (!file) return;
+
+    const MAX_IMPORT_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_IMPORT_SIZE) {
+      Swal.fire({
+        icon: "warning",
+        title: language === "th" ? "ไฟล์เกินขนาดกำหนด" : "File Size Exceeded",
+        text: language === "th" ? "ไฟล์นำเข้ามีขนาดเกินกำหนด (สูงสุด 10MB)" : "Import file size exceeds limit (Maximum 10MB)",
+      });
+      return;
+    }
 
     const fileExtension = file.name.split(".").pop().toLowerCase();
 

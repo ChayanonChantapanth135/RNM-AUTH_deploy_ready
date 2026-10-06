@@ -226,6 +226,19 @@ const TaskDetailModal = ({
     const file = e.target.files[0];
     if (!file || !selectedTask) return;
 
+    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+    if (file.size > MAX_FILE_SIZE) {
+      Swal.fire({
+        icon: "warning",
+        title: language === "th" ? "ไฟล์เกินขนาดกำหนด" : "File Size Exceeded",
+        text: language === "th" ? "ไฟล์มีขนาดเกินกำหนด (สูงสุด 25MB)" : "File size exceeds limit (Maximum 25MB)",
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
     const fileFormData = new FormData();
     fileFormData.append("file", file);
     fileFormData.append("uploadedBy", currentUser?.id);
@@ -243,6 +256,12 @@ const TaskDetailModal = ({
       fetchFiles();
     } catch (err) {
       console.error("Error uploading file:", err);
+      const errMsg = err.response?.data?.message || (language === "th" ? "เกิดข้อผิดพลาดในการอัปโหลดไฟล์" : "Failed to upload file");
+      Swal.fire({
+        icon: "error",
+        title: language === "th" ? "เกิดข้อผิดพลาด" : "Upload Error",
+        text: errMsg,
+      });
     } finally {
       setUploading(false);
     }
