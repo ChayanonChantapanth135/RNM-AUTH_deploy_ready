@@ -73,13 +73,24 @@ const UserTable = ({
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
-              <th className="py-4 px-4 text-left whitespace-nowrap">{t("colUser")}</th>
-              <th className="py-4 px-4 text-left whitespace-nowrap">{t("colEmail")}</th>
-              <th className="py-4 px-4 text-left whitespace-nowrap">{t("colPhone") || "Phone"}</th>
-              <th className="py-4 px-4 text-center whitespace-nowrap">{t("colRole")}</th>
-              <th className="py-4 px-4 text-center whitespace-nowrap">{t("colStatus")}</th>
-              <th className="py-4 px-4 text-center whitespace-nowrap">{t("colLastLogin")}</th>
-              <th className="py-4 px-4 text-center w-36 whitespace-nowrap">{t("colManage")}</th>
+              <th className="py-4 px-4 text-left whitespace-nowrap">
+                {t("colUser")}
+              </th>
+              <th className="py-4 px-4 text-left whitespace-nowrap">
+                {t("colEmail")}
+              </th>
+              <th className="py-4 px-4 text-center whitespace-nowrap">
+                {t("colRole")}
+              </th>
+              <th className="py-4 px-4 text-center whitespace-nowrap">
+                {t("colStatus")}
+              </th>
+              <th className="py-4 px-4 text-center whitespace-nowrap">
+                {t("colLastLogin")}
+              </th>
+              <th className="py-4 px-4 text-center w-36 whitespace-nowrap">
+                {t("colManage")}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-sm text-slate-200">
@@ -107,17 +118,17 @@ const UserTable = ({
                           alt={user.name}
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.style.display = 'none';
+                            e.target.style.display = "none";
                             if (e.target.nextSibling) {
-                              e.target.nextSibling.style.display = 'flex';
+                              e.target.nextSibling.style.display = "flex";
                             }
                           }}
                           className="w-9 h-9 rounded-full object-cover shrink-0"
                         />
                       ) : null}
-                      <div 
+                      <div
                         className="w-9 h-9 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0"
-                        style={{ display: user.avatar ? 'none' : 'flex' }}
+                        style={{ display: user.avatar ? "none" : "flex" }}
                       >
                         {user.initials}
                       </div>
@@ -142,7 +153,9 @@ const UserTable = ({
                     <div>{user.email}</div>
                   </td>
                   <td className="py-4 px-4 text-slate-300 text-xs text-left whitespace-nowrap font-mono">
-                    <div>{user.phone && user.phone !== "-" ? user.phone : "-"}</div>
+                    <div>
+                      {user.phone && user.phone !== "-" ? user.phone : "-"}
+                    </div>
                   </td>
                   <td className="py-4 px-4 text-center whitespace-nowrap">
                     <span
@@ -223,8 +236,7 @@ const UserTable = ({
           const isSelf =
             currentUser &&
             (Number(currentUser.id) === Number(user.id) ||
-              currentUser.email?.toLowerCase() ===
-                user.email?.toLowerCase());
+              currentUser.email?.toLowerCase() === user.email?.toLowerCase());
 
           return (
             <div
@@ -244,9 +256,9 @@ const UserTable = ({
                       alt={user.name}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.style.display = 'none';
+                        e.target.style.display = "none";
                         if (e.target.nextSibling) {
-                          e.target.nextSibling.style.display = 'flex';
+                          e.target.nextSibling.style.display = "flex";
                         }
                       }}
                       className="w-10 h-10 rounded-full object-cover shrink-0"
@@ -254,7 +266,7 @@ const UserTable = ({
                   ) : null}
                   <div
                     className="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0"
-                    style={{ display: user.avatar ? 'none' : 'flex' }}
+                    style={{ display: user.avatar ? "none" : "flex" }}
                   >
                     {user.initials}
                   </div>
@@ -300,8 +312,8 @@ const UserTable = ({
                       isSelf
                         ? "opacity-30 cursor-not-allowed bg-white/5"
                         : user.status === "suspended"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-amber-500/20 text-amber-300"
+                          ? "bg-emerald-500/20 text-emerald-300"
+                          : "bg-amber-500/20 text-amber-300"
                     }`}
                     onClick={() => !isSelf && handleToggleStatus(user)}
                     title={
@@ -337,7 +349,7 @@ const UserTable = ({
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span
                     className={`px-2 py-0.5 rounded-md font-semibold text-[11px] ${getRoleBadgeStyle(
-                      user.role
+                      user.role,
                     )}`}
                   >
                     {formatRole(user.role)}
@@ -353,7 +365,8 @@ const UserTable = ({
                   )}
                 </div>
                 <div className="text-[11px] text-slate-400 shrink-0">
-                  <span className="opacity-60">{t("colLastLogin")}:</span> {user.lastLogin || "-"}
+                  <span className="opacity-60">{t("colLastLogin")}:</span>{" "}
+                  {user.lastLogin || "-"}
                 </div>
               </div>
             </div>
