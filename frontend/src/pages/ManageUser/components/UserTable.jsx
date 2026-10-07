@@ -152,11 +152,11 @@ const UserTable = ({
                   <td className="py-4 px-4 text-slate-400 text-xs text-left">
                     <div>{user.email}</div>
                   </td>
-                  <td className="py-4 px-4 text-slate-300 text-xs text-left whitespace-nowrap font-mono">
+                  {/* <td className="py-4 px-4 text-slate-300 text-xs text-left whitespace-nowrap font-mono">
                     <div>
                       {user.phone && user.phone !== "-" ? user.phone : "-"}
                     </div>
-                  </td>
+                  </td> */}
                   <td className="py-4 px-4 text-center whitespace-nowrap">
                     <span
                       className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap ${getRoleBadgeStyle(user.role)}`}
