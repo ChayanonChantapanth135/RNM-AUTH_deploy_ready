@@ -99,15 +99,15 @@ const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 px-4 py-3 shadow-sm transition-all">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-50 px-2.5 sm:px-4 py-2.5 sm:py-3 shadow-sm transition-all">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-4">
           {/* Logo */}
           <Link
             to="/Home"
-            className="flex items-center gap-2 no-underline group"
+            className="flex items-center gap-1.5 sm:gap-2 no-underline group shrink min-w-0"
           >
             <span
-              className="text-xl font-black tracking-wider transition-transform group-hover:scale-105 whitespace-nowrap shrink-0"
+              className="text-base xs:text-lg sm:text-xl font-black tracking-wider transition-transform group-hover:scale-105 whitespace-nowrap truncate"
               style={{ color: "var(--text-primary)" }}
             >
               PROJECT <span className="gradient-text">TASK</span>
@@ -185,7 +185,7 @@ const Header = () => {
           )}
 
           {/* Right Section */}
-          <div className="flex items-center gap-2.5 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             {isLoggedIn && <NotificationBell />}
             <LanguageSwitcher variant="dark" />
 
@@ -203,10 +203,10 @@ const Header = () => {
                       className="p-0.5 rounded-full hover:scale-105 transition-transform flex-shrink-0 overflow-hidden flex items-center justify-center"
                       style={{
                         backgroundColor: "var(--brand-color)",
-                        width: "38px",
-                        height: "38px",
-                        minWidth: "38px",
-                        minHeight: "38px",
+                        width: "36px",
+                        height: "36px",
+                        minWidth: "36px",
+                        minHeight: "36px",
                         borderRadius: "50%",
                         aspectRatio: "1 / 1",
                       }}
@@ -383,10 +383,10 @@ const Header = () => {
 
             {/* Mobile Navigation Dropdown Menu (No Border / Clean Safari Design) */}
             {isLoggedIn && (
-              <Dropdown align="end" className="md:hidden">
+              <Dropdown align="end" className="md:hidden flex-shrink-0">
                 <Dropdown.Toggle
                   variant="link"
-                  className="p-2 rounded-xl transition-colors focus:outline-none focus:ring-0 active:outline-none border-0 no-underline after:hidden shadow-none flex items-center justify-center flex-shrink-0"
+                  className="p-1.5 xs:p-2 rounded-xl transition-colors focus:outline-none focus:ring-0 active:outline-none border-0 no-underline after:hidden shadow-none flex items-center justify-center flex-shrink-0"
                   style={{
                     backgroundColor: "var(--bg-surface-hover)",
                     border: "none",
