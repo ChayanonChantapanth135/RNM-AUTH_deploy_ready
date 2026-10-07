@@ -156,7 +156,7 @@ const UserModal = ({
                 </div>
               </div>
 
-              {/* Phone */}
+              {/* Phone with Country Code Selector */}
               <div>
                 <label
                   className="form-label mb-1"
@@ -168,14 +168,77 @@ const UserModal = ({
                 >
                   {t("modalPhoneLabel")}
                 </label>
-                <input
-                  type="text"
-                  name="phone"
-                  className="form-control rounded-xl py-2.5 px-3 text-sm focus:outline-none transition-all shadow-sm"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="0812345678, +66812345678, +12025550125"
-                />
+                <div className="d-flex gap-2">
+                  <select
+                    className="form-select rounded-xl py-2 px-2.5 text-sm focus:outline-none transition-all shadow-sm"
+                    style={{ width: "auto", minWidth: "140px", flexShrink: 0 }}
+                    value={
+                      [
+                        "+66",
+                        "+1",
+                        "+44",
+                        "+81",
+                        "+82",
+                        "+86",
+                        "+65",
+                        "+60",
+                        "+84",
+                        "+62",
+                        "+63",
+                        "+91",
+                        "+61",
+                        "+49",
+                        "+33",
+                        "+886",
+                        "+852",
+                      ].find((code) => (formData.phone || "").startsWith(code)) ||
+                      ((formData.phone || "").startsWith("+") ? "custom" : "+66")
+                    }
+                    onChange={(e) => {
+                      const selectedPrefix = e.target.value;
+                      if (selectedPrefix === "custom") return;
+                      const raw = (formData.phone || "").trim();
+                      // ดึงเฉพาะตัวเลขหลังรหัสประเทศเดิม
+                      const numberWithoutCode = raw
+                        .replace(/^\+\d+/, "")
+                        .replace(/^0+/, "")
+                        .replace(/[\s\-\(\)\.]/g, "");
+                      handleInputChange({
+                        target: {
+                          name: "phone",
+                          value: numberWithoutCode ? `${selectedPrefix}${numberWithoutCode}` : selectedPrefix,
+                        },
+                      });
+                    }}
+                  >
+                    <option value="+66">🇹🇭 ไทย (+66)</option>
+                    <option value="+1">🇺🇸/🇨🇦 USA/CAN (+1)</option>
+                    <option value="+44">🇬🇧 UK (+44)</option>
+                    <option value="+81">🇯🇵 ญี่ปุ่น (+81)</option>
+                    <option value="+82">🇰🇷 เกาหลีใต้ (+82)</option>
+                    <option value="+86">🇨🇳 จีน (+86)</option>
+                    <option value="+65">🇸🇬 สิงคโปร์ (+65)</option>
+                    <option value="+60">🇲🇾 มาเลเซีย (+60)</option>
+                    <option value="+84">🇻🇳 เวียดนาม (+84)</option>
+                    <option value="+62">🇮🇩 อินโดนีเซีย (+62)</option>
+                    <option value="+63">🇵🇭 ฟิลิปปินส์ (+63)</option>
+                    <option value="+91">🇮🇳 อินเดีย (+91)</option>
+                    <option value="+61">🇦🇺 ออสเตรเลีย (+61)</option>
+                    <option value="+49">🇩🇪 เยอรมนี (+49)</option>
+                    <option value="+33">🇫🇷 ฝรั่งเศส (+33)</option>
+                    <option value="+886">🇹🇼 ไต้หวัน (+886)</option>
+                    <option value="+852">🇭🇰 ฮ่องกง (+852)</option>
+                    <option value="custom">🌐 อื่นๆ / ระบุเอง</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="phone"
+                    className="form-control rounded-xl py-2.5 px-3 text-sm focus:outline-none transition-all shadow-sm flex-grow-1"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="เช่น 0812345678 หรือ +66812345678"
+                  />
+                </div>
               </div>
 
               {/* Leader Selection */}
