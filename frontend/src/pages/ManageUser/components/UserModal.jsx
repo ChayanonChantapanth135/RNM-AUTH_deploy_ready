@@ -174,7 +174,7 @@ const UserModal = ({
                   className="form-control rounded-xl py-2.5 px-3 text-sm focus:outline-none transition-all shadow-sm"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  placeholder="+66"
+                  placeholder="0812345678, +66812345678, +12025550125"
                 />
               </div>
 

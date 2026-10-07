@@ -176,12 +176,31 @@ async function logActivity(db, userId, action, details) {
  */
 function formatPhoneNumber(phone) {
     if (!phone) return null;
-    let cleaned = String(phone).trim().replace(/[\s-]/g, '');
-    if (cleaned === '' || cleaned === '+66') return null;
+    let cleaned = String(phone).trim().replace(/[\s\-\(\)\.]/g, '');
+    if (cleaned === '' || cleaned === '+66' || cleaned === '-' || cleaned === '+') return null;
+
+    // กรณีมีรหัสโทรออกต่างประเทศ 00 เช่น 001..., 0044...
+    if (cleaned.startsWith('00')) {
+        return '+' + cleaned.slice(2);
+    }
+    // กรณีพิมพ์ +66 แล้วตามด้วยเลข 0 เช่น +660812345678
+    if (cleaned.startsWith('+660')) {
+        return '+66' + cleaned.slice(4);
+    }
+    // กรณีพิมพ์ 66 โดยไม่ใส่ +
+    if (cleaned.startsWith('66') && !cleaned.startsWith('+')) {
+        return '+' + cleaned;
+    }
+    // กรณีเบอร์โทรไทยขึ้นต้นด้วย 0 นำหน้า
     if (cleaned.startsWith('0')) {
         return '+66' + cleaned.slice(1);
     }
-    return cleaned;
+    // กรณีขึ้นต้นด้วย + อยู่แล้ว (เบอร์ต่างประเทศหรือเบอร์ไทยสากล)
+    if (cleaned.startsWith('+')) {
+        return cleaned;
+    }
+    // กรณีอื่นๆ ถ้าเป็นตัวเลขล้วนที่อาจเป็นรหัสประเทศต่างประเทศ
+    return '+' + cleaned;
 }
 
 /**
@@ -627,9 +646,6 @@ export const updateUser = async (req, res) => {
         const parsedStartDate = start_date !== undefined ? (start_date && String(start_date).trim() !== '' ? String(start_date).trim() : null) : (oldUserRows[0]?.start_date || null);
         const parsedExpireDate = expire_date !== undefined ? (expire_date && String(expire_date).trim() !== '' ? String(expire_date).trim() : null) : (oldUserRows[0]?.expire_date || null);
 
-        let query = 'UPDATE users SET fullname = ?, email = ?, phone = ?, role = ?, status = ?, leader_id = ?, start_date = ?, expire_date = ?';
-        let params = [fullname, email, formattedPhone, role, status || 'active', parsedLeaderId, parsedStartDate, parsedExpireDate];
-        
         let sqlRole = 'storyboard';
         const normRole = (role || '').trim().toLowerCase();
         if (normRole === 'admin') sqlRole = 'admin';
@@ -638,8 +654,9 @@ export const updateUser = async (req, res) => {
         else if (normRole === 'animation') sqlRole = 'animation';
         else if (normRole === 'designer') sqlRole = 'designer';
         else if (normRole === 'programmer') sqlRole = 'programmer';
-        
-        params[3] = sqlRole;
+
+        let query = 'UPDATE users SET fullname = ?, email = ?, phone = ?, role = ?, status = ?, leader_id = ?, start_date = ?, expire_date = ?';
+        let params = [fullname, email, formattedPhone, sqlRole, status || 'active', parsedLeaderId, parsedStartDate, parsedExpireDate];
 
         if (password) {
             const hashPassword = await bcrypt.hash(password, 10);

@@ -75,6 +75,7 @@ const UserTable = ({
             <tr className="border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
               <th className="py-4 px-4 text-left whitespace-nowrap">{t("colUser")}</th>
               <th className="py-4 px-4 text-left whitespace-nowrap">{t("colEmail")}</th>
+              <th className="py-4 px-4 text-left whitespace-nowrap">{t("colPhone") || "Phone"}</th>
               <th className="py-4 px-4 text-center whitespace-nowrap">{t("colRole")}</th>
               <th className="py-4 px-4 text-center whitespace-nowrap">{t("colStatus")}</th>
               <th className="py-4 px-4 text-center whitespace-nowrap">{t("colLastLogin")}</th>
@@ -140,6 +141,9 @@ const UserTable = ({
                   <td className="py-4 px-4 text-slate-400 text-xs text-left">
                     <div>{user.email}</div>
                   </td>
+                  <td className="py-4 px-4 text-slate-300 text-xs text-left whitespace-nowrap font-mono">
+                    <div>{user.phone && user.phone !== "-" ? user.phone : "-"}</div>
+                  </td>
                   <td className="py-4 px-4 text-center whitespace-nowrap">
                     <span
                       className={`inline-block px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap ${getRoleBadgeStyle(user.role)}`}
@@ -202,7 +206,7 @@ const UserTable = ({
             {currentEntries.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="text-center text-slate-500 py-8 text-sm"
                 >
                   {t("noUsersText")}
@@ -273,6 +277,11 @@ const UserTable = ({
                     <div className="text-xs text-slate-400 truncate mt-0.5">
                       {user.email}
                     </div>
+                    {user.phone && user.phone !== "-" && (
+                      <div className="text-[11px] text-slate-400 font-mono mt-0.5">
+                        📞 {user.phone}
+                      </div>
+                    )}
                   </div>
                 </div>
 
