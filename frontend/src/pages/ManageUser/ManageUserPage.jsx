@@ -230,6 +230,7 @@ const ManageUserPage = () => {
         modalSuccess={userHook.modalSuccess}
         handleCreateOrUpdateUser={userHook.handleCreateOrUpdateUser}
         t={t}
+        language={language}
       />
 
       {/* DELETE CONFIRM MODAL */}

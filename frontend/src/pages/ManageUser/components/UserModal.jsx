@@ -18,6 +18,7 @@ const UserModal = ({
   modalSuccess,
   handleCreateOrUpdateUser,
   t,
+  language = "en",
 }) => {
   return (
     <Modal
@@ -171,7 +172,7 @@ const UserModal = ({
                 <div className="d-flex gap-2">
                   <select
                     className="form-select rounded-xl py-2 px-2.5 text-sm focus:outline-none transition-all shadow-sm"
-                    style={{ width: "auto", minWidth: "140px", flexShrink: 0 }}
+                    style={{ width: "auto", minWidth: "145px", flexShrink: 0 }}
                     value={
                       [
                         "+66",
@@ -211,24 +212,24 @@ const UserModal = ({
                       });
                     }}
                   >
-                    <option value="+66">🇹🇭 ไทย (+66)</option>
-                    <option value="+1">🇺🇸/🇨🇦 USA/CAN (+1)</option>
-                    <option value="+44">🇬🇧 UK (+44)</option>
-                    <option value="+81">🇯🇵 ญี่ปุ่น (+81)</option>
-                    <option value="+82">🇰🇷 เกาหลีใต้ (+82)</option>
-                    <option value="+86">🇨🇳 จีน (+86)</option>
-                    <option value="+65">🇸🇬 สิงคโปร์ (+65)</option>
-                    <option value="+60">🇲🇾 มาเลเซีย (+60)</option>
-                    <option value="+84">🇻🇳 เวียดนาม (+84)</option>
-                    <option value="+62">🇮🇩 อินโดนีเซีย (+62)</option>
-                    <option value="+63">🇵🇭 ฟิลิปปินส์ (+63)</option>
-                    <option value="+91">🇮🇳 อินเดีย (+91)</option>
-                    <option value="+61">🇦🇺 ออสเตรเลีย (+61)</option>
-                    <option value="+49">🇩🇪 เยอรมนี (+49)</option>
-                    <option value="+33">🇫🇷 ฝรั่งเศส (+33)</option>
-                    <option value="+886">🇹🇼 ไต้หวัน (+886)</option>
-                    <option value="+852">🇭🇰 ฮ่องกง (+852)</option>
-                    <option value="custom">🌐 อื่นๆ / ระบุเอง</option>
+                    <option value="+66">🇹🇭 {language === "th" ? "ไทย" : "Thailand"} (+66)</option>
+                    <option value="+1">🇺🇸/🇨🇦 {language === "th" ? "สหรัฐฯ / แคนาดา" : "USA / Canada"} (+1)</option>
+                    <option value="+44">🇬🇧 {language === "th" ? "สหราชอาณาจักร" : "UK"} (+44)</option>
+                    <option value="+81">🇯🇵 {language === "th" ? "ญี่ปุ่น" : "Japan"} (+81)</option>
+                    <option value="+82">🇰🇷 {language === "th" ? "เกาหลีใต้" : "South Korea"} (+82)</option>
+                    <option value="+86">🇨🇳 {language === "th" ? "จีน" : "China"} (+86)</option>
+                    <option value="+65">🇸🇬 {language === "th" ? "สิงคโปร์" : "Singapore"} (+65)</option>
+                    <option value="+60">🇲🇾 {language === "th" ? "มาเลเซีย" : "Malaysia"} (+60)</option>
+                    <option value="+84">🇻🇳 {language === "th" ? "เวียดนาม" : "Vietnam"} (+84)</option>
+                    <option value="+62">🇮🇩 {language === "th" ? "อินโดนีเซีย" : "Indonesia"} (+62)</option>
+                    <option value="+63">🇵🇭 {language === "th" ? "ฟิลิปปินส์" : "Philippines"} (+63)</option>
+                    <option value="+91">🇮🇳 {language === "th" ? "อินเดีย" : "India"} (+91)</option>
+                    <option value="+61">🇦🇺 {language === "th" ? "ออสเตรเลีย" : "Australia"} (+61)</option>
+                    <option value="+49">🇩🇪 {language === "th" ? "เยอรมนี" : "Germany"} (+49)</option>
+                    <option value="+33">🇫🇷 {language === "th" ? "ฝรั่งเศส" : "France"} (+33)</option>
+                    <option value="+886">🇹🇼 {language === "th" ? "ไต้หวัน" : "Taiwan"} (+886)</option>
+                    <option value="+852">🇭🇰 {language === "th" ? "ฮ่องกง" : "Hong Kong"} (+852)</option>
+                    <option value="custom">🌐 {language === "th" ? "อื่นๆ / ระบุเอง" : "Other / Custom"}</option>
                   </select>
                   <input
                     type="text"
@@ -236,7 +237,12 @@ const UserModal = ({
                     className="form-control rounded-xl py-2.5 px-3 text-sm focus:outline-none transition-all shadow-sm flex-grow-1"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="เช่น 0812345678 หรือ +66812345678"
+                    placeholder={
+                      t("modalPhonePlaceholder") ||
+                      (language === "th"
+                        ? "เช่น 0812345678 หรือ +66812345678"
+                        : "e.g. 0812345678 or +66812345678")
+                    }
                   />
                 </div>
               </div>
