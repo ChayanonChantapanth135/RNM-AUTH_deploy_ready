@@ -600,11 +600,10 @@ export const useUserManagement = (t, language = "en") => {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Users");
 
-      // Define columns (Without leader_email to keep data simple and avoid sync confusion)
+      // Define columns (Without leader_email and phone to keep data simple and clean)
       worksheet.columns = [
         { header: "fullname", key: "fullname", width: 25 },
         { header: "email", key: "email", width: 30 },
-        { header: "phone", key: "phone", width: 18 },
         { header: "role", key: "role", width: 18 },
         { header: "status", key: "status", width: 15 },
         { header: "start_date", key: "start_date", width: 18 },
@@ -624,7 +623,6 @@ export const useUserManagement = (t, language = "en") => {
         worksheet.addRow({
           fullname: u.name || "",
           email: u.email || "",
-          phone: u.phone !== "-" ? u.phone : "",
           role: rawRole,
           status: u.status || "active",
           start_date: u.startDate || "",
@@ -645,7 +643,8 @@ export const useUserManagement = (t, language = "en") => {
       const roleOptions = ["admin", "manager", "storyboard", "animation", "designer", "programmer"];
       const statusOptions = ["active", "suspended"];
 
-      worksheet.dataValidations.add("D2:D500", {
+      // คอลัมน์ C: role
+      worksheet.dataValidations.add("C2:C500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${roleOptions.join(",")}"`],
@@ -654,7 +653,8 @@ export const useUserManagement = (t, language = "en") => {
         error: "Please select a role from the dropdown list."
       });
 
-      worksheet.dataValidations.add("E2:E500", {
+      // คอลัมน์ D: status
+      worksheet.dataValidations.add("D2:D500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${statusOptions.join(",")}"`],
