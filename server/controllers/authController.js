@@ -926,6 +926,7 @@ export const importUsers = async (req, res) => {
         });
 
         let skippedCount = 0;
+        const newUsersToNotify = [];
 
         for (const item of users) {
             const fullname = (item.fullname || item.username || item.name || '').trim();
@@ -1022,13 +1023,35 @@ export const importUsers = async (req, res) => {
                 );
                 importedCount++;
 
-                // ส่งอีเมลต้อนรับพร้อมรหัสผ่านชั่วคราว 6 หลักให้ผู้ใช้ใหม่
-                sendWelcomeUserEmail({
-                    recipientEmail: email,
-                    recipientName: fullname,
+                // เพิ่มเข้าคิวส่งอีเมลต้อนรับ
+                newUsersToNotify.push({
+                    email,
+                    fullname,
                     tempPassword: finalPassword
-                }).catch(e => console.error(`[Background Email Error for ${email}]:`, e.message));
+                });
             }
+        }
+
+        // ส่งอีเมลต้อนรับให้ผู้ใช้ใหม่ทุกคนแบบปลอดภัยจาก Rate Limit
+        if (newUsersToNotify.length > 0) {
+            (async () => {
+                console.log(`[Import Users] Starting email dispatch for ${newUsersToNotify.length} new users...`);
+                for (const u of newUsersToNotify) {
+                    try {
+                        console.log(`[Import Users] Sending temporary password to: ${u.email}`);
+                        await sendWelcomeUserEmail({
+                            recipientEmail: u.email,
+                            recipientName: u.fullname,
+                            tempPassword: u.tempPassword
+                        });
+                        // หน่วงเวลา 600ms ป้องกันการบล็อกจาก Mail Gateway
+                        await new Promise(res => setTimeout(res, 600));
+                    } catch (e) {
+                        console.error(`[Import Users Email Error] Failed to send to ${u.email}:`, e.message);
+                    }
+                }
+                console.log(`[Import Users] Finished email dispatch for new users.`);
+            })();
         }
 
         memoryCache.del('team_leaders');
