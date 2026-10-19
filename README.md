@@ -5,11 +5,12 @@
 ![Vite](https://img.shields.io/badge/Vite-6.x-646cff?style=for-the-badge&logo=vite&logoColor=white)
 ![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479a1?style=for-the-badge&logo=mysql&logoColor=white)
+![TiDB Cloud](https://img.shields.io/badge/TiDB%20Cloud-Serverless-f34b29?style=for-the-badge&logo=pingcap&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-Ready-3448c5?style=for-the-badge&logo=cloudinary&logoColor=white)
 ![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)
 
-ระบบบริหารจัดการโครงการและติดตามภารกิจในองค์กรแบบครบวงจร (Production-Ready Enterprise Solution) พัฒนาด้วยสถาปัตยกรรม **Modern Modular Frontend & High-Performance RESTful Backend** ภายใต้ระบบดีไซน์ **Multi-Accent Theme & Solid Contrast Design System** ที่ทันสมัย ลื่นไหล ปลอดภัย พร้อมระบบคำนวณความคืบหน้าโครงการอัตโนมัติ การจัดการสิทธิ์ผู้ใช้งานตามบทบาท (RBAC) ปฏิทินกำหนดส่งงานแบบลากวางสองทิศทาง (Bidirectional Drag & Drop) ระบบ Personal Kanban Board ระบบนำเข้าข้อมูลผู้ใช้พร้อมหน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal) ระบบแคชความเร็วสูง (In-Memory Caching) การจัดเก็บไฟล์ขึ้น Cloudinary และระบบแจ้งเตือนงานเกินกำหนดอัตโนมัติผ่านอีเมลและ In-App WebSockets
+ระบบบริหารจัดการโครงการและติดตามภารกิจในองค์กรแบบครบวงจร (Production-Ready Enterprise Solution) พัฒนาด้วยสถาปัตยกรรม **Modern Modular Frontend & High-Performance RESTful Backend** รองรับทั้งฐานข้อมูล **MySQL และ TiDB Cloud Serverless (SSL)** ภายใต้ระบบดีไซน์ **Multi-Accent Theme & Solid Contrast Design System** ที่ทันสมัย ลื่นไหล ปลอดภัย พร้อมระบบคำนวณความคืบหน้าโครงการอัตโนมัติ การจัดการสิทธิ์ผู้ใช้งานตามบทบาท (RBAC) ระบบสุ่มรหัสผ่านชั่วคราว 6 หลักและส่งอีเมลต้อนรับอัตโนมัติ การบังคับเปลี่ยนรหัสผ่านครั้งแรก ปฏิทินกำหนดส่งงานแบบลากวางสองทิศทาง (Bidirectional Drag & Drop) ระบบ Personal Kanban Board ระบบนำเข้าข้อมูลผู้ใช้พร้อมหน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal) ระบบแคชความเร็วสูง (In-Memory Caching) การจัดเก็บไฟล์ขึ้น Cloudinary และระบบแจ้งเตือนงานเกินกำหนดอัตโนมัติผ่านอีเมลและ In-App WebSockets
 
 > 🌐 **Production Backend URL**: `https://rnm-authdeployready-production.up.railway.app`
 
@@ -51,10 +52,15 @@
   6. **Programmer** (`programmer`) - นักพัฒนาซอฟต์แวร์ ดำเนินงานด้านระบบและโค้ด
      _(ทุกบทบาทสามารถได้รับแต่งตั้งเป็น **Team Leader** ในแต่ละโครงการเพื่อกำกับดูแลงานในทีมได้)_
 - **Direct Leader Binding**: สมาชิกสามารถเลือกหัวหน้าสายตรง (Leader) ได้ในหน้าโปรไฟล์เพื่อการส่งต่อและอนุมัติงาน
+- **Automated Password Generation & Welcome Email**:
+  - เมื่อ Admin เพิ่มผู้ใช้ใหม่ หรือนำเข้าผู้ใช้ผ่าน Excel/CSV ระบบสามารถสุ่มรหัสผ่านชั่วคราว 6 หลัก (`tempPassword`) ให้โดยอัตโนมัติ
+  - ส่งอีเมลต้อนรับ (Welcome Email) แจ้งสิทธิ์การเข้าใช้งานและรหัสผ่านชั่วคราวให้ผู้ใช้ใหม่ทันที
+  - ผู้ใช้ใหม่ทุกคนจะได้รับสถานะ `is_force_reset = 1` เพื่อบังคับเปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งแรก
 - **Interactive Excel / CSV Import with Preview**:
-  - รองรับการดาวน์โหลดเทมเพลตและนำเข้าไฟล์ `.xlsx` และ `.csv`
+  - เทมเพลตแบบกระชับ (Streamlined Columns): `fullname`, `email`, `role`, `status`, `start_date`, `expire_date` (ตัดคอลัมน์ที่ไม่จำเป็นออกเพื่อความปลอดภัยและความสะดวก)
   - มี **หน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal)** แสดงจำนวนผู้ใช้ที่จะเพิ่มใหม่ (Create), อัปเดตข้อมูลเดิม (Update), และแจ้งเตือนข้อมูลที่ไม่สมบูรณ์ก่อนกดยืนยันบันทึกจริง
-- **User Export**: ส่งออกรายชื่อผู้ใช้ทั้งหมดเป็นไฟล์ Excel ครบถ้วนทุกฟิลด์
+  - ระบบคิวส่งอีเมลพร้อมหน่วงเวลา (Throttled Queue 600ms) ป้องกันการติด Rate Limit ของ SMTP / Resend
+- **User Export**: ส่งออกรายชื่อผู้ใช้ทั้งหมดเป็นไฟล์ Excel ในฟอร์แมตเดียวกับเทมเพลต สามารถนำไปแก้ไขและ Import กลับเข้ามาใหม่ได้อย่างไร้รอยต่อ
 - **Avatar & Profile Management**: อัปโหลดเปลี่ยนรูปโปรไฟล์ รองรับทั้งบันทึกลง **Cloudinary** หรือ Local Disk พร้อมระบบลบรูปเดิมอัตโนมัติ
 
 #### 📊 ตารางเปรียบเทียบสิทธิ์ผู้ใช้งาน (Role Permission Matrix)
@@ -247,11 +253,12 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | ตัวแปร                  | ตัวอย่างค่า              | คำอธิบาย                                     |
 | :---------------------- | :----------------------- | :------------------------------------------- |
 | `PORT`                  | `3000`                   | พอร์ตของ Backend Server                      |
-| `DB_HOST`               | `localhost`              | ที่อยู่ของฐานข้อมูล MySQL                    |
-| `DB_USER`               | `root`                   | ชื่อผู้ใช้ MySQL                             |
-| `DB_PASSWORD`           | `""`                     | รหัสผ่าน MySQL                               |
-| `DB_NAME`               | `myapp_db`               | ชื่อฐานข้อมูล (สร้างเปล่าไว้ใน MySQL)        |
-| `DB_PORT`               | `3306`                   | พอร์ต MySQL                                  |
+| `DB_HOST`               | `localhost`              | ที่อยู่ของฐานข้อมูล (MySQL หรือ TiDB Cloud Host) |
+| `DB_USER`               | `root`                   | ชื่อผู้ใช้ MySQL / TiDB                      |
+| `DB_PASSWORD`           | `""`                     | รหัสผ่าน MySQL / TiDB                        |
+| `DB_NAME`               | `myapp_db`               | ชื่อฐานข้อมูล                                |
+| `DB_PORT`               | `3306` หรือ `4000`       | พอร์ต MySQL (ค่าเริ่มต้น 3306, TiDB ใช้ 4000) |
+| `DB_SSL`                | `true`                   | เปิดใช้งาน SSL/TLS (จำเป็นสำหรับ TiDB Cloud) |
 | `JWT_KEY`               | `random_secret_string`   | คีย์เข้ารหัส JWT Session Token               |
 | `FRONTEND_URL`          | `http://localhost:5173`  | โดเมนของ Frontend (สำหรับ CORS)              |
 | `BASE_URL`              | `http://localhost:3000`  | โดเมนของ Backend Server                      |
