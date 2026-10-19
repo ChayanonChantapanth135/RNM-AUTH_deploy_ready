@@ -14,8 +14,15 @@ export const initializeDatabase = async () => {
   const dbUrl = process.env.DATABASE_URL || process.env.MYSQL_URL;
 
   try {
+    const sslConfig = (process.env.DB_SSL === 'true' || process.env.TIDB_ENABLE_SSL === 'true' || Boolean(process.env.TIDB_HOST))
+      ? { minVersion: 'TLSv1.2', rejectUnauthorized: true }
+      : undefined;
+
     if (dbUrl) {
-      connection = await mysql.createConnection(dbUrl);
+      connection = await mysql.createConnection({
+        uri: dbUrl,
+        ssl: sslConfig
+      });
     } else {
       const host = process.env.DB_HOST || process.env.MYSQLHOST || 'localhost';
       const port = Number(process.env.DB_PORT || process.env.MYSQLPORT) || 3306;
@@ -24,12 +31,12 @@ export const initializeDatabase = async () => {
 
       try {
         // Try connecting without specifying DB to create it if needed
-        connection = await mysql.createConnection({ host, port, user, password });
+        connection = await mysql.createConnection({ host, port, user, password, ssl: sslConfig });
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
         await connection.query(`USE \`${dbName}\``);
       } catch (connErr) {
-        // If create database is restricted (e.g. Railway managed MySQL), connect directly to the database
-        connection = await mysql.createConnection({ host, port, user, password, database: dbName });
+        // If create database is restricted (e.g. Railway managed MySQL / TiDB), connect directly to the database
+        connection = await mysql.createConnection({ host, port, user, password, database: dbName, ssl: sslConfig });
       }
     }
     
