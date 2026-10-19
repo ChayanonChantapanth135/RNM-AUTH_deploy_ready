@@ -511,35 +511,29 @@ export const useUserManagement = (t, language = "en") => {
       worksheet.columns = [
         { header: "fullname", key: "fullname", width: 25 },
         { header: "email", key: "email", width: 30 },
-        { header: "phone", key: "phone", width: 18 },
         { header: "role", key: "role", width: 18 },
         { header: "status", key: "status", width: 15 },
         { header: "start_date", key: "start_date", width: 18 },
         { header: "expire_date", key: "expire_date", width: 18 },
-        { header: "password", key: "password", width: 18 },
       ];
 
       // ตัวอย่างข้อมูลในเทมเพลต
       worksheet.addRow({
         fullname: "Somchai Jaidee",
         email: "somchai@company.com",
-        phone: "+66812345678",
         role: "storyboard",
         status: "active",
         start_date: "2026-09-01",
         expire_date: "2027-09-01",
-        password: "password123",
       });
 
       worksheet.addRow({
         fullname: "Somsak Rakdee",
         email: "somsak@company.com",
-        phone: "+66898765432",
         role: "programmer",
         status: "active",
         start_date: "",
         expire_date: "",
-        password: "",
       });
 
       // ตกแต่งส่วนหัวตาราง
@@ -554,7 +548,8 @@ export const useUserManagement = (t, language = "en") => {
       const roleOptions = ["admin", "manager", "storyboard", "animation", "designer", "programmer"];
       const statusOptions = ["active", "suspended"];
 
-      worksheet.dataValidations.add("D2:D500", {
+      // คอลัมน์ C: role
+      worksheet.dataValidations.add("C2:C500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${roleOptions.join(",")}"`],
@@ -563,7 +558,8 @@ export const useUserManagement = (t, language = "en") => {
         error: "Please select a role from the dropdown list."
       });
 
-      worksheet.dataValidations.add("E2:E500", {
+      // คอลัมน์ D: status
+      worksheet.dataValidations.add("D2:D500", {
         type: "list",
         allowBlank: true,
         formulae: [`"${statusOptions.join(",")}"`],
