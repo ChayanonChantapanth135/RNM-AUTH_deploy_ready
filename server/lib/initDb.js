@@ -85,7 +85,7 @@ export const initializeDatabase = async () => {
         phone VARCHAR(50) DEFAULT NULL,
         start_date DATE NULL DEFAULT NULL,
         expire_date DATE NULL DEFAULT NULL,
-        is_force_reset TINYINT(1) DEFAULT 0,
+        is_force_reset TINYINT(1) DEFAULT 1,
         leader_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         deleted_at TIMESTAMP NULL DEFAULT NULL,

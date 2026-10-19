@@ -552,7 +552,7 @@ export const createUser = async (req, res) => {
         let avatarUrl = req.file ? getUploadedFileUrl(req.file) : null;
 
         const [result] = await db.query(
-            'INSERT INTO users (fullname, email, password, phone, role, status, avatar, leader_id, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO users (fullname, email, password, phone, role, status, avatar, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
             [fullname, email, hashPassword, formattedPhone, sqlRole, sqlStatus, avatarUrl, parsedLeaderId, parsedStartDate, parsedExpireDate]
         );
 
@@ -1009,7 +1009,7 @@ export const importUsers = async (req, res) => {
                 const finalPassword = password || '123456';
                 const hashPassword = await bcrypt.hash(finalPassword, 10);
                 await db.query(
-                    'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
                     [fullname, email, hashPassword, role, status, phone, leaderId, startDate, expireDate]
                 );
                 importedCount++;
