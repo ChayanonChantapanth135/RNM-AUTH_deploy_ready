@@ -532,7 +532,12 @@ export const createUser = async (req, res) => {
             return res.status(409).json({ message: 'User already exists' });
         }
 
-        const hashPassword = await bcrypt.hash(password, 10);
+        // สุ่มรหัสผ่าน 6 หลักหากไม่มีการระบุรหัสผ่านเข้ามา
+        const finalPassword = (password && password.trim() !== '') 
+            ? password.trim() 
+            : Math.floor(100000 + Math.random() * 900000).toString();
+
+        const hashPassword = await bcrypt.hash(finalPassword, 10);
         const formattedPhone = formatPhoneNumber(phone);
         
         let sqlRole = 'storyboard';
@@ -556,11 +561,11 @@ export const createUser = async (req, res) => {
             [fullname, email, hashPassword, formattedPhone, sqlRole, sqlStatus, avatarUrl, parsedLeaderId, parsedStartDate, parsedExpireDate]
         );
 
-        // Send welcome email to new user via emailService asynchronously (do not block client response)
+        // Send welcome email with 6-digit temporary password via emailService asynchronously
         sendWelcomeUserEmail({
             recipientEmail: email,
             recipientName: fullname,
-            tempPassword: password
+            tempPassword: finalPassword
         }).catch(e => console.error('[Background Email Error]:', e.message));
 
         const { creatorId } = req.body;
@@ -1006,13 +1011,23 @@ export const importUsers = async (req, res) => {
                 await db.query(query, params);
                 updatedCount++;
             } else {
-                const finalPassword = password || '123456';
+                // ผู้ใช้ใหม่: สุ่มรหัสผ่านชั่วคราว 6 หลักเสมอหากไม่ได้ระบุมา และส่งเมลต้อนรับ
+                const finalPassword = (password && String(password).trim() !== '') 
+                    ? String(password).trim() 
+                    : Math.floor(100000 + Math.random() * 900000).toString();
                 const hashPassword = await bcrypt.hash(finalPassword, 10);
                 await db.query(
                     'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
                     [fullname, email, hashPassword, role, status, phone, leaderId, startDate, expireDate]
                 );
                 importedCount++;
+
+                // ส่งอีเมลต้อนรับพร้อมรหัสผ่านชั่วคราว 6 หลักให้ผู้ใช้ใหม่
+                sendWelcomeUserEmail({
+                    recipientEmail: email,
+                    recipientName: fullname,
+                    tempPassword: finalPassword
+                }).catch(e => console.error(`[Background Email Error for ${email}]:`, e.message));
             }
         }
 
