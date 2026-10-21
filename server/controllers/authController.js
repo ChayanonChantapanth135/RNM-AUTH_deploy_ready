@@ -1114,13 +1114,6 @@ export const getTeamLeaders = async (req, res) => {
         if (rows.length === 0) {
             [rows] = await db.query("SELECT id, fullname, email FROM users WHERE deleted_at IS NULL");
         }
-        if (rows.length === 0) {
-            rows = [
-                { id: 3, fullname: "Somsak Somdee (Simulated)" },
-                { id: 4, fullname: "Wichai Jaidee (Simulated)" },
-                { id: 5, fullname: "Anong Rakdee (Simulated)" }
-            ];
-        }
         memoryCache.set(cacheKey, rows, 120); // 2 minutes TTL
         res.status(200).json(rows);
     } catch (error) {

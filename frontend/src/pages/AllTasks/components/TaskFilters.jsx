@@ -16,7 +16,10 @@ const TaskFilters = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* ค้นหา */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+          <label
+            className="text-xs font-bold uppercase tracking-wider"
+            style={{ color: "var(--text-secondary)" }}
+          >
             {language === "th" ? "ค้นหางาน" : "Search Task"}
           </label>
           <input
