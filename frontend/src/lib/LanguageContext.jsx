@@ -595,12 +595,12 @@ const translations = {
     welcomeBackPortal: "Welcome back to the portal",
 
     // Project & Task Modals & Tables
-    colProjectNameUpper: "PROJECT NAME",
-    colTeamLeaderUpper: "TEAM LEADER",
-    colPriorityUpper: "PRIORITY",
-    colStatusUpper: "STATUS",
-    colDueDateUpper: "DUE DATE",
-    colActionUpper: "ACTION",
+    colProjectNameUpper: "Project Name",
+    colTeamLeaderUpper: "Team Leader",
+    colPriorityUpper: "Priority",
+    colStatusUpper: "Status",
+    colDueDateUpper: "Due Date",
+    colActionUpper: "Action",
     manageActionBtn: "Manage",
     editTaskInfo: "Edit Task Info",
     statusHistoryTitle: "Status History",
@@ -616,8 +616,10 @@ const translations = {
     completedCategoryLabel: "Completed",
     allCategoryLabel: "All",
     statusUpdatedSuccess: "Status updated successfully",
-    activeTaskInProgressSelf: 'You already have task "{task}" (in project {project}) in progress. Please complete it before starting a new task.',
-    activeTaskInProgressUser: 'This user already have task "{task}" (in project {project}) in progress. Please complete it before starting a new task.',
+    activeTaskInProgressSelf:
+      'You already have task "{task}" (in project {project}) in progress. Please complete it before starting a new task.',
+    activeTaskInProgressUser:
+      'This user already have task "{task}" (in project {project}) in progress. Please complete it before starting a new task.',
     noData: "No Data",
     noTaskData: "No Task Data",
     noProjectsData: "No Projects Data",
@@ -767,7 +769,8 @@ const translations = {
     // 404 Not Found Page
     notFoundBadge: "404 Error",
     notFoundTitle: "Page Not Found",
-    notFoundDesc: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    notFoundDesc:
+      "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
     notFoundBackHome: "Back to Home",
     notFoundDashboard: "Go to Dashboard",
     notFoundPrevious: "Go Back",
@@ -1391,8 +1394,10 @@ const translations = {
     completedCategoryLabel: "เสร็จสิ้น",
     allCategoryLabel: "ทั้งหมด",
     statusUpdatedSuccess: "อัปเดตสถานะงานสำเร็จ",
-    activeTaskInProgressSelf: 'คุณมีงาน "{task}" (ในโปรเจกต์ {project}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่',
-    activeTaskInProgressUser: 'ผู้ใช้นี้มีงาน "{task}" (ในโปรเจกต์ {project}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่',
+    activeTaskInProgressSelf:
+      'คุณมีงาน "{task}" (ในโปรเจกต์ {project}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่',
+    activeTaskInProgressUser:
+      'ผู้ใช้นี้มีงาน "{task}" (ในโปรเจกต์ {project}) ที่กำลังดำเนินการอยู่แล้ว กรุณาทำงานดังกล่าวให้เสร็จก่อนเริ่มงานใหม่',
     noData: "ไม่มีข้อมูล",
     noTaskData: "ไม่มีข้อมูลงาน",
     noProjectsData: "ไม่มีข้อมูลโครงการ",
@@ -1538,7 +1543,8 @@ const translations = {
     // 404 Not Found Page
     notFoundBadge: "ข้อผิดพลาด 404",
     notFoundTitle: "ไม่พบหน้าที่ต้องการ",
-    notFoundDesc: "หน้าที่คุณกำลังค้นหาอาจถูกลบ ย้ายชื่อ หรือไม่สามารถใช้งานได้ชั่วคราว",
+    notFoundDesc:
+      "หน้าที่คุณกำลังค้นหาอาจถูกลบ ย้ายชื่อ หรือไม่สามารถใช้งานได้ชั่วคราว",
     notFoundBackHome: "กลับสู่หน้าแรก",
     notFoundDashboard: "ไปที่แดชบอร์ด",
     notFoundPrevious: "ย้อนกลับหน้าเดิม",
