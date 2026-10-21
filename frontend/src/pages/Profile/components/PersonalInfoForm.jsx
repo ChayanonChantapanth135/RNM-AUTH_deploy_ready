@@ -56,6 +56,29 @@ const PersonalInfoForm = ({
           />
         </div>
 
+        {/* Email */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            className="text-xs font-bold"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            {t("profileEmail") || "Email"}
+          </label>
+          <input
+            type="email"
+            className="rounded-2xl px-4 py-3 text-sm font-medium cursor-not-allowed opacity-60"
+            style={{
+              background: "var(--bg-surface-hover)",
+              color: "var(--text-secondary)",
+              border: "1px dashed var(--border-surface)",
+            }}
+            value={email || ""}
+            disabled
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Leader Selector / Locked Leader */}
         <div className="flex flex-col gap-1.5">
           <label
@@ -121,29 +144,25 @@ const PersonalInfoForm = ({
             </div>
           )}
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Email */}
-        <div className="flex flex-col gap-1.5">
-          <label
-            className="text-xs font-bold"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {t("profileEmail") || "Email"}
+        {/* Phone */}
+        {/* <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-bold" style={{ color: "var(--text-secondary)" }}>
+            {t("profilePhone")}
           </label>
           <input
-            type="email"
-            className="rounded-2xl px-4 py-3 text-sm font-medium cursor-not-allowed opacity-60"
+            type="tel"
+            className="rounded-2xl px-4 py-3 text-sm font-medium transition-all focus:outline-none placeholder:text-slate-400"
             style={{
               background: "var(--bg-surface-hover)",
-              color: "var(--text-secondary)",
-              border: "1px dashed var(--border-surface)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-surface)",
             }}
-            value={email || ""}
-            disabled
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+66XXXXXXXXX"
           />
-        </div>
+        </div>  */}
       </div>
     </div>
   );
