@@ -109,8 +109,21 @@ export const useAllTasks = () => {
 
   const fetchUsers = async () => {
     try {
+      const cached = sessionStorage.getItem("cached_users_list");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAllUsersList(parsed);
+            return;
+          }
+        } catch (e) {
+          // ignore parsing error and re-fetch
+        }
+      }
       const response = await axios.get("/auth/users");
       setAllUsersList(response.data);
+      sessionStorage.setItem("cached_users_list", JSON.stringify(response.data));
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -127,16 +140,47 @@ export const useAllTasks = () => {
       fetchTasks();
     };
 
+    const handleStatusUpdated = (payload) => {
+      if (!payload || !payload.taskId) {
+        fetchTasks();
+        return;
+      }
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (Number(task.id) === Number(payload.taskId)) {
+            let normalizedStatus = "Pending";
+            if (payload.status) {
+              const s = payload.status.toLowerCase();
+              if (s === "pending") normalizedStatus = "Pending";
+              else if (s === "in progress" || s === "in_progress") normalizedStatus = "In Progress";
+              else if (s === "reviewing" || s === "review") normalizedStatus = "Reviewing";
+              else if (s === "completed") normalizedStatus = "Completed";
+            }
+            return { ...task, status: normalizedStatus };
+          }
+          return task;
+        })
+      );
+    };
+
+    const handleTaskDeleted = (payload) => {
+      if (!payload || !payload.taskId) {
+        fetchTasks();
+        return;
+      }
+      setTasks((prevTasks) => prevTasks.filter((task) => Number(task.id) !== Number(payload.taskId)));
+    };
+
     socket.on("task:created", handleTaskChange);
-    socket.on("task:status:updated", handleTaskChange);
+    socket.on("task:status:updated", handleStatusUpdated);
     socket.on("task:updated", handleTaskChange);
-    socket.on("task:deleted", handleTaskChange);
+    socket.on("task:deleted", handleTaskDeleted);
 
     return () => {
       socket.off("task:created", handleTaskChange);
-      socket.off("task:status:updated", handleTaskChange);
+      socket.off("task:status:updated", handleStatusUpdated);
       socket.off("task:updated", handleTaskChange);
-      socket.off("task:deleted", handleTaskChange);
+      socket.off("task:deleted", handleTaskDeleted);
     };
   }, []);
 

@@ -463,6 +463,12 @@ export const logout = async (req, res) => {
 export const getUsers = async (req, res) => {
     const { includeDeleted } = req.query;
     try {
+        const cacheKey = `users_list_${includeDeleted === 'true' ? 'all' : 'active'}`;
+        const cached = memoryCache.get(cacheKey);
+        if (cached) {
+            return res.status(200).json(cached);
+        }
+
         const db = await connectToDatabase();
         const whereClause = includeDeleted === 'true' ? '' : 'WHERE u.deleted_at IS NULL';
         const query = `
@@ -481,6 +487,7 @@ export const getUsers = async (req, res) => {
             ORDER BY u.id ASC
         `;
         const [rows] = await db.query(query);
+        memoryCache.set(cacheKey, rows, 60); // Cache for 60 seconds
         res.status(200).json(rows);
     } catch (error) {
         console.error('Error fetching users:', error.message);
@@ -928,6 +935,8 @@ export const importUsers = async (req, res) => {
         let skippedCount = 0;
         const newUsersToNotify = [];
 
+        const newUsersToInsert = [];
+
         for (const item of users) {
             const fullname = (item.fullname || item.username || item.name || '').trim();
             const email = (item.email || '').trim().toLowerCase();
@@ -1012,16 +1021,15 @@ export const importUsers = async (req, res) => {
                 await db.query(query, params);
                 updatedCount++;
             } else {
-                // ผู้ใช้ใหม่: สุ่มรหัสผ่านชั่วคราว 6 หลักเสมอหากไม่ได้ระบุมา และส่งเมลต้อนรับ
+                // ผู้ใช้ใหม่: สุ่มรหัสผ่านชั่วคราว 6 หลักเสมอหากไม่ได้ระบุมา และเตรียมสำหรับ Batch Insert
                 const finalPassword = (password && String(password).trim() !== '') 
                     ? String(password).trim() 
                     : Math.floor(100000 + Math.random() * 900000).toString();
                 const hashPassword = await bcrypt.hash(finalPassword, 10);
-                await db.query(
-                    'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
-                    [fullname, email, hashPassword, role, status, phone, leaderId, startDate, expireDate]
-                );
-                importedCount++;
+
+                newUsersToInsert.push([
+                    fullname, email, hashPassword, role, status, phone, leaderId, startDate, expireDate, 1
+                ]);
 
                 // เพิ่มเข้าคิวส่งอีเมลต้อนรับ
                 newUsersToNotify.push({
@@ -1030,6 +1038,15 @@ export const importUsers = async (req, res) => {
                     tempPassword: finalPassword
                 });
             }
+        }
+
+        // Batch Insert ผู้ใช้ใหม่ทั้งหมดในคำสั่งเดียว (Single Query Batch)
+        if (newUsersToInsert.length > 0) {
+            await db.query(
+                'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES ?',
+                [newUsersToInsert]
+            );
+            importedCount += newUsersToInsert.length;
         }
 
         // ส่งอีเมลต้อนรับให้ผู้ใช้ใหม่ทุกคนแบบปลอดภัยจาก Rate Limit
@@ -1055,6 +1072,8 @@ export const importUsers = async (req, res) => {
         }
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
 
         await logActivity(
             db,
