@@ -104,7 +104,6 @@ const PersonalTaskPage = () => {
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-500/10"
                 }`}
               >
-                <span>📋</span>
                 <span>{isThai ? "บอร์ด" : "Kanban"}</span>
               </button>
 
