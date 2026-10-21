@@ -98,7 +98,10 @@ const UserModal = ({
                   }}
                 >
                   {t("modalPasswordLabel")}{" "}
-                  <span className="text-muted fw-normal" style={{ fontSize: "0.75rem" }}>
+                  <span
+                    className="text-muted fw-normal"
+                    style={{ fontSize: "0.75rem" }}
+                  >
                     ({t("optional") || "ไม่ระบุ = สุ่ม 6 หลักส่งทางเมล"})
                   </span>
                 </label>
@@ -108,7 +111,12 @@ const UserModal = ({
                   className="form-control rounded-xl py-2.5 px-3 text-sm focus:outline-none transition-all shadow-sm"
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder={isEditMode ? "••••••••" : (t("autoGeneratePlaceholder") || "เว้นว่างไว้เพื่อสุ่ม 6 หลักส่งเข้าเมล")}
+                  placeholder={
+                    isEditMode
+                      ? "••••••••"
+                      : t("autoGeneratePlaceholder") ||
+                        "เว้นว่างไว้เพื่อสุ่ม 6 หลักส่งเข้าเมล"
+                  }
                 />
               </div>
 
@@ -158,7 +166,7 @@ const UserModal = ({
                 </div>
               </div>
 
-              {/* Phone with Country Code Selector */}
+              {/* Phone with Country Code Selector
               <div>
                 <label
                   className="form-label mb-1"
@@ -246,7 +254,7 @@ const UserModal = ({
                     }
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Leader Selection */}
               <div>
