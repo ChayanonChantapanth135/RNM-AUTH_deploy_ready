@@ -181,10 +181,16 @@ const ImportPreviewModal = ({
         if (status !== exStatus) {
           changedFields.push("status");
         }
-        if (startDate !== exStartDate && (startDate !== "" || exStartDate !== "")) {
+        if (
+          startDate !== exStartDate &&
+          (startDate !== "" || exStartDate !== "")
+        ) {
           changedFields.push("startDate");
         }
-        if (expireDate !== exExpireDate && (expireDate !== "" || exExpireDate !== "")) {
+        if (
+          expireDate !== exExpireDate &&
+          (expireDate !== "" || exExpireDate !== "")
+        ) {
           changedFields.push("expireDate");
         }
         if (leader && leader !== "-" && leader.toLowerCase() !== "null") {
@@ -315,9 +321,7 @@ const ImportPreviewModal = ({
                 </span>
                 {" • "}
                 {t("importPreviewTotal") || "ทั้งหมด"}{" "}
-                <span className="font-bold text-slate-800">
-                  {stats.total}
-                </span>{" "}
+                <span className="font-bold text-slate-800">{stats.total}</span>{" "}
                 {t("entriesText") || "รายการ"}
               </p>
             </div>
@@ -410,7 +414,8 @@ const ImportPreviewModal = ({
                   : "bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700"
               }`}
             >
-              {t("importChangedUsers") || "ข้อมูลเปลี่ยน"} ({stats.changedCount})
+              {t("importChangedUsers") || "ข้อมูลเปลี่ยน"} ({stats.changedCount}
+              )
             </button>
             <button
               onClick={() => setStatusFilter("new")}
@@ -430,7 +435,8 @@ const ImportPreviewModal = ({
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              {t("importUnchangedUsers") || "ไม่เปลี่ยน"} ({stats.unchangedCount})
+              {t("importUnchangedUsers") || "ไม่เปลี่ยน"} (
+              {stats.unchangedCount})
             </button>
             {stats.invalidCount > 0 && (
               <button
@@ -477,9 +483,9 @@ const ImportPreviewModal = ({
                   <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
                     {t("colEmail") || "อีเมล"}
                   </th>
-                  <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
+                  {/* <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
                     {t("modalPhoneLabel") || "เบอร์โทรศัพท์"}
-                  </th>
+                  </th> */}
                   <th className="py-3 px-4 text-center whitespace-nowrap text-slate-600">
                     {t("colRole") || "บทบาท"}
                   </th>
@@ -668,10 +674,10 @@ const ImportPreviewModal = ({
                     user.importType === "new"
                       ? "bg-emerald-50/40 border-emerald-200/90 shadow-sm"
                       : user.importType === "changed"
-                      ? "bg-amber-50/50 border-amber-200/90 shadow-sm"
-                      : user.importType === "invalid"
-                      ? "bg-rose-50/40 border-rose-200/90 shadow-sm"
-                      : "bg-white border-slate-200 opacity-80"
+                        ? "bg-amber-50/50 border-amber-200/90 shadow-sm"
+                        : user.importType === "invalid"
+                          ? "bg-rose-50/40 border-rose-200/90 shadow-sm"
+                          : "bg-white border-slate-200 opacity-80"
                   }`}
                 >
                   {/* Card Header: # + Avatar + Full Name + Import Action Badge */}
@@ -681,9 +687,7 @@ const ImportPreviewModal = ({
                         #{user.idx}
                       </span>
                       <div className="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-200 text-indigo-700 font-black flex items-center justify-center text-xs shrink-0">
-                        {user.fullname
-                          ? user.fullname[0]?.toUpperCase()
-                          : "U"}
+                        {user.fullname ? user.fullname[0]?.toUpperCase() : "U"}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -864,7 +868,8 @@ const ImportPreviewModal = ({
             {stats.unchangedCount > 0 && (
               <span className="text-slate-500 block sm:inline sm:ml-2">
                 ({t("importUnchangedUsers") || "ข้อมูลเหมือนเดิม"}{" "}
-                {stats.unchangedCount} {t("entriesText") || "รายการ ข้ามอัตโนมัติ"})
+                {stats.unchangedCount}{" "}
+                {t("entriesText") || "รายการ ข้ามอัตโนมัติ"})
               </span>
             )}
             {stats.invalidCount > 0 && (
