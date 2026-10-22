@@ -204,7 +204,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Bootstrap Button & Segmented Overrides */
-.btn, .btn-group, .btn-group .btn, button {
+.btn, .btn-group, .btn-group .btn {
   border-radius: 9999px !important;
 }
 
@@ -975,11 +975,4 @@ a, a:hover, a:focus {
 .form-control:focus, .form-select:focus {
   border-color: var(--brand-color) !important;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
-}
-
-/* 4. Normalize button resets so Tailwind utility classes always win */
-button:not(.btn) {
-  background-color: transparent;
-  padding: 0;
-  border-width: 0;
 }

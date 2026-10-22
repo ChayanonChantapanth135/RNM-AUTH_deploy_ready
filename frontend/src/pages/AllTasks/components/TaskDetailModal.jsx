@@ -971,7 +971,8 @@ const TaskDetailModal = ({
                 </button>
                 <button
                   type="button"
-                  className="flex-1 sm:flex-none px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
+                  className="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md hover:shadow-emerald-500/25 cursor-pointer text-center"
+                  style={{ backgroundColor: "#10b981", color: "#ffffff" }}
                   onClick={onSave}
                 >
                   {language === "th" ? "บันทึกข้อมูล" : "Save Changes"}
@@ -988,7 +989,8 @@ const TaskDetailModal = ({
                 </button>
                 <button
                   type="button"
-                  className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
+                  className="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md hover:shadow-emerald-500/25 cursor-pointer text-center"
+                  style={{ backgroundColor: "#10b981", color: "#ffffff" }}
                   onClick={handleUpdateStatusOnly}
                 >
                   {t("updateStatusBtn") || "Update Status"}
