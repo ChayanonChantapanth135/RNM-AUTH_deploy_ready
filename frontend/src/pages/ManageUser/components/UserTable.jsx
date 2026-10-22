@@ -179,50 +179,37 @@ const UserTable = ({
                     {user.lastLogin}
                   </td>
                   <td className="py-4 px-4 text-center w-36">
-                    <div className="inline-flex items-center gap-2.5 justify-center">
+                    <div className="inline-flex items-center gap-2 justify-center">
                       <button
-                        className="w-9 h-9 rounded-full bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-slate-200 transition-all duration-200 flex items-center justify-center hover:scale-110 shadow-sm cursor-pointer"
+                        className="p-2 rounded-xl bg-white/5 text-slate-300 transition-colors hover:scale-110"
                         onClick={() => handleOpenEdit(user)}
-                        title={t("edit") || "แก้ไข"}
                       >
-                        <span className="text-sm">✏️</span>
+                        ✏️
                       </button>
                       <button
                         disabled={isSelf}
-                        className={`w-9 h-9 rounded-full border transition-all duration-200 flex items-center justify-center shadow-sm ${
-                          isSelf
-                            ? "opacity-30 cursor-not-allowed bg-slate-500/10 border-slate-500/10"
-                            : user.status === "suspended"
-                              ? "bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/20 text-emerald-300 hover:scale-110 cursor-pointer"
-                              : "bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/20 text-amber-300 hover:scale-110 cursor-pointer"
-                        }`}
+                        className={`p-2 rounded-xl transition-colors ${isSelf ? "opacity-30 cursor-not-allowed" : user.status === "suspended" ? "bg-emerald-500/20 text-emerald-300 hover:scale-110" : "bg-amber-500/20 text-amber-300 hover:scale-110"}`}
                         onClick={() => !isSelf && handleToggleStatus(user)}
                         title={
                           isSelf
                             ? t("cannotSuspendSelf") ||
                               "ไม่สามารถระงับสิทธิ์ตัวเองได้"
-                            : user.status === "suspended"
-                              ? t("activateUser") || "เปิดใช้งานบัญชี"
-                              : t("suspendUser") || "ระงับการใช้งาน"
+                            : ""
                         }
                       >
-                        <span className="text-sm">{user.status === "suspended" ? "🔓" : "⏸️"}</span>
+                        {user.status === "suspended" ? "🔓" : "⏸️"}
                       </button>
                       <button
                         disabled={isSelf}
-                        className={`w-9 h-9 rounded-full border transition-all duration-200 flex items-center justify-center shadow-sm ${
-                          isSelf
-                            ? "opacity-30 cursor-not-allowed bg-slate-500/10 border-slate-500/10"
-                            : "bg-rose-500/15 hover:bg-rose-500/25 border-rose-500/20 text-rose-300 hover:scale-110 cursor-pointer"
-                        }`}
+                        className={`p-2 rounded-xl bg-rose-500/20 text-rose-300 transition-colors ${isSelf ? "opacity-30 cursor-not-allowed" : "hover:scale-110"}`}
                         onClick={() => !isSelf && handleDeleteUser(user)}
                         title={
                           isSelf
                             ? t("cannotDeleteSelf") || "ไม่สามารถลบตัวเองได้"
-                            : t("deleteUser") || "ลบผู้ใช้"
+                            : ""
                         }
                       >
-                        <span className="text-sm">🗑️</span>
+                        🗑️
                       </button>
                     </div>
                   </td>
@@ -311,9 +298,9 @@ const UserTable = ({
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
-                    className="w-8 h-8 rounded-full bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-slate-200 flex items-center justify-center text-xs transition-all shadow-sm cursor-pointer"
+                    className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 flex items-center justify-center text-xs transition-colors"
                     onClick={() => handleOpenEdit(user)}
                     aria-label="Edit"
                   >
@@ -321,12 +308,12 @@ const UserTable = ({
                   </button>
                   <button
                     disabled={isSelf}
-                    className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs transition-all shadow-sm ${
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-colors ${
                       isSelf
-                        ? "opacity-30 cursor-not-allowed bg-slate-500/10 border-slate-500/10"
+                        ? "opacity-30 cursor-not-allowed bg-white/5"
                         : user.status === "suspended"
-                          ? "bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/20 text-emerald-300 cursor-pointer"
-                          : "bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/20 text-amber-300 cursor-pointer"
+                          ? "bg-emerald-500/20 text-emerald-300"
+                          : "bg-amber-500/20 text-amber-300"
                     }`}
                     onClick={() => !isSelf && handleToggleStatus(user)}
                     title={
@@ -341,8 +328,8 @@ const UserTable = ({
                   </button>
                   <button
                     disabled={isSelf}
-                    className={`w-8 h-8 rounded-full border border-rose-500/20 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 flex items-center justify-center text-xs transition-all shadow-sm ${
-                      isSelf ? "opacity-30 cursor-not-allowed bg-slate-500/10 border-slate-500/10" : "cursor-pointer"
+                    className={`w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-colors ${
+                      isSelf ? "opacity-30 cursor-not-allowed" : ""
                     }`}
                     onClick={() => !isSelf && handleDeleteUser(user)}
                     title={

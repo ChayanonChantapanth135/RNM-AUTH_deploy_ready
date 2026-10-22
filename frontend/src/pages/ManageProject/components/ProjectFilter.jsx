@@ -36,35 +36,31 @@ const ProjectFilter = ({
       <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between sm:justify-end">
         {/* View Switcher Segmented Control */}
         <div 
-          className="inline-flex items-center p-1 rounded-2xl border backdrop-blur-md shadow-inner gap-1"
+          className="flex items-center p-1 sm:p-1.5 rounded-full"
           style={{
             background: "var(--bg-surface-hover)",
-            borderColor: "var(--border-surface)",
+            border: "1px solid var(--border-surface)",
           }}
         >
           <button
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               viewMode === "table"
-                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-[1.02]"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
-            style={viewMode === "table" ? { backgroundColor: "#4f46e5", color: "#ffffff" } : {}}
             onClick={() => setViewMode("table")}
           >
-            <span className="text-sm">📋</span>
-            <span>{t("tableView")}</span>
+            📋 {t("tableView")}
           </button>
           <button
-            className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+            className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               viewMode === "board"
-                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-[1.02]"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
-            style={viewMode === "board" ? { backgroundColor: "#4f46e5", color: "#ffffff" } : {}}
             onClick={() => setViewMode("board")}
           >
-            <span className="text-sm">🗂️</span>
-            <span>{t("boardView")}</span>
+            🗂️ {t("boardView")}
           </button>
         </div>
 

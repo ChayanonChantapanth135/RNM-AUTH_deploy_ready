@@ -204,7 +204,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Bootstrap Button & Segmented Overrides */
-.btn, .btn-group, .btn-group .btn {
+.btn, .btn-group, .btn-group .btn, button {
   border-radius: 9999px !important;
 }
 
@@ -949,30 +949,3 @@ html.light .project-badge-pill {
   background-color: #1e293b !important;
   color: #ffffff !important;
 }
-
-/* ============================================================== */
-/* 🛡️ UI FRAMEWORK OVERLAP HARMONIZATION (Bootstrap & Tailwind)   */
-/* ป้องกันการชนกันของ Bootstrap CSS และ Tailwind โดยรักษาโทนสีเดิม */
-/* ============================================================== */
-
-/* 1. Prevent Bootstrap link & text colors from overriding theme variables */
-a, a:hover, a:focus {
-  text-decoration: none;
-}
-
-/* 2. Harmonize Bootstrap modal containers with existing theme design system */
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.modal-dialog {
-  color: var(--text-primary);
-}
-
-/* 3. Keep Bootstrap form-controls respecting solid contrast design without color changes */
-.form-control:focus, .form-select:focus {
-  border-color: var(--brand-color) !important;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
-}

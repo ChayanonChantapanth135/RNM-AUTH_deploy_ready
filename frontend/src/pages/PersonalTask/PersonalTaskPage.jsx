@@ -89,37 +89,33 @@ const PersonalTaskPage = () => {
           <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto flex-wrap gap-2.5">
             {/* View Mode Toggle Switcher */}
             <div
-              className="inline-flex items-center p-1 rounded-2xl border backdrop-blur-md shadow-inner gap-1 text-xs font-bold"
+              className="flex items-center gap-1 p-1 rounded-2xl shadow-md text-xs font-bold"
               style={{
-                background: "var(--bg-surface-hover)",
-                borderColor: "var(--border-surface)",
+                backgroundColor: "var(--bg-surface)",
+                border: "1px solid var(--border-surface)",
               }}
             >
               <button
                 type="button"
                 onClick={() => setViewMode("board")}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                   viewMode === "board"
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-[1.02]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-500/10"
                 }`}
-                style={viewMode === "board" ? { backgroundColor: "#4f46e5", color: "#ffffff" } : {}}
               >
-                <span className="text-sm">📋</span>
                 <span>{isThai ? "บอร์ด" : "Kanban"}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setViewMode("calendar")}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl transition-all cursor-pointer ${
                   viewMode === "calendar"
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-[1.02]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-500/10"
                 }`}
-                style={viewMode === "calendar" ? { backgroundColor: "#4f46e5", color: "#ffffff" } : {}}
               >
-                <span className="text-sm">📅</span>
                 <span>{isThai ? "ปฏิทิน" : "Calendar"}</span>
               </button>
             </div>

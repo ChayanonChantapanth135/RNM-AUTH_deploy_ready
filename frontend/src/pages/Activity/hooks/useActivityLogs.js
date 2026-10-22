@@ -10,60 +10,33 @@ export const useActivityLogs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(20);
 
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-
-  const fetchLogs = async (page = 1, append = false) => {
-    if (append) {
-      setLoadingMore(true);
-    } else {
-      setLoading(true);
-    }
+  const fetchLogs = async () => {
+    setLoading(true);
     try {
       const u = await getCurrentUser();
-      const params = {
-        page,
-        limit: entriesPerPage,
-      };
+      const params = {};
       if (u) {
         params.role = u.role;
         params.userId = u.id;
       }
       const response = await axios.get("/auth/activity-logs", { params });
-      
-      // ตรวจสอบโครงสร้าง response ว่าเป็นแบบ pagination object หรือ array
-      const receivedLogs = response.data?.data ? response.data.data : (Array.isArray(response.data) ? response.data : []);
-      const pagination = response.data?.pagination;
-
-      if (append) {
-        setLogs((prev) => [...prev, ...receivedLogs]);
+      if (response.data && Array.isArray(response.data.data)) {
+        setLogs(response.data.data);
+      } else if (Array.isArray(response.data)) {
+        setLogs(response.data);
       } else {
-        setLogs(receivedLogs);
-      }
-
-      if (pagination) {
-        setHasMore(pagination.hasMore);
-      } else {
-        setHasMore(receivedLogs.length === entriesPerPage);
+        setLogs([]);
       }
     } catch (error) {
       console.error("Error fetching logs:", error);
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
-  const loadMore = async () => {
-    if (loadingMore || !hasMore) return;
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    await fetchLogs(nextPage, true);
-  };
-
   useEffect(() => {
-    fetchLogs(1, false);
-  }, [entriesPerPage]);
+    fetchLogs();
+  }, []);
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
@@ -103,9 +76,6 @@ export const useActivityLogs = () => {
   return {
     logs,
     loading,
-    loadingMore,
-    hasMore,
-    loadMore,
     searchQuery,
     setSearchQuery,
     actionFilter,
@@ -114,7 +84,7 @@ export const useActivityLogs = () => {
     setCurrentPage,
     entriesPerPage,
     setEntriesPerPage,
-    fetchLogs: () => fetchLogs(1, false),
+    fetchLogs,
     filteredLogs,
     currentEntries,
     indexOfFirstEntry,

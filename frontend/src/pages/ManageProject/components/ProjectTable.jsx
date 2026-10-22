@@ -243,18 +243,18 @@ const ProjectTable = ({
                         {canManage && (
                           <>
                             <button
-                              className="w-8 h-8 rounded-full bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-slate-200 flex items-center justify-center text-xs transition-all duration-200 shadow-sm hover:scale-110 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 text-xs font-medium transition-colors"
                               onClick={() => handleOpenEdit(project)}
-                              title={language === "th" ? "แก้ไขโครงการ" : "Edit Project"}
+                              title="แก้ไขโครงการ"
                             >
-                              <span className="text-sm">✏️</span>
+                              ✏️
                             </button>
                             <button
-                              className="w-8 h-8 rounded-full bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-all duration-200 shadow-sm hover:scale-110 cursor-pointer"
+                              className="px-2.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-medium transition-colors"
                               onClick={() => handleOpenDelete(project)}
-                              title={language === "th" ? "ลบโครงการ" : "Delete Project"}
+                              title="ลบโครงการ"
                             >
-                              <span className="text-sm">🗑️</span>
+                              🗑️
                             </button>
                           </>
                         )}
@@ -331,14 +331,14 @@ const ProjectTable = ({
                     {canManage && (
                       <>
                         <button
-                          className="w-8 h-8 rounded-full bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-slate-200 flex items-center justify-center text-xs transition-all shadow-sm cursor-pointer"
+                          className="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-300 flex items-center justify-center text-xs transition-colors"
                           onClick={() => handleOpenEdit(project)}
                           title="แก้ไขโครงการ"
                         >
                           ✏️
                         </button>
                         <button
-                          className="w-8 h-8 rounded-full bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-all shadow-sm cursor-pointer"
+                          className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-300 flex items-center justify-center text-xs transition-colors"
                           onClick={() => handleOpenDelete(project)}
                           title="ลบโครงการ"
                         >

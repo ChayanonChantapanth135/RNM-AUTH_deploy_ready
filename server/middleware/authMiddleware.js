@@ -53,9 +53,8 @@ export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     let token = authHeader && authHeader.split(' ')[1];
 
-    // รองรับการดึง token จาก HttpOnly Cookie ด้วย (authToken หรือ token)
-    if (!token && req.cookies) {
-        token = req.cookies.authToken || req.cookies.token;
+    if (!token && req.cookies && req.cookies.userToken) {
+        token = req.cookies.userToken;
     }
 
     if (!token) {
