@@ -65,16 +65,16 @@
 
 #### 📊 ตารางเปรียบเทียบสิทธิ์ผู้ใช้งาน (Role Permission Matrix)
 
-| ความสามารถ / บทบาท | Admin (`admin`) | Manager (`manager`) | Team Leader | Member / Staff |
-| :---------------- | :-------------: | :-----------------: | :---------: | :------------: |
-| จัดการบัญชีผู้ใช้ / กำหนดบทบาท / นำเข้า Excel | ✅ | ❌ | ❌ | ❌ |
-| สร้าง / แก้ไข / ลบ โครงการ | ✅ | ✅ | ❌ | ❌ |
-| สร้างงาน / มอบหมายงานในโครงการ | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ❌ |
-| เปลี่ยนสถานะงานในโครงการ | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ✅ (เฉพาะงานที่ได้รับมอบหมาย) |
-| แนบไฟล์ / คอมเมนต์งานแบบเรียลไทม์ | ✅ | ✅ | ✅ | ✅ |
-| บอร์ดส่วนตัว & ปฏิทิน (Personal Kanban & Calendar) | ✅ | ✅ | ✅ | ✅ |
-| สิทธิ์การดูรายงานสรุป (Reports) | ภาพรวมทั้งระบบ | โครงการในความดูแล | ทีมในโครงการ | สถิติตนเอง |
-| ประวัติกิจกรรมระบบ (System Activity Logs) | ✅ | ❌ | ❌ | ❌ |
+| ความสามารถ / บทบาท                                 | Admin (`admin`) | Manager (`manager`) |      Team Leader      |        Member / Staff         |
+| :------------------------------------------------- | :-------------: | :-----------------: | :-------------------: | :---------------------------: |
+| จัดการบัญชีผู้ใช้ / กำหนดบทบาท / นำเข้า Excel      |       ✅        |         ❌          |          ❌           |              ❌               |
+| สร้าง / แก้ไข / ลบ โครงการ                         |       ✅        |         ✅          |          ❌           |              ❌               |
+| สร้างงาน / มอบหมายงานในโครงการ                     |       ✅        |         ✅          | ✅ (ในโครงการที่ดูแล) |              ❌               |
+| เปลี่ยนสถานะงานในโครงการ                           |       ✅        |         ✅          | ✅ (ในโครงการที่ดูแล) | ✅ (เฉพาะงานที่ได้รับมอบหมาย) |
+| แนบไฟล์ / คอมเมนต์งานแบบเรียลไทม์                  |       ✅        |         ✅          |          ✅           |              ✅               |
+| บอร์ดส่วนตัว & ปฏิทิน (Personal Kanban & Calendar) |       ✅        |         ✅          |          ✅           |              ✅               |
+| สิทธิ์การดูรายงานสรุป (Reports)                    | ภาพรวมทั้งระบบ  |  โครงการในความดูแล  |     ทีมในโครงการ      |          สถิติตนเอง           |
+| ประวัติกิจกรรมระบบ (System Activity Logs)          |       ✅        |         ❌          |          ❌           |              ❌               |
 
 ### 3. การบริหารโครงการ (Project Management)
 
@@ -250,27 +250,25 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 
 สร้างไฟล์ `server/.env` โดยคัดลอกตัวอย่างจาก `server/.env.example`:
 
-| ตัวแปร                  | ตัวอย่างค่า              | คำอธิบาย                                     |
-| :---------------------- | :----------------------- | :------------------------------------------- |
-| `PORT`                  | `3000`                   | พอร์ตของ Backend Server                      |
+| ตัวแปร                  | ตัวอย่างค่า              | คำอธิบาย                                         |
+| :---------------------- | :----------------------- | :----------------------------------------------- |
+| `PORT`                  | `3000`                   | พอร์ตของ Backend Server                          |
 | `DB_HOST`               | `localhost`              | ที่อยู่ของฐานข้อมูล (MySQL หรือ TiDB Cloud Host) |
-| `DB_USER`               | `root`                   | ชื่อผู้ใช้ MySQL / TiDB                      |
-| `DB_PASSWORD`           | `""`                     | รหัสผ่าน MySQL / TiDB                        |
-| `DB_NAME`               | `myapp_db`               | ชื่อฐานข้อมูล                                |
-| `DB_PORT`               | `3306` หรือ `4000`       | พอร์ต MySQL (ค่าเริ่มต้น 3306, TiDB ใช้ 4000) |
-| `DB_SSL`                | `true`                   | เปิดใช้งาน SSL/TLS (จำเป็นสำหรับ TiDB Cloud) |
-| `JWT_KEY`               | `random_secret_string`   | คีย์เข้ารหัส JWT Session Token               |
-| `FRONTEND_URL`          | `http://localhost:5173`  | โดเมนของ Frontend (สำหรับ CORS)              |
-| `BASE_URL`              | `http://localhost:3000`  | โดเมนของ Backend Server                      |
-| `BREVO_API_KEY`         | `xkeysib-...`            | API Key จาก Brevo (แนะนำสำหรับ Railway/Render ฟรี 300 ฉบับ/วัน) |
-| `BREVO_SENDER_EMAIL`    | `your_email@gmail.com`   | อีเมลผู้ส่งผ่าน Brevo                        |
-| `RESEND_API_KEY`        | `re_...`                 | API Key จาก Resend                           |
-| `RESEND_FROM`           | `support@yourdomain.com` | อีเมลผู้ส่งผ่าน Resend (ต้องใช้โดเมนตนเอง)   |
-| `EMAIL_USER`            | `your_email@gmail.com`   | อีเมลสำหรับ SMTP (กรณีใช้ Gmail)             |
-| `EMAIL_PASS`            | `xxxx xxxx xxxx xxxx`    | App Password 16 หลักจาก Google Account       |
-| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name`        | Cloudinary Name สำหรับบันทึกไฟล์ถาวรบนคลาวด์ |
-| `CLOUDINARY_API_KEY`    | `your_api_key`           | Cloudinary API Key                           |
-| `CLOUDINARY_API_SECRET` | `your_api_secret`        | Cloudinary API Secret                        |
+| `DB_USER`               | `root`                   | ชื่อผู้ใช้ MySQL / TiDB                          |
+| `DB_PASSWORD`           | `""`                     | รหัสผ่าน MySQL / TiDB                            |
+| `DB_NAME`               | `myapp_db`               | ชื่อฐานข้อมูล                                    |
+| `DB_PORT`               | `3306` หรือ `4000`       | พอร์ต MySQL (ค่าเริ่มต้น 3306, TiDB ใช้ 4000)    |
+| `DB_SSL`                | `true`                   | เปิดใช้งาน SSL/TLS (จำเป็นสำหรับ TiDB Cloud)     |
+| `JWT_KEY`               | `random_secret_string`   | คีย์เข้ารหัส JWT Session Token                   |
+| `FRONTEND_URL`          | `http://localhost:5173`  | โดเมนของ Frontend (สำหรับ CORS)                  |
+| `BASE_URL`              | `http://localhost:3000`  | โดเมนของ Backend Server                          |
+| `RESEND_API_KEY`        | `re_...`                 | API Key จาก Resend                               |
+| `RESEND_FROM`           | `support@yourdomain.com` | อีเมลผู้ส่งผ่าน Resend (ต้องใช้โดเมนตนเอง)       |
+| `EMAIL_USER`            | `your_email@gmail.com`   | อีเมลสำหรับ SMTP (กรณีใช้ Gmail)                 |
+| `EMAIL_PASS`            | `xxxx xxxx xxxx xxxx`    | App Password 16 หลักจาก Google Account           |
+| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name`        | Cloudinary Name สำหรับบันทึกไฟล์ถาวรบนคลาวด์     |
+| `CLOUDINARY_API_KEY`    | `your_api_key`           | Cloudinary API Key                               |
+| `CLOUDINARY_API_SECRET` | `your_api_secret`        | Cloudinary API Secret                            |
 
 ### 2. ฝั่ง Frontend (`frontend/.env`)
 
@@ -358,7 +356,7 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `PUT`    | `/auth/projects/:id`              |     Token Required      | แก้ไขข้อมูลโครงการ                                    |
 | `DELETE` | `/auth/projects/:id`              |     Token Required      | ลบโครงการพร้อมงานทั้งหมด                              |
 | `POST`   | `/auth/tasks`                     |     Token Required      | สร้างงานใหม่ภายใต้โครงการ                             |
-| `PUT`    | `/auth/tasks/:id`                 |     Token Required      | แก้ไขรายละเอียดงาน                                   |
+| `PUT`    | `/auth/tasks/:id`                 |     Token Required      | แก้ไขรายละเอียดงาน                                    |
 | `PUT`    | `/auth/tasks/:id/status`          |     Token Required      | อัปเดตสถานะงาน (Sync เรียลไทม์ผ่าน WebSockets)        |
 | `DELETE` | `/auth/tasks/:id`                 |     Token Required      | ลบงานออกจากโครงการ                                    |
 | `GET`    | `/auth/tasks/:id/status-history`  |     Token Required      | ดึงประวัติ Timeline การเปลี่ยนสถานะงาน                |
@@ -369,7 +367,7 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `GET`    | `/auth/personal-tasks`            |     Token Required      | ดึงรายการงานส่วนตัวของผู้ใช้งาน                       |
 | `POST`   | `/auth/personal-tasks`            |     Token Required      | สร้างงานส่วนตัวใหม่                                   |
 | `PUT`    | `/auth/personal-tasks/reorder`    |     Token Required      | อัปเดตลำดับและสถานะการลากวางบน Kanban                 |
-| `PUT`    | `/auth/personal-tasks/:id`        |     Token Required      | แก้ไขรายละเอียดงานส่วนตัว                            |
+| `PUT`    | `/auth/personal-tasks/:id`        |     Token Required      | แก้ไขรายละเอียดงานส่วนตัว                             |
 | `DELETE` | `/auth/personal-tasks/:id`        |     Token Required      | ลบงานส่วนตัวออกจากบอร์ดและปฏิทิน                      |
 | `GET`    | `/auth/calendar-events`           |     Token Required      | ดึงข้อมูลกำหนดการสำหรับแสดงผลบน FullCalendar          |
 | `GET`    | `/auth/notifications`             |     Token Required      | ดึงรายการแจ้งเตือน In-App ของตนเอง                    |
@@ -380,7 +378,3 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `GET`    | `/auth/activity-logs`             | Token Required (Admin)  | ดึงบันทึกประวัติกิจกรรมในระบบ                         |
 
 ---
-
-## 📄 License & Maintainers
-
-พัฒนาและดูแลระบบโดยทีมงาน **Enterprise Project & Task Management System (RNM AUTH)**

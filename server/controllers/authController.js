@@ -340,6 +340,15 @@ export const login = async (req, res) => {
         const tokenExpiresInSeconds = 40 * 60;
         const token = jwt.sign({ id: rows[0].id }, jwtSecret, { expiresIn: tokenExpiresIn });
 
+        // ตั้งค่า HttpOnly Cookie สำหรับเพิ่มระดับความปลอดภัย ป้องกัน XSS
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.cookie('userToken', token, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
+            maxAge: tokenExpiresInSeconds * 1000
+        });
+
         // บันทึกเวลาเข้าสู่ระบบล่าสุด (Last Login) และ Activity Log
         await db.query('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?', [rows[0].id]);
         await logActivity(db, rows[0].id, 'Login', `User logged in: ${rows[0].fullname}`);
@@ -387,7 +396,7 @@ export const login = async (req, res) => {
  * ต่ออายุ Token (Refresh JWT Token) เมื่อใกล้หมดอายุ
  */
 export const refresh = async (req, res) => {
-    const { token } = req.body;
+    const token = req.body?.token || req.cookies?.userToken;
     if (!token) return res.status(400).json({ message: 'Token required' });
     try {
         const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'jwt-secret-key-rnm';
@@ -417,6 +426,14 @@ export const refresh = async (req, res) => {
         const tokenExpiresInSeconds = 40 * 60;
         const newToken = jwt.sign({ id: decoded.id }, jwtSecret, { expiresIn: tokenExpiresIn });
         
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.cookie('userToken', newToken, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax',
+            maxAge: tokenExpiresInSeconds * 1000
+        });
+
         return res.status(200).json({
             token: newToken,
             expiresInSeconds: tokenExpiresInSeconds,
@@ -440,6 +457,13 @@ export const refresh = async (req, res) => {
 export const logout = async (req, res) => {
     const { userId } = req.body;
     try {
+        const isProduction = process.env.NODE_ENV === 'production';
+        res.clearCookie('userToken', {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
+        });
+
         const db = await connectToDatabase();
         if (userId) {
             const [userRows] = await db.query('SELECT fullname FROM users WHERE id = ?', [userId]);
@@ -1620,6 +1644,94 @@ async function resolveUniqueTaskTitle(db, projectId, inputTitle, excludeTaskId =
     const nextNum = Math.max(maxNum + 1, 1);
     return `${baseName} (${nextNum})`;
 }
+
+/**
+ * ดึงรายการงานทั้งหมดในระบบ (พร้อมระบบค้นหา กรอง และ Pagination)
+ */
+export const getTasks = async (req, res) => {
+    try {
+        const db = await connectToDatabase();
+        const { search, status, priority, projectId, assignedTo, page, limit, paginated } = req.query;
+
+        let query = `
+            SELECT t.id, t.project_id, t.title, t.status, t.due_date, t.assigned_to, 
+                   t.description, t.task_type, t.priority, t.created_at, t.updated_at,
+                   u.fullname AS assigned_to_name, u.avatar AS assigned_to_avatar,
+                   p.name AS project_name, p.status AS project_status
+            FROM tasks t
+            LEFT JOIN users u ON t.assigned_to = u.id
+            LEFT JOIN projects p ON t.project_id = p.id
+            WHERE t.deleted_at IS NULL
+        `;
+        const params = [];
+
+        if (projectId) {
+            query += ` AND t.project_id = ?`;
+            params.push(projectId);
+        }
+
+        if (assignedTo) {
+            query += ` AND t.assigned_to = ?`;
+            params.push(assignedTo);
+        }
+
+        if (status && status.toLowerCase() !== 'all') {
+            query += ` AND LOWER(t.status) = ?`;
+            params.push(status.toLowerCase());
+        }
+
+        if (priority && priority.toLowerCase() !== 'all') {
+            query += ` AND LOWER(t.priority) = ?`;
+            params.push(priority.toLowerCase());
+        }
+
+        if (search && search.trim()) {
+            query += ` AND (t.title LIKE ? OR t.description LIKE ? OR u.fullname LIKE ? OR p.name LIKE ?)`;
+            const term = `%${search.trim()}%`;
+            params.push(term, term, term, term);
+        }
+
+        const isPaginated = page !== undefined || paginated === 'true';
+
+        if (isPaginated) {
+            const pageNum = Math.max(1, parseInt(page, 10) || 1);
+            const pageSize = Math.max(1, Math.min(100, parseInt(limit, 10) || 20));
+            const offset = (pageNum - 1) * pageSize;
+
+            // นับจำนวนทั้งหมด
+            const countQuery = `SELECT COUNT(*) as total FROM (${query}) AS counted_tasks`;
+            const [countRows] = await db.query(countQuery, params);
+            const total = countRows[0]?.total || 0;
+            const totalPages = Math.ceil(total / pageSize);
+
+            query += ` ORDER BY t.created_at DESC LIMIT ? OFFSET ?`;
+            const [rows] = await db.query(query, [...params, pageSize, offset]);
+
+            return res.status(200).json({
+                data: rows,
+                pagination: {
+                    page: pageNum,
+                    limit: pageSize,
+                    total,
+                    totalPages,
+                    hasMore: pageNum < totalPages
+                }
+            });
+        }
+
+        query += ` ORDER BY t.created_at DESC`;
+        if (limit && !isNaN(limit)) {
+            query += ` LIMIT ?`;
+            params.push(parseInt(limit, 10));
+        }
+
+        const [rows] = await db.query(query, params);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Error fetching tasks:', error.message);
+        res.status(500).json({ message: error.message });
+    }
+};
 
 /**
  * สร้างงานใหม่ในโปรเจกต์ (Task)
@@ -2812,15 +2924,48 @@ export const getActivityLogs = async (req, res) => {
             }
         }
 
-        if (conditions.length > 0) {
-            query += ` WHERE ` + conditions.join(' AND ');
+        const page = req.query.page ? parseInt(req.query.page, 10) : null;
+        const requestedLimit = req.query.limit ? parseInt(req.query.limit, 10) : null;
+        const isPaginated = page !== null || req.query.paginated === 'true';
+
+        let whereClause = conditions.length > 0 ? ` WHERE ` + conditions.join(' AND ') : '';
+
+        if (isPaginated) {
+            const currentPageNum = Math.max(1, page || 1);
+            const pageSize = Math.max(1, Math.min(100, requestedLimit || 20));
+            const offset = (currentPageNum - 1) * pageSize;
+
+            // นับจำนวนทั้งหมดสำหรับ Pagination
+            const countQuery = `
+                SELECT COUNT(*) as total 
+                FROM activity_logs al
+                LEFT JOIN users u ON al.user_id = u.id
+                ${whereClause}
+            `;
+            const [countRows] = await db.query(countQuery, params);
+            const total = countRows[0]?.total || 0;
+            const totalPages = Math.ceil(total / pageSize);
+
+            const pagedQuery = `${query} ${whereClause} ORDER BY al.created_at DESC LIMIT ? OFFSET ?`;
+            const [rows] = await db.query(pagedQuery, [...params, pageSize, offset]);
+
+            return res.status(200).json({
+                data: rows,
+                pagination: {
+                    page: currentPageNum,
+                    limit: pageSize,
+                    total,
+                    totalPages,
+                    hasMore: currentPageNum < totalPages
+                }
+            });
         }
 
-        query += ` ORDER BY al.created_at DESC`;
+        query += whereClause + ` ORDER BY al.created_at DESC`;
 
-        if (limit && !isNaN(limit)) {
+        if (requestedLimit && !isNaN(requestedLimit)) {
             query += ` LIMIT ?`;
-            params.push(limit);
+            params.push(requestedLimit);
         }
 
         const [rows] = await db.query(query, params);

@@ -51,7 +51,8 @@ export const uploadTaskFileMiddleware = multer({
 // Middleware to verify JWT token
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const bearerToken = authHeader && authHeader.split(' ')[1];
+    const token = bearerToken || req.cookies?.userToken;
 
     if (!token) {
         return res.status(401).json({ message: 'Access denied: Token required' });

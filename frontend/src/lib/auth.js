@@ -81,10 +81,9 @@ export const syncCurrentUserProfile = async () => {
  */
 export const renewToken = async () => {
     const token = localStorage.getItem('userToken');
-    if (!token) return false;
     try {
         const axios = (await import('axios')).default;
-        const response = await axios.post(`${API_URL}/auth/refresh`, { token });
+        const response = await axios.post(`${API_URL}/auth/refresh`, { token }, { withCredentials: true });
         const { token: newToken, user, expiresInSeconds } = response.data;
         await signIn({ token: newToken, user, expiresInSeconds });
         return true;
@@ -112,11 +111,9 @@ export const signOut = async () => {
         localStorage.removeItem('userData');
         localStorage.removeItem('userTokenExpiresAt');
 
-        if (userData) {
-            const user = JSON.parse(userData);
-            const axios = (await import('axios')).default;
-            await axios.post(`${API_URL}/auth/logout`, { userId: user.id });
-        }
+        const axios = (await import('axios')).default;
+        const userId = userData ? JSON.parse(userData)?.id : null;
+        await axios.post(`${API_URL}/auth/logout`, { userId }, { withCredentials: true });
     } catch (e) {
         console.error("Logout log failed:", e);
     } finally {

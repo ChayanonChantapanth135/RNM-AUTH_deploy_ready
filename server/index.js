@@ -96,8 +96,11 @@ try {
   // Fallback if compression is optional
 }
 
+import cookieParser from 'cookie-parser';
+
 // ตั้งค่าให้ Express สามารถแปลง body ของ Request ที่เป็น JSON ได้
 app.use(express.json())
+app.use(cookieParser())
 
 // บริการไฟล์ Static ในโฟลเดอร์ uploads (สำหรับเข้าถึงรูปภาพโปรไฟล์ผู้ใช้งาน)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))

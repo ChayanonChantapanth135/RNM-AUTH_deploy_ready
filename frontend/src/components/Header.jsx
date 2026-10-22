@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
 import logoW from "../assets/LogoW.png";
 import logoB from "../assets/LogoB.png";
 import { signOut, getCurrentUser } from "../lib/auth";

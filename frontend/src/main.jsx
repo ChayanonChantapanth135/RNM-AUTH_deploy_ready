@@ -20,6 +20,7 @@ import { API_URL } from './config';
 import { signOut } from './lib/auth';
 
 axios.defaults.baseURL = API_URL;
+axios.defaults.withCredentials = true;
 
 // Request interceptor: แนบ Token อัตโนมัติใน Authorization header
 axios.interceptors.request.use(
