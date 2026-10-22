@@ -672,7 +672,7 @@ export const useUserManagement = (t, language = "en") => {
 
       const now = new Date();
       const dateStr = now.toISOString().split("T")[0];
-      link.setAttribute("download", `user_xport_${dateStr}.xlsx`);
+      link.setAttribute("download", `user_export_${dateStr}.xlsx`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
