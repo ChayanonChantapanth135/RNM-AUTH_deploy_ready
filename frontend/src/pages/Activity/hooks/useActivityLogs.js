@@ -1,55 +1,50 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { getCurrentUser } from "../../../lib/auth";
 
 export const useActivityLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(20);
-  const [hasMore, setHasMore] = useState(false);
-  const [totalServerEntries, setTotalServerEntries] = useState(0);
 
-  const fetchLogs = useCallback(async (isLoadMore = false, pageToFetch = 1) => {
-    if (isLoadMore) {
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const fetchLogs = async (page = 1, append = false) => {
+    if (append) {
       setLoadingMore(true);
     } else {
       setLoading(true);
     }
-
     try {
       const u = await getCurrentUser();
       const params = {
-        page: pageToFetch,
+        page,
         limit: entriesPerPage,
-        paginated: 'true',
       };
       if (u) {
         params.role = u.role;
         params.userId = u.id;
       }
-
       const response = await axios.get("/auth/activity-logs", { params });
       
-      if (response.data && response.data.pagination) {
-        const newItems = response.data.data || [];
-        setTotalServerEntries(response.data.pagination.total);
-        setHasMore(response.data.pagination.hasMore);
+      // ตรวจสอบโครงสร้าง response ว่าเป็นแบบ pagination object หรือ array
+      const receivedLogs = response.data?.data ? response.data.data : (Array.isArray(response.data) ? response.data : []);
+      const pagination = response.data?.pagination;
 
-        if (isLoadMore) {
-          setLogs((prev) => [...prev, ...newItems]);
-        } else {
-          setLogs(newItems);
-        }
+      if (append) {
+        setLogs((prev) => [...prev, ...receivedLogs]);
       } else {
-        // Fallback for non-paginated payload
-        const arrayData = Array.isArray(response.data) ? response.data : (response.data?.data || []);
-        setLogs(arrayData);
-        setTotalServerEntries(arrayData.length);
-        setHasMore(false);
+        setLogs(receivedLogs);
+      }
+
+      if (pagination) {
+        setHasMore(pagination.hasMore);
+      } else {
+        setHasMore(receivedLogs.length === entriesPerPage);
       }
     } catch (error) {
       console.error("Error fetching logs:", error);
@@ -57,19 +52,18 @@ export const useActivityLogs = () => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [entriesPerPage]);
+  };
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    await fetchLogs(nextPage, true);
+  };
 
   useEffect(() => {
-    fetchLogs(false, currentPage);
-  }, [fetchLogs, currentPage]);
-
-  const loadMore = () => {
-    if (!loadingMore && hasMore) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchLogs(true, nextPage);
-    }
-  };
+    fetchLogs(1, false);
+  }, [entriesPerPage]);
 
   const filteredLogs = logs.filter((log) => {
     const matchesSearch =
@@ -98,14 +92,20 @@ export const useActivityLogs = () => {
     return matchesSearch && matchesAction;
   });
 
-  const totalPages = Math.ceil(totalServerEntries / entriesPerPage) || 1;
-  const indexOfFirstEntry = (currentPage - 1) * entriesPerPage;
-  const indexOfLastEntry = Math.min(currentPage * entriesPerPage, totalServerEntries);
+  const indexOfLastEntry = currentPage * entriesPerPage;
+  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
+  const currentEntries = filteredLogs.slice(
+    indexOfFirstEntry,
+    indexOfLastEntry
+  );
+  const totalPages = Math.ceil(filteredLogs.length / entriesPerPage);
 
   return {
     logs,
     loading,
     loadingMore,
+    hasMore,
+    loadMore,
     searchQuery,
     setSearchQuery,
     actionFilter,
@@ -114,14 +114,11 @@ export const useActivityLogs = () => {
     setCurrentPage,
     entriesPerPage,
     setEntriesPerPage,
-    fetchLogs: () => fetchLogs(false, 1),
-    loadMore,
-    hasMore,
+    fetchLogs: () => fetchLogs(1, false),
     filteredLogs,
-    currentEntries: filteredLogs,
+    currentEntries,
     indexOfFirstEntry,
     indexOfLastEntry,
     totalPages,
-    totalEntries: totalServerEntries,
   };
 };

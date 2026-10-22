@@ -950,59 +950,36 @@ html.light .project-badge-pill {
   color: #ffffff !important;
 }
 
-/* ============================================================
-   🎨 UI Framework Harmonization (Bootstrap Modal & Button Overrides)
-   Ensures React-Bootstrap Modals seamlessly inherit theme design tokens
-   without visual clashes against Tailwind CSS.
-   ============================================================ */
+/* ============================================================== */
+/* 🛡️ UI FRAMEWORK OVERLAP HARMONIZATION (Bootstrap & Tailwind)   */
+/* ป้องกันการชนกันของ Bootstrap CSS และ Tailwind โดยรักษาโทนสีเดิม */
+/* ============================================================== */
+
+/* 1. Prevent Bootstrap link & text colors from overriding theme variables */
+a, a:hover, a:focus {
+  text-decoration: none;
+}
+
+/* 2. Harmonize Bootstrap modal containers with existing theme design system */
 .modal-backdrop {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  background-color: rgba(15, 23, 42, 0.75) !important;
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.modal-content {
-  background-color: var(--bg-surface) !important;
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-surface) !important;
-  border-radius: 1.25rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-  overflow: hidden;
+.modal-dialog {
+  color: var(--text-primary);
 }
 
-.modal-header, .modal-footer {
-  border-color: var(--border-surface) !important;
-  background-color: transparent !important;
-}
-
-.modal-header .btn-close {
-  filter: invert(1) grayscale(100%) brightness(200%);
-  opacity: 0.7;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.light .modal-header .btn-close,
-:root.light .modal-header .btn-close {
-  filter: none;
-  opacity: 0.6;
-}
-
-.modal-header .btn-close:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* Form Controls inside Bootstrap Modals inherit theme colors cleanly */
-.modal-content .form-control,
-.modal-content .form-select {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-surface) !important;
-  border-radius: 0.75rem !important;
-}
-
-.modal-content .form-control:focus,
-.modal-content .form-select:focus {
+/* 3. Keep Bootstrap form-controls respecting solid contrast design without color changes */
+.form-control:focus, .form-select:focus {
   border-color: var(--brand-color) !important;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
 }
+
+/* 4. Normalize button resets so Tailwind utility classes always win */
+button:not(.btn) {
+  background-color: transparent;
+  padding: 0;
+  border-width: 0;
+}

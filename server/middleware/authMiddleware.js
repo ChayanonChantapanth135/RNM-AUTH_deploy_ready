@@ -51,8 +51,12 @@ export const uploadTaskFileMiddleware = multer({
 // Middleware to verify JWT token
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const bearerToken = authHeader && authHeader.split(' ')[1];
-    const token = bearerToken || req.cookies?.userToken;
+    let token = authHeader && authHeader.split(' ')[1];
+
+    // รองรับการดึง token จาก HttpOnly Cookie ด้วย (authToken หรือ token)
+    if (!token && req.cookies) {
+        token = req.cookies.authToken || req.cookies.token;
+    }
 
     if (!token) {
         return res.status(401).json({ message: 'Access denied: Token required' });

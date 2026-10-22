@@ -96,7 +96,7 @@ try {
   // Fallback if compression is optional
 }
 
-import cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'
 
 // ตั้งค่าให้ Express สามารถแปลง body ของ Request ที่เป็น JSON ได้
 app.use(express.json())
