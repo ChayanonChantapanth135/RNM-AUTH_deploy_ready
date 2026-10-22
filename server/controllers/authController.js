@@ -902,16 +902,26 @@ export const importUsers = async (req, res) => {
 
         const normalizeDateStr = (dateVal) => {
             if (!dateVal) return null;
+            if (dateVal instanceof Date && !isNaN(dateVal.getTime())) {
+                const y = dateVal.getFullYear();
+                const m = String(dateVal.getMonth() + 1).padStart(2, '0');
+                const d = String(dateVal.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
             const str = String(dateVal).trim();
             if (!str || str === '-' || str.toLowerCase() === 'null') return null;
 
-            // DD/MM/YYYY or DD-MM-YYYY
-            const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-            if (dmyMatch) {
-                const day = dmyMatch[1].padStart(2, '0');
-                const month = dmyMatch[2].padStart(2, '0');
-                const year = dmyMatch[3];
-                return `${year}-${month}-${day}`;
+            // Excel Serial Number (e.g. 45587)
+            if (/^\d{4,5}$/.test(str)) {
+                const serial = parseInt(str, 10);
+                const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+                const target = new Date(excelEpoch.getTime() + serial * 86400000);
+                if (!isNaN(target.getTime())) {
+                    const y = target.getUTCFullYear();
+                    const m = String(target.getUTCMonth() + 1).padStart(2, '0');
+                    const d = String(target.getUTCDate()).padStart(2, '0');
+                    return `${y}-${m}-${d}`;
+                }
             }
 
             // ISO String
@@ -928,9 +938,26 @@ export const importUsers = async (req, res) => {
                 return `${year}-${month}-${day}`;
             }
 
+            // MM/DD/YYYY or DD/MM/YYYY
+            const slashMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (slashMatch) {
+                const num1 = parseInt(slashMatch[1], 10);
+                const num2 = parseInt(slashMatch[2], 10);
+                let year = parseInt(slashMatch[3], 10);
+                if (year > 2400) year -= 543;
+
+                if (num1 > 12 && num2 <= 12) {
+                    return `${year}-${String(num2).padStart(2, '0')}-${String(num1).padStart(2, '0')}`;
+                }
+                return `${year}-${String(num1).padStart(2, '0')}-${String(num2).padStart(2, '0')}`;
+            }
+
             const d = new Date(str);
             if (!isNaN(d.getTime())) {
-                return d.toISOString().split('T')[0];
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
             }
             return null;
         };

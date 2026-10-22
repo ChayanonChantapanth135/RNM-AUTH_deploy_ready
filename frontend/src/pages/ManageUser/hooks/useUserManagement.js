@@ -396,7 +396,7 @@ export const useUserManagement = (t, language = "en") => {
       reader.onload = async (e) => {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
+          const workbook = XLSX.read(data, { type: "array", cellDates: true });
           const firstSheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[firstSheetName];
           const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
@@ -406,11 +406,87 @@ export const useUserManagement = (t, language = "en") => {
             return;
           }
 
+          // Helper to format date object or serial or string to YYYY-MM-DD
+          const formatImportDate = (val) => {
+            if (!val) return "";
+            if (val instanceof Date && !isNaN(val.getTime())) {
+              const y = val.getFullYear();
+              const m = String(val.getMonth() + 1).padStart(2, "0");
+              const d = String(val.getDate()).padStart(2, "0");
+              return `${y}-${m}-${d}`;
+            }
+            const str = String(val).trim();
+            if (!str || str === "-" || str.toLowerCase() === "null") return "";
+
+            // If Excel Serial Number (e.g. 45587)
+            if (/^\d{4,5}$/.test(str)) {
+              const serial = parseInt(str, 10);
+              const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+              const target = new Date(excelEpoch.getTime() + serial * 86400000);
+              if (!isNaN(target.getTime())) {
+                const y = target.getUTCFullYear();
+                const m = String(target.getUTCMonth() + 1).padStart(2, "0");
+                const d = String(target.getUTCDate()).padStart(2, "0");
+                return `${y}-${m}-${d}`;
+              }
+            }
+
+            // ISO string YYYY-MM-DDTHH:mm:ss
+            if (str.includes("T")) {
+              return str.split("T")[0];
+            }
+
+            // YYYY-MM-DD or YYYY/MM/DD
+            const ymdMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            if (ymdMatch) {
+              const year = ymdMatch[1];
+              const month = ymdMatch[2].padStart(2, "0");
+              const day = ymdMatch[3].padStart(2, "0");
+              return `${year}-${month}-${day}`;
+            }
+
+            // Matches MM/DD/YYYY or DD/MM/YYYY or MM-DD-YYYY or DD-MM-YYYY
+            const slashMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (slashMatch) {
+              const num1 = parseInt(slashMatch[1], 10);
+              const num2 = parseInt(slashMatch[2], 10);
+              let year = parseInt(slashMatch[3], 10);
+              if (year > 2400) year -= 543; // Thai Buddhist year adjustment
+
+              // If num1 > 12, it must be DD/MM/YYYY
+              if (num1 > 12 && num2 <= 12) {
+                return `${year}-${String(num2).padStart(2, "0")}-${String(num1).padStart(2, "0")}`;
+              }
+              // If num2 > 12, it must be MM/DD/YYYY (Excel US default)
+              if (num2 > 12 && num1 <= 12) {
+                return `${year}-${String(num1).padStart(2, "0")}-${String(num2).padStart(2, "0")}`;
+              }
+              // If both <= 12, default to MM/DD/YYYY if from US Excel, but preserve common format
+              // Let's standardise: if month/day, parse safely
+              return `${year}-${String(num1).padStart(2, "0")}-${String(num2).padStart(2, "0")}`;
+            }
+
+            const parsed = new Date(str);
+            if (!isNaN(parsed.getTime())) {
+              const y = parsed.getFullYear();
+              const m = String(parsed.getMonth() + 1).padStart(2, "0");
+              const d = String(parsed.getDate()).padStart(2, "0");
+              return `${y}-${m}-${d}`;
+            }
+
+            return str;
+          };
+
           // Map properties to lowercase keys
           const parsedUsers = jsonData.map((row) => {
             const userObj = {};
             Object.entries(row).forEach(([key, val]) => {
-              userObj[key.trim().toLowerCase()] = String(val).trim();
+              const lowerKey = key.trim().toLowerCase();
+              if (lowerKey.includes("start") || lowerKey.includes("expire") || lowerKey.includes("date")) {
+                userObj[lowerKey] = formatImportDate(val);
+              } else {
+                userObj[lowerKey] = String(val).trim();
+              }
             });
             return userObj;
           });
