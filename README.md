@@ -1,5 +1,5 @@
 # Enterprise Project & Task Management System (RNM AUTH)
--
+-.-
 ![Node.js](https://img.shields.io/badge/Node.js-20+-68a063?style=for-the-badge&logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6.x-646cff?style=for-the-badge&logo=vite&logoColor=white)
@@ -280,18 +280,6 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 
 ---
 
-## 🔑 บัญชีผู้ใช้เริ่มต้นสำหรับทดสอบ (Default Credentials)
-
-เมื่อรัน Backend ครั้งแรก ระบบจะสร้างบทบาทเริ่มต้นและบัญชีผู้ดูแลระบบให้อัตโนมัติ:
-
-- **Email**: `admin@example.com`
-- **Password**: `Admin@1234`
-- **Role**: `admin` (ผู้ดูแลระบบสูงสุด)
-
-> [!NOTE]
-> **ระบบรักษาความปลอดภัยของรหัสผ่านแอดมิน**: เมื่อแอดมินเปลี่ยนรหัสผ่านใหม่ในระบบ รหัสผ่านใหม่จะถูกบันทึกไว้อย่างถาวร และระบบจะไม่รีเซ็ตกลับเป็นรหัสผ่านเริ่มต้นเมื่อ Server รีสตาร์ต
-
----
 
 ## 🛡️ สถาปัตยกรรมความปลอดภัยและประสิทธิภาพ (Security & Performance)
 
