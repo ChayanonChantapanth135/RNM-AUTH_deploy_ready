@@ -1013,15 +1013,29 @@ export const importUsers = async (req, res) => {
 
         const newUsersToInsert = [];
 
-        for (const item of users) {
-            const fullname = (item.fullname || item.username || item.name || '').trim();
             const email = (item.email || '').trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                continue;
+            }
+
+            const existing = fullUserByEmail.get(email);
+            const rawFullname = (item.fullname || item.username || item.name || '').trim();
+            // ถ้าไม่ระบุ fullname: ถ้าเป็น user เดิมให้ใช้ชื่อเดิม ถ้าเป็น user ใหม่ให้ใช้ชื่อหน้า @ ของอีเมล
+            const fallbackName = email.split('@')[0].replace(/[._-]/g, ' ');
+            const fullname = rawFullname || (existing ? (existing.fullname || fallbackName) : fallbackName);
+
             const password = (item.password || '').trim();
-            const role = normalizeRole(item.role);
-            const status = (item.status || 'active').trim().toLowerCase() === 'suspended' ? 'suspended' : 'active';
-            const phone = formatPhoneNumber(item.phone || item.phonenumber || item.tel || '');
-            const startDate = normalizeDateStr(item.start_date || item.startdate || item.startDate);
-            const expireDate = normalizeDateStr(item.expire_date || item.expiredate || item.expireDate);
+            const role = normalizeRole(item.role || (existing ? existing.role : 'storyboard'));
+            const status = (item.status || (existing ? existing.status : 'active')).trim().toLowerCase() === 'suspended' ? 'suspended' : 'active';
+            const phone = item.phone || item.phonenumber || item.tel 
+                ? formatPhoneNumber(item.phone || item.phonenumber || item.tel || '') 
+                : (existing ? (existing.phone || '') : '');
+            const startDate = (item.start_date || item.startdate || item.startDate)
+                ? normalizeDateStr(item.start_date || item.startdate || item.startDate)
+                : (existing?.start_date ? normalizeDateStr(existing.start_date) : null);
+            const expireDate = (item.expire_date || item.expiredate || item.expireDate)
+                ? normalizeDateStr(item.expire_date || item.expiredate || item.expireDate)
+                : (existing?.expire_date ? normalizeDateStr(existing.expire_date) : null);
 
             // Resolve leader_id
             const leaderInput = (item.leader_email || item.leader || item.leader_name || item.leader_id || item.leaderId || '').toString().trim();
@@ -1036,12 +1050,6 @@ export const importUsers = async (req, res) => {
                 }
             }
 
-            if (!email || !fullname) {
-                continue;
-            }
-
-            const existing = fullUserByEmail.get(email);
-
             if (existing) {
                 const userIdToUpdate = existing.id;
                 const dbStartDate = existing.start_date ? normalizeDateStr(existing.start_date) : null;
@@ -1050,16 +1058,15 @@ export const importUsers = async (req, res) => {
                 const dbRole = normalizeRole(existing.role);
                 const dbStatus = (existing.status || 'active').trim().toLowerCase() === 'suspended' ? 'suspended' : 'active';
                 const dbLeaderId = existing.leader_id ? Number(existing.leader_id) : null;
-                const targetLeaderId = (leaderId && leaderId !== userIdToUpdate) ? leaderId : (existing.leader_id || null);
 
                 // Smart Diff: Check if anything actually changed
-                const isNameChanged = fullname !== (existing.fullname || '').trim();
+                const isNameChanged = Boolean(rawFullname) && fullname !== (existing.fullname || '').trim();
                 const isRoleChanged = role !== dbRole;
                 const isStatusChanged = status !== dbStatus;
                 const isPhoneChanged = phone !== dbPhone && (phone !== '' || dbPhone !== '');
                 const isStartDateChanged = startDate !== dbStartDate && (startDate !== null || dbStartDate !== null);
                 const isExpireDateChanged = expireDate !== dbExpireDate && (expireDate !== null || dbExpireDate !== null);
-                const isLeaderChanged = leaderId && leaderId !== userIdToUpdate && leaderId !== dbLeaderId;
+                const isLeaderChanged = Boolean(leaderId) && leaderId !== userIdToUpdate && leaderId !== dbLeaderId;
                 const isPasswordChanged = Boolean(password);
 
                 const hasAnyChange =

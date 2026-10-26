@@ -144,16 +144,23 @@ const ImportPreviewModal = ({
   // วิเคราะห์สถานะของแต่ละแถวด้วย Smart Diff
   const analyzedUsers = useMemo(() => {
     return users.map((user, idx) => {
-      const fullname = (
+      const rawFullname = (
         user.fullname ||
         user.name ||
         user.username ||
         ""
       ).trim();
       const email = (user.email || "").toLowerCase().trim();
+      const existing = existingUserMap.get(email);
+      const isExisting = Boolean(existing);
+
+      // ถ้าไม่มี fullname: กรณีมี user เดิมให้ใช้ชื่อเดิม หรือถ้าเป็น user ใหม่ให้ใช้ชื่อหน้า @ ของอีเมล
+      const fallbackName = email ? email.split("@")[0].replace(/[._-]/g, " ") : "";
+      const fullname = rawFullname || (isExisting ? (existing.fullname || existing.name || fallbackName) : fallbackName);
+
       const rawPhone = user.phone || user.phonenumber || user.tel || "";
       const phone = String(rawPhone).trim();
-      const role = normalizeRole(user.role || "storyboard");
+      const role = normalizeRole(user.role || (isExisting ? (existing.rawRole || existing.role) : "storyboard"));
       const leader = (
         user.leader_email ||
         user.leader ||
@@ -175,9 +182,8 @@ const ImportPreviewModal = ({
       );
       const password = (user.password || "").trim();
 
-      const isValid = Boolean(email && fullname);
-      const existing = existingUserMap.get(email);
-      const isExisting = Boolean(existing);
+      // มี email ก็ถือว่า Valid แล้ว (fullname จะ fallback อัตโนมัติ)
+      const isValid = Boolean(email && email.includes("@"));
 
       let importType = "new"; // "new", "changed", "unchanged", "invalid"
       const changedFields = [];
@@ -201,7 +207,7 @@ const ImportPreviewModal = ({
           existing.expireDate || existing.expire_date,
         );
 
-        if (fullname.toLowerCase() !== exName.toLowerCase()) {
+        if (rawFullname && fullname.toLowerCase() !== exName.toLowerCase()) {
           changedFields.push("fullname");
         }
         if (curPhone !== exPhone && (curPhone !== "" || exPhone !== "")) {
