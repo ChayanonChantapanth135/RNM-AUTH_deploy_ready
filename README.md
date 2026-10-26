@@ -1,5 +1,5 @@
-# Enterprise Project & Task Management System (RNM AUTH)
--.-
+# Enterprise Project & Task Management System
+
 ![Node.js](https://img.shields.io/badge/Node.js-20+-68a063?style=for-the-badge&logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-6.x-646cff?style=for-the-badge&logo=vite&logoColor=white)
@@ -279,7 +279,6 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 | `VITE_API_URL` | `http://localhost:3000` | ที่อยู่ของ Backend API (เมื่อขึ้น Production ให้เปลี่ยนเป็น URL ของ Render/Railway) |
 
 ---
-
 
 ## 🛡️ สถาปัตยกรรมความปลอดภัยและประสิทธิภาพ (Security & Performance)
 
