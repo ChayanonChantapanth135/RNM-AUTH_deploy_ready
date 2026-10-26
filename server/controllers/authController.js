@@ -1013,6 +1013,7 @@ export const importUsers = async (req, res) => {
 
         const newUsersToInsert = [];
 
+        for (const item of users) {
             const email = (item.email || '').trim().toLowerCase();
             if (!email || !email.includes('@')) {
                 continue;
