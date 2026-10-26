@@ -29,7 +29,11 @@ const ContractPage = () => {
       await axios.post("/auth/contact", formData);
       Swal.fire({
         icon: "success",
-        title: t("sendMessageSuccess") || (language === "th" ? "ส่งข้อความสำเร็จแล้ว!" : "Message sent successfully!"),
+        title:
+          t("sendMessageSuccess") ||
+          (language === "th"
+            ? "ส่งข้อความสำเร็จแล้ว!"
+            : "Message sent successfully!"),
         timer: 1000,
         showConfirmButton: false,
       });
@@ -38,7 +42,9 @@ const ContractPage = () => {
       console.error("Error sending contact message:", error);
       const msg =
         error.response?.data?.message ||
-        (language === "th" ? "ไม่สามารถส่งข้อความได้ กรุณาลองใหม่อีกครั้ง" : "Failed to send message. Please try again.");
+        (language === "th"
+          ? "ไม่สามารถส่งข้อความได้ กรุณาลองใหม่อีกครั้ง"
+          : "Failed to send message. Please try again.");
       Swal.fire({
         icon: "error",
         title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",
@@ -59,13 +65,13 @@ const ContractPage = () => {
     {
       icon: "📧",
       titleKey: "contactEmailLabel",
-      val: "chayanon.sent@gmail.com / linkzy.1547@gmail.com",
+      val: "chayanon.sent@gmail.com",
       gradient: "from-indigo-500/20 to-purple-500/20",
     },
     {
       icon: "📞",
       titleKey: "contactPhoneLabel",
-      val: "+66 2 123 4567 / +66 81 234 5678",
+      val: "------------------------",
       gradient: "from-emerald-500/20 to-cyan-500/20",
     },
     {
