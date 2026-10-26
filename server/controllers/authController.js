@@ -26,6 +26,29 @@ function getBangkokDateString() {
 }
 
 /**
+ * Cache Map ของ role_name -> role_id เพื่อลดการ query ตาราง roles ซ้ำๆ
+ */
+let roleMapCache = null;
+async function getRoleIdByName(db, roleName) {
+    if (!roleMapCache) {
+        try {
+            const [rows] = await db.query('SELECT id, role_name FROM roles');
+            roleMapCache = new Map();
+            rows.forEach(r => roleMapCache.set(r.role_name.toLowerCase(), r.id));
+        } catch (e) {
+            console.error('Error fetching role map:', e.message);
+        }
+    }
+    const clean = (roleName || '').toLowerCase().trim();
+    if (roleMapCache && roleMapCache.has(clean)) {
+        return roleMapCache.get(clean);
+    }
+    // Fallback ID mappings
+    const fallback = { admin: 1, manager: 2, storyboard: 3, animation: 4, designer: 5, programmer: 6 };
+    return fallback[clean] || 3;
+}
+
+/**
  * Helper ดึง URL ของไฟล์ที่อัปโหลด (รองรับทั้ง Cloudinary URL และ Local Path)
  */
 function getUploadedFileUrl(file) {
@@ -583,12 +606,13 @@ export const createUser = async (req, res) => {
         const parsedLeaderId = leader_id && !isNaN(leader_id) ? Number(leader_id) : null;
         const parsedStartDate = start_date && start_date.trim() !== '' ? start_date.trim() : null;
         const parsedExpireDate = expire_date && expire_date.trim() !== '' ? expire_date.trim() : null;
+        const roleId = await getRoleIdByName(db, sqlRole);
 
         let avatarUrl = req.file ? getUploadedFileUrl(req.file) : null;
 
         const [result] = await db.query(
-            'INSERT INTO users (fullname, email, password, phone, role, status, avatar, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
-            [fullname, email, hashPassword, formattedPhone, sqlRole, sqlStatus, avatarUrl, parsedLeaderId, parsedStartDate, parsedExpireDate]
+            'INSERT INTO users (fullname, email, password, phone, role, role_id, status, avatar, leader_id, start_date, expire_date, is_force_reset) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)',
+            [fullname, email, hashPassword, formattedPhone, sqlRole, roleId, sqlStatus, avatarUrl, parsedLeaderId, parsedStartDate, parsedExpireDate]
         );
 
         // Send welcome email with 6-digit temporary password via emailService asynchronously
@@ -690,8 +714,10 @@ export const updateUser = async (req, res) => {
         else if (normRole === 'designer') sqlRole = 'designer';
         else if (normRole === 'programmer') sqlRole = 'programmer';
 
-        let query = 'UPDATE users SET fullname = ?, email = ?, phone = ?, role = ?, status = ?, leader_id = ?, start_date = ?, expire_date = ?';
-        let params = [fullname, email, formattedPhone, sqlRole, status || 'active', parsedLeaderId, parsedStartDate, parsedExpireDate];
+        const roleId = await getRoleIdByName(db, sqlRole);
+
+        let query = 'UPDATE users SET fullname = ?, email = ?, phone = ?, role = ?, role_id = ?, status = ?, leader_id = ?, start_date = ?, expire_date = ?';
+        let params = [fullname, email, formattedPhone, sqlRole, roleId, status || 'active', parsedLeaderId, parsedStartDate, parsedExpireDate];
 
         if (password) {
             const hashPassword = await bcrypt.hash(password, 10);
@@ -1051,8 +1077,9 @@ export const importUsers = async (req, res) => {
                     continue; // Skip DB update since data is identical!
                 }
 
-                let query = 'UPDATE users SET fullname = ?, role = ?, status = ?, phone = ?, start_date = ?, expire_date = ?';
-                let params = [fullname, role, status, phone, startDate, expireDate];
+                const roleId = await getRoleIdByName(db, role);
+                let query = 'UPDATE users SET fullname = ?, role = ?, role_id = ?, status = ?, phone = ?, start_date = ?, expire_date = ?';
+                let params = [fullname, role, roleId, status, phone, startDate, expireDate];
 
                 if (leaderId && leaderId !== userIdToUpdate) {
                     query += ', leader_id = ?';
@@ -1076,9 +1103,10 @@ export const importUsers = async (req, res) => {
                     ? String(password).trim() 
                     : Math.floor(100000 + Math.random() * 900000).toString();
                 const hashPassword = await bcrypt.hash(finalPassword, 10);
+                const roleId = await getRoleIdByName(db, role);
 
                 newUsersToInsert.push([
-                    fullname, email, hashPassword, role, status, phone, leaderId, startDate, expireDate, 1
+                    fullname, email, hashPassword, role, roleId, status, phone, leaderId, startDate, expireDate, 1
                 ]);
 
                 // เพิ่มเข้าคิวส่งอีเมลต้อนรับ
@@ -1093,7 +1121,7 @@ export const importUsers = async (req, res) => {
         // Batch Insert ผู้ใช้ใหม่ทั้งหมดในคำสั่งเดียว (Single Query Batch)
         if (newUsersToInsert.length > 0) {
             await db.query(
-                'INSERT INTO users (fullname, email, password, role, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES ?',
+                'INSERT INTO users (fullname, email, password, role, role_id, status, phone, leader_id, start_date, expire_date, is_force_reset) VALUES ?',
                 [newUsersToInsert]
             );
             importedCount += newUsersToInsert.length;

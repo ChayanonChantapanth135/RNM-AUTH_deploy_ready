@@ -376,6 +376,22 @@ export const initializeDatabase = async () => {
     for (const q of alterProjectsQueries) {
       try { await connection.query(q) } catch (e) { /* ignore if column or constraint already exists */ }
     }
+
+    // Synchronize role_id with role in users table
+    try {
+      await connection.query(`
+        UPDATE users u
+        JOIN roles r ON (
+          r.role_name = u.role
+          OR (u.role IN ('manager', 'project_manager') AND r.role_name = 'manager')
+        )
+        SET u.role_id = r.id
+        WHERE u.role_id IS NULL OR u.role_id != r.id
+      `)
+      console.log('Synchronized users.role_id with roles successfully.')
+    } catch (syncErr) {
+      console.error('Error synchronizing role_id:', syncErr.message)
+    }
     
     console.log('Database initialized successfully with all 12 tables.')
     await connection.end()
