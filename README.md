@@ -374,7 +374,3 @@ _(หรือเข้าโฟลเดอร์ `server` แล้วสั�
 - **Website**: [chayanonlab.link](https://www.chayanonlab.link/)
 - **GitHub**: [@ChayanonChantapanth135](https://github.com/ChayanonChantapanth135)
 - **Project Repository**: [RNM-AUTH_deploy_ready](https://github.com/ChayanonChantapanth135/RNM-AUTH_deploy_ready)
-
----
-
-<p align="center">Made with ❤️ for Enterprise Collaboration & Productivity</p>
