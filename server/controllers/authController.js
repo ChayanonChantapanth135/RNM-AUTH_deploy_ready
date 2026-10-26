@@ -641,6 +641,8 @@ export const createUser = async (req, res) => {
         });
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
         res.status(201).json({ message: 'User created successfully', id: result.insertId });
     } catch (error) {
         console.error('Error creating user:', error.message);
@@ -771,6 +773,8 @@ export const updateUser = async (req, res) => {
         });
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
         res.status(200).json({ message: 'User updated successfully' });
     } catch (error) {
         console.error('Error updating user:', error.message);
@@ -802,6 +806,8 @@ export const softDeleteUser = async (req, res) => {
         });
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
         res.status(200).json({ message: 'User soft-deleted successfully' });
     } catch (error) {
         console.error('Error soft deleting user:', error.message);
@@ -834,6 +840,8 @@ export const restoreUser = async (req, res) => {
         });
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
         res.status(200).json({ message: 'User restored successfully' });
     } catch (error) {
         console.error('Error restoring user:', error.message);
