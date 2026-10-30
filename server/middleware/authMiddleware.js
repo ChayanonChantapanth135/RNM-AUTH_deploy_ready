@@ -90,3 +90,12 @@ export const otpLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+// Rate limiter for Contact Form (ป้องกันการสแปมส่งข้อความติดต่อ: 5 ครั้งต่อ 1 นาทีต่อ 1 IP)
+export const contactLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 5, // Limit each IP to 5 contact requests per windowMs
+    message: { message: 'มีการส่งข้อความติดต่อบ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});

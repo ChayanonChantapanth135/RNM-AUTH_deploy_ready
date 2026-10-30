@@ -580,6 +580,12 @@ export const createUser = async (req, res) => {
     const { fullname, email, password, phone, role, status, leader_id, start_date, expire_date } = req.body;
     try {
         const db = await connectToDatabase();
+        if (req.userId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (!reqUser[0] || reqUser[0].role !== 'admin') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์สร้างผู้ใช้งาน (เฉพาะ Admin เท่านั้น)' });
+            }
+        }
         const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length > 0) {
             return res.status(409).json({ message: 'User already exists' });
@@ -674,6 +680,11 @@ export const updateUser = async (req, res) => {
             isAdmin = requesterRows[0]?.role === 'admin';
         }
 
+        // ป้องกันผู้ใช้ที่ไม่ใช่ Admin แก้ไขข้อมูลผู้ใช้อื่น
+        if (!isAdmin && String(id) !== String(req.userId)) {
+            return res.status(403).json({ message: 'ไม่มีสิทธิ์แก้ไขข้อมูลของผู้ใช้อื่น' });
+        }
+
         if (password && String(id) === String(requesterId)) {
             if (!currentPassword) {
                 return res.status(400).json({ message: 'กรุณากรอกรหัสผ่านปัจจุบัน' });
@@ -707,19 +718,22 @@ export const updateUser = async (req, res) => {
         const parsedStartDate = start_date !== undefined ? (start_date && String(start_date).trim() !== '' ? String(start_date).trim() : null) : (oldUserRows[0]?.start_date || null);
         const parsedExpireDate = expire_date !== undefined ? (expire_date && String(expire_date).trim() !== '' ? String(expire_date).trim() : null) : (oldUserRows[0]?.expire_date || null);
 
-        let sqlRole = 'storyboard';
-        const normRole = (role || '').trim().toLowerCase();
-        if (normRole === 'admin') sqlRole = 'admin';
-        else if (normRole === 'project manager' || normRole === 'manager' || normRole === 'project_manager') sqlRole = 'manager';
-        else if (normRole === 'storyboard') sqlRole = 'storyboard';
-        else if (normRole === 'animation') sqlRole = 'animation';
-        else if (normRole === 'designer') sqlRole = 'designer';
-        else if (normRole === 'programmer') sqlRole = 'programmer';
+        let sqlRole = oldUserRows[0]?.role || 'storyboard';
+        if (isAdmin && role !== undefined) {
+            const normRole = (role || '').trim().toLowerCase();
+            if (normRole === 'admin') sqlRole = 'admin';
+            else if (normRole === 'project manager' || normRole === 'manager' || normRole === 'project_manager') sqlRole = 'manager';
+            else if (normRole === 'storyboard') sqlRole = 'storyboard';
+            else if (normRole === 'animation') sqlRole = 'animation';
+            else if (normRole === 'designer') sqlRole = 'designer';
+            else if (normRole === 'programmer') sqlRole = 'programmer';
+        }
 
+        const effectiveStatus = isAdmin ? (status || oldStatus || 'active') : (oldStatus || 'active');
         const roleId = await getRoleIdByName(db, sqlRole);
 
         let query = 'UPDATE users SET fullname = ?, email = ?, phone = ?, role = ?, role_id = ?, status = ?, leader_id = ?, start_date = ?, expire_date = ?';
-        let params = [fullname, email, formattedPhone, sqlRole, roleId, status || 'active', parsedLeaderId, parsedStartDate, parsedExpireDate];
+        let params = [fullname, email, formattedPhone, sqlRole, roleId, effectiveStatus, parsedLeaderId, parsedStartDate, parsedExpireDate];
 
         if (password) {
             const hashPassword = await bcrypt.hash(password, 10);
@@ -790,6 +804,12 @@ export const softDeleteUser = async (req, res) => {
     const { creatorId } = req.query;
     try {
         const db = await connectToDatabase();
+        if (req.userId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (!reqUser[0] || reqUser[0].role !== 'admin') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบผู้ใช้งาน (เฉพาะ Admin เท่านั้น)' });
+            }
+        }
         const [userRows] = await db.query('SELECT fullname, email FROM users WHERE id = ? AND deleted_at IS NULL', [id]);
         if (userRows.length === 0) {
             return res.status(404).json({ message: 'User not found or already deleted' });
@@ -823,6 +843,12 @@ export const restoreUser = async (req, res) => {
     const { creatorId } = req.body;
     try {
         const db = await connectToDatabase();
+        if (req.userId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (!reqUser[0] || reqUser[0].role !== 'admin') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์กู้คืนผู้ใช้งาน (เฉพาะ Admin เท่านั้น)' });
+            }
+        }
         const [userRows] = await db.query('SELECT fullname, email FROM users WHERE id = ?', [id]);
         if (userRows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
@@ -857,6 +883,12 @@ export const permanentDeleteUser = async (req, res) => {
     const { creatorId } = req.query;
     try {
         const db = await connectToDatabase();
+        if (req.userId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (!reqUser[0] || reqUser[0].role !== 'admin') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบผู้ใช้งานถาวร (เฉพาะ Admin เท่านั้น)' });
+            }
+        }
         const [userRows] = await db.query('SELECT fullname, email, avatar FROM users WHERE id = ?', [id]);
         if (userRows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
@@ -920,6 +952,12 @@ export const importUsers = async (req, res) => {
 
     try {
         const db = await connectToDatabase();
+        if (req.userId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (!reqUser[0] || reqUser[0].role !== 'admin') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์นำเข้าผู้ใช้งาน (เฉพาะ Admin เท่านั้น)' });
+            }
+        }
         let importedCount = 0;
         let updatedCount = 0;
 
@@ -1402,6 +1440,14 @@ export const createProject = async (req, res) => {
     const { name, endDate, priority, teamLeaderId, createdBy } = req.body;
     try {
         const db = await connectToDatabase();
+        const requesterId = req.userId || (createdBy ? Number(createdBy) : null);
+        if (requesterId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [requesterId]);
+            const reqRole = (reqUser[0]?.role || '').toLowerCase().trim().replace(/\s+/g, '_');
+            if (reqRole !== 'admin' && reqRole !== 'manager' && reqRole !== 'project_manager') {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์สร้างโปรเจกต์ (เฉพาะ Admin หรือ Project Manager เท่านั้น)' });
+            }
+        }
         const [result] = await db.query(
             "INSERT INTO projects (name, status, priority, end_date, created_by) VALUES (?, 'Pending', ?, ?, ?)",
             [name, priority, endDate, createdBy]
@@ -1593,9 +1639,18 @@ export const deleteProject = async (req, res) => {
     const { userId } = req.query;
     try {
         const db = await connectToDatabase();
-        const [projRows] = await db.query('SELECT name FROM projects WHERE id = ? AND deleted_at IS NULL', [id]);
+        const [projRows] = await db.query('SELECT name, created_by FROM projects WHERE id = ? AND deleted_at IS NULL', [id]);
         if (projRows.length === 0) {
             return res.status(404).json({ message: 'Project not found or already deleted' });
+        }
+        const requesterId = req.userId || (userId ? Number(userId) : null);
+        if (requesterId) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [requesterId]);
+            const isAdmin = reqUser[0]?.role === 'admin';
+            const isCreator = Number(projRows[0].created_by) === Number(requesterId);
+            if (!isAdmin && !isCreator) {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบโปรเจกต์นี้ (เฉพาะ Admin หรือผู้สร้างโปรเจกต์เท่านั้น)' });
+            }
         }
         const projName = projRows[0]?.name || id;
 
@@ -1947,11 +2002,24 @@ export const updateTaskStatus = async (req, res) => {
     const { status, userId } = req.body;
     try {
         const db = await connectToDatabase();
-        const [taskRows] = await db.query('SELECT t.title, t.project_id, t.assigned_to, t.status AS current_status, p.name AS project_name FROM tasks t JOIN projects p ON t.project_id = p.id WHERE t.id = ?', [id]);
+        const [taskRows] = await db.query('SELECT t.title, t.project_id, t.assigned_to, t.status AS current_status, p.name AS project_name, p.created_by, ptl.user_id AS team_leader_id FROM tasks t JOIN projects p ON t.project_id = p.id LEFT JOIN project_team_leaders ptl ON p.id = ptl.project_id WHERE t.id = ?', [id]);
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
-        const { title, project_id, project_name, assigned_to, current_status } = taskRows[0];
+        const { title, project_id, project_name, assigned_to, current_status, created_by, team_leader_id } = taskRows[0];
+
+        const requesterId = req.userId || (userId ? Number(userId) : null);
+        if (requesterId && assigned_to) {
+            const [reqUser] = await db.query('SELECT role FROM users WHERE id = ?', [requesterId]);
+            const reqRole = (reqUser[0]?.role || '').toLowerCase().trim().replace(/\s+/g, '_');
+            const isAdmin = reqRole === 'admin';
+            const isManager = reqRole === 'manager' || reqRole === 'project_manager' || Number(created_by) === Number(requesterId);
+            const isTeamLeader = Number(team_leader_id) === Number(requesterId);
+            const isAssignee = Number(assigned_to) === Number(requesterId);
+            if (!isAdmin && !isManager && !isTeamLeader && !isAssignee) {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์เปลี่ยนสถานะงานที่ไม่ได้รับมอบหมาย' });
+            }
+        }
 
         // ตรวจสอบกฎ: 1 คนสามารถมีงาน In Progress ได้ทีละ 1 งานเท่านั้น
         const isTargetInProgress = status && (status.toLowerCase() === 'in progress' || status.toLowerCase() === 'in_progress');
@@ -2837,12 +2905,28 @@ export const getActivityLogs = async (req, res) => {
         const targetUserId = queryUserId || req.userId;
         let role = req.query.role ? req.query.role.toLowerCase().trim().replace(/\s+/g, '_') : null;
 
+        // ตรวจสอบ role ที่แท้จริงของ req.userId จากฐานข้อมูลเพื่อป้องกันการปลอมแปลงสิทธิ์
+        let actualRequesterRole = null;
+        if (req.userId) {
+            const [reqRows] = await db.query('SELECT role FROM users WHERE id = ?', [req.userId]);
+            if (reqRows.length > 0) {
+                actualRequesterRole = (reqRows[0].role || '').toLowerCase().trim().replace(/\s+/g, '_');
+            }
+        }
+
+        // หากผู้เรียกไม่ใช่ Admin และพยายามเรียกดู Activity Logs ทั้งระบบโดยไม่ระบุ userId หรือส่ง role=admin ปลอมมา
+        if (actualRequesterRole && actualRequesterRole !== 'admin') {
+            if (!req.query.userId && !req.query.role) {
+                return res.status(403).json({ message: 'ไม่มีสิทธิ์เข้าถึงประวัติกิจกรรมทั้งระบบ (เฉพาะ Admin เท่านั้น)' });
+            }
+            if (role === 'admin') {
+                role = actualRequesterRole;
+            }
+        }
+
         // หากไม่ได้ส่ง role มา แต่มี targetUserId ให้ลองหา role จากฐานข้อมูล
         if (!role && targetUserId && !queryUserId) {
-            const [userRows] = await db.query('SELECT role FROM users WHERE id = ?', [targetUserId]);
-            if (userRows.length > 0) {
-                role = (userRows[0].role || '').toLowerCase().trim().replace(/\s+/g, '_');
-            }
+            role = actualRequesterRole;
         }
 
         const isAdmin = role === 'admin';

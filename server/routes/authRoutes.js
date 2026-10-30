@@ -1,5 +1,5 @@
 import express from 'express';
-import { upload, uploadTaskFileMiddleware, verifyToken, loginLimiter, otpLimiter } from '../middleware/authMiddleware.js';
+import { upload, uploadTaskFileMiddleware, verifyToken, loginLimiter, otpLimiter, contactLimiter } from '../middleware/authMiddleware.js';
 import * as authCtrl from '../controllers/authController.js';
 import * as notificationCtrl from '../controllers/notificationController.js';
 
@@ -57,7 +57,7 @@ router.get('/activity-logs', verifyToken, authCtrl.getActivityLogs);
 router.post('/send-otp', otpLimiter, authCtrl.sendOtp);
 router.post('/reset-password', authCtrl.resetPassword);
 router.post('/reset-password-first-time', authCtrl.resetPasswordFirstTime);
-router.post('/contact', authCtrl.sendContactMessage);
+router.post('/contact', contactLimiter, authCtrl.sendContactMessage);
 
 // --- NOTIFICATION ROUTES (Protected) ---
 router.get('/notifications', verifyToken, notificationCtrl.getUserNotifications);

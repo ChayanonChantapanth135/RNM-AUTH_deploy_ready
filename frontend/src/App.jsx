@@ -128,7 +128,7 @@ function App() {
             <Route
               path="/Activity"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={["admin"]}>
                   <Activity />
                 </ProtectedRoute>
               }

@@ -24,6 +24,21 @@ const TaskDetailModal = ({
 }) => {
   const { language } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
+  const taskProj = projects.find(
+    (p) => Number(p.id) === Number(selectedTask?.project_id || selectedTask?.projectId)
+  );
+  const userRole = (currentUser?.role || "").toLowerCase().trim().replace(/\s+/g, "_");
+  const isAdmin = userRole === "admin";
+  const isProjectManager =
+    Number(taskProj?.created_by) === Number(currentUser?.id) ||
+    Number(taskProj?.project_manager_id) === Number(currentUser?.id);
+  const isTeamLeader =
+    Number(taskProj?.team_leader_id) === Number(currentUser?.id) ||
+    Number(taskProj?.teamLeaderId) === Number(currentUser?.id);
+  const isAssignee =
+    !selectedTask?.assigned_to ||
+    Number(selectedTask?.assigned_to || selectedTask?.assignedTo) === Number(currentUser?.id);
+  const canUpdateStatus = isAdmin || isProjectManager || isTeamLeader || isAssignee;
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -716,6 +731,7 @@ const TaskDetailModal = ({
               <select
                 className="form-select rounded-lg text-sm py-2 font-semibold"
                 value={tempStatus}
+                disabled={!canUpdateStatus}
                 onChange={(e) => setTempStatus(e.target.value)}
               >
                 <option value="Pending">
@@ -986,13 +1002,15 @@ const TaskDetailModal = ({
                 >
                   {t("cancelBtn") || "Cancel"}
                 </button>
-                <button
-                  type="button"
-                  className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
-                  onClick={handleUpdateStatusOnly}
-                >
-                  {t("updateStatusBtn") || "Update Status"}
-                </button>
+                {canUpdateStatus && (
+                  <button
+                    type="button"
+                    className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
+                    onClick={handleUpdateStatusOnly}
+                  >
+                    {t("updateStatusBtn") || "Update Status"}
+                  </button>
+                )}
               </>
             )}
           </div>

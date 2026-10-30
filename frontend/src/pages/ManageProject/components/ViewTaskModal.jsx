@@ -34,6 +34,10 @@ const ViewTaskModal = ({
     userRole === "admin" ||
     (isManagerRole && isCreatorOfProject) ||
     isTeamLeaderOfProject;
+  const isAssigneeOfTask =
+    !selectedTask?.assigned_to ||
+    Number(selectedTask?.assigned_to || selectedTask?.assignedTo) === Number(currentUser?.id);
+  const canUpdateStatus = canManage || isAssigneeOfTask;
 
   const [comments, setComments] = useState([]);
   const [files, setFiles] = useState([]);
@@ -753,6 +757,7 @@ const ViewTaskModal = ({
               <select
                 className="form-select rounded-lg text-sm py-2"
                 value={tempStatus}
+                disabled={!canUpdateStatus}
                 onChange={(e) => {
                   setTempStatus(e.target.value);
                   setFormData((prev) => ({ ...prev, status: e.target.value }));
@@ -1006,13 +1011,15 @@ const ViewTaskModal = ({
                 >
                   {t("cancelBtn") || "Cancel"}
                 </button>
-                <button
-                  type="button"
-                  className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
-                  onClick={handleSaveTaskDetails}
-                >
-                  {t("updateStatusBtn") || "Update Status"}
-                </button>
+                {canUpdateStatus && (
+                  <button
+                    type="button"
+                    className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md cursor-pointer text-center"
+                    onClick={handleSaveTaskDetails}
+                  >
+                    {t("updateStatusBtn") || "Update Status"}
+                  </button>
+                )}
               </>
             )}
           </div>
