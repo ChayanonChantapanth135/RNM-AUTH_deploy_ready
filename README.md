@@ -12,8 +12,7 @@
 
 ระบบบริหารจัดการโครงการและติดตามภารกิจในองค์กรแบบครบวงจร (Production-Ready Enterprise Solution) พัฒนาด้วยสถาปัตยกรรม **Modern Modular Frontend & High-Performance RESTful Backend** รองรับทั้งฐานข้อมูล **MySQL และ TiDB Cloud Serverless (SSL)** ภายใต้ระบบดีไซน์ **Multi-Accent Theme & Solid Contrast Design System** ที่ทันสมัย ลื่นไหล ปลอดภัย พร้อมระบบคำนวณความคืบหน้าโครงการอัตโนมัติ การจัดการสิทธิ์ผู้ใช้งานตามบทบาท (RBAC) ระบบสุ่มรหัสผ่านชั่วคราว 6 หลักและส่งอีเมลต้อนรับอัตโนมัติ การบังคับเปลี่ยนรหัสผ่านครั้งแรก ปฏิทินกำหนดส่งงานแบบลากวางสองทิศทาง (Bidirectional Drag & Drop) ระบบ Personal Kanban Board ระบบนำเข้าข้อมูลผู้ใช้พร้อมหน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal) ระบบแคชความเร็วสูง (In-Memory Caching) การจัดเก็บไฟล์ขึ้น Cloudinary และระบบแจ้งเตือนงานเกินกำหนดอัตโนมัติผ่านอีเมลและ In-App WebSockets
 
-> 🌐 **Live Website (Frontend)**: [https://www.chayanonlab.link](https://www.chayanonlab.link)  
-> ⚙️ **Production API (Backend)**: `https://rnm-authdeployready-production.up.railway.app`  
+> 🌐 **Live Website (Frontend)**: [https://www.chayanonlab.link](https://www.chayanonlab.link)    
 > 📖 **Deployment Guide**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 
 ---
