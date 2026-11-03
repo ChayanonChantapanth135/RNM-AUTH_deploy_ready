@@ -210,9 +210,6 @@ const ImportPreviewModal = ({
         if (rawFullname && fullname.toLowerCase() !== exName.toLowerCase()) {
           changedFields.push("fullname");
         }
-        if (curPhone !== exPhone && (curPhone !== "" || exPhone !== "")) {
-          changedFields.push("phone");
-        }
         if (role !== exRole) {
           changedFields.push("role");
         }
@@ -298,7 +295,6 @@ const ImportPreviewModal = ({
         searchTerm === "" ||
         u.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.leader.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.role.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -521,9 +517,6 @@ const ImportPreviewModal = ({
                   <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
                     {t("colEmail") || "อีเมล"}
                   </th>
-                  {/* <th className="py-3 px-4 text-left whitespace-nowrap text-slate-600">
-                    {t("modalPhoneLabel") || "เบอร์โทรศัพท์"}
-                  </th> */}
                   <th className="py-3 px-4 text-center whitespace-nowrap text-slate-600">
                     {t("colRole") || "บทบาท"}
                   </th>
@@ -581,20 +574,6 @@ const ImportPreviewModal = ({
                       </td>
                       <td className="py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap">
                         {user.email}
-                      </td>
-                      <td
-                        className={`py-3 px-4 text-left text-slate-600 font-medium whitespace-nowrap ${
-                          isChangedRow && fields.includes("phone")
-                            ? "bg-amber-50/80 font-bold text-amber-900"
-                            : ""
-                        }`}
-                      >
-                        {user.phone}
-                        {isChangedRow && fields.includes("phone") && (
-                          <span className="ml-1 text-[10px] text-amber-700 font-bold">
-                            ✏️
-                          </span>
-                        )}
                       </td>
                       <td
                         className={`py-3 px-4 text-center whitespace-nowrap ${
@@ -811,27 +790,6 @@ const ImportPreviewModal = ({
                         </span>
                       )}
                       {isChangedRow && fields.includes("status") && (
-                        <span className="text-[10px] text-amber-700 font-bold">
-                          ✏️
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Phone */}
-                    <div className="flex items-center gap-1.5 col-span-2">
-                      <span className="text-slate-400 text-[11px] shrink-0">
-                        {t("modalPhoneLabel") || "เบอร์โทร"}:
-                      </span>
-                      <span
-                        className={`text-[11px] text-slate-700 font-medium ${
-                          isChangedRow && fields.includes("phone")
-                            ? "bg-amber-100 text-amber-900 px-1 rounded font-bold"
-                            : ""
-                        }`}
-                      >
-                        {user.phone || "-"}
-                      </span>
-                      {isChangedRow && fields.includes("phone") && (
                         <span className="text-[10px] text-amber-700 font-bold">
                           ✏️
                         </span>
