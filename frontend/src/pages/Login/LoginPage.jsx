@@ -46,11 +46,8 @@ const LoginPage = () => {
       </div>
 
       {/* Main Glassmorphic Login Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 120, damping: 18 }}
-        className="glass-panel w-full max-w-md p-8 md:p-10 rounded-3xl z-10 shadow-2xl relative"
+      <div
+        className="glass-panel w-full max-w-md p-8 md:p-10 rounded-3xl z-10 shadow-2xl relative transition-all"
       >
         {/* Icon Header */}
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-500 p-0.5 mx-auto mb-6 shadow-lg shadow-teal-500/30">
@@ -90,7 +87,7 @@ const LoginPage = () => {
           language={language}
           t={t}
         />
-      </motion.div>
+      </div>
     </div>
   );
 };

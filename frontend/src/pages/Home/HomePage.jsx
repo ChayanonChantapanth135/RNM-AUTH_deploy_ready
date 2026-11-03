@@ -100,7 +100,7 @@ const HomePage = () => {
               </Link>
             ) : (
               <Link
-                to="/Login"
+                to="/login"
                 className="px-10 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-extrabold shadow-xl text-base glow-button no-underline inline-block"
               >
                 {t("getStartedBtn") || "เริ่มต้นสมัครใช้งานฟรี ✨"}

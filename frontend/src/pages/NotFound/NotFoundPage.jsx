@@ -49,7 +49,22 @@ const NotFoundPage = () => {
     { scope: containerRef }
   );
 
-  const isLoggedIn = Boolean(localStorage.getItem("userToken"));
+  const isLoggedIn = (() => {
+    const token = localStorage.getItem("userToken");
+    const userData = localStorage.getItem("userData");
+    const expiresAt = Number(localStorage.getItem("userTokenExpiresAt"));
+    if (!token || !userData) return false;
+    if (expiresAt && Date.now() >= expiresAt) return false;
+    return true;
+  })();
+
+  const handleGoBack = () => {
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate(isLoggedIn ? "/Dashboard" : "/Home", { replace: true });
+    }
+  };
 
   return (
     <div
@@ -137,7 +152,7 @@ const NotFoundPage = () => {
             {/* Go Back button */}
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={handleGoBack}
               className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer shadow-sm hover:scale-102 active:scale-98"
               style={{
                 backgroundColor: "var(--bg-surface-hover)",

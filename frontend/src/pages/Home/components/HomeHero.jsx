@@ -56,7 +56,7 @@ const HomeHero = ({ t, isLoggedIn }) => {
           <>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                to="/Login"
+                to="/login"
                 className="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-bold text-base glow-button no-underline inline-block"
               >
                 {t("getStartedBtn") || "เริ่มต้นใช้งานฟรี ✨"}
