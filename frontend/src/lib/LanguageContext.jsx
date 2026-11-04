@@ -1503,6 +1503,10 @@ const translations = {
       "แจ้งเตือนการส่งอีเมลงานเกินกำหนด",
     "Send Email Failed (Task Overdue to Leader)":
       "ส่งอีเมลแจ้งเตือนงานเกินกำหนดไม่สำเร็จ",
+    "Send Email (Project Overdue to Manager)":
+      "ส่งอีเมลแจ้งเตือนโปรเจกต์เกินกำหนดถึง Project Manager",
+    "Send Email Failed (Project Overdue to Manager)":
+      "ส่งอีเมลแจ้งเตือนโปรเจกต์เกินกำหนดไม่สำเร็จ",
     เข้าสู่ระบบ: "เข้าสู่ระบบ",
     ออกจากระบบ: "ออกจากระบบ",
     สร้างผู้ใช้: "สร้างผู้ใช้ใหม่",

@@ -521,6 +521,109 @@ export async function sendTaskOverdueLeaderEmail({
 }
 
 /**
+ * Send overdue project notification email to Project Manager (Limited to at most 1 email per project per day)
+ */
+export async function sendProjectOverdueManagerEmail({
+  projectId,
+  recipientEmail,
+  recipientName,
+  projectName,
+  teamLeaderName,
+  endDate,
+  priority,
+  status
+}) {
+  if (!recipientEmail) return;
+
+  try {
+    const db = await connectToDatabase();
+
+    // Prevent spamming: Check if overdue email for this project has already been sent to this recipient today
+    if (projectId) {
+      const [alreadySent] = await db.query(
+        `SELECT id FROM activity_logs 
+         WHERE action = 'Send Email (Project Overdue to Manager)' 
+           AND details LIKE ? 
+           AND DATE(created_at) = CURDATE()
+         LIMIT 1`,
+        [`%[ProjectID: ${projectId}]%${recipientEmail}%`]
+      );
+
+      if (alreadySent && alreadySent.length > 0) {
+        console.log(`[Email Throttled] Overdue email for project "${projectName}" (ProjectID: ${projectId}) already sent to ${recipientEmail} today. Skipped.`);
+        return;
+      }
+    }
+
+    await sendMailUniversal({
+      to: recipientEmail,
+      fromName: 'Project Management System',
+      subject: `[URGENT] Project Overdue: "${projectName}"`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
+          <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">🚨 Project Overdue Alert</h2>
+            <p style="color: #fecaca; font-size: 13px; margin-top: 6px;">Notification for Project Manager</p>
+          </div>
+
+          <p style="color: #334155; font-size: 15px;">Dear <b>${recipientName || 'Project Manager'}</b>,</p>
+          <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+            The system has detected that project <b>"${projectName}"</b> is incomplete and has passed its scheduled end date. Details are as follows:
+          </p>
+
+          <div style="background-color: #ffffff; padding: 18px; border-radius: 12px; border-left: 4px solid #dc2626; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #334155;">
+              <tr>
+                <td style="padding: 6px 0; font-weight: bold; width: 140px;">Project Name:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: bold;">${projectName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-weight: bold;">Team Leader:</td>
+                <td style="padding: 6px 0; color: #0284c7; font-weight: bold;">${teamLeaderName || '-'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-weight: bold;">Current Status:</td>
+                <td style="padding: 6px 0;"><span style="background-color: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${status || 'In Progress'}</span></td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-weight: bold;">Priority:</td>
+                <td style="padding: 6px 0;"><span style="background-color: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">${priority || 'Medium'}</span></td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; font-weight: bold;">End Date:</td>
+                <td style="padding: 6px 0; color: #dc2626; font-weight: bold;">${formatDateEn(endDate)}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="text-align: center; margin: 24px 0 16px 0;">
+            <a href="${(process.env.APP_URL || 'https://www.chayanonlab.link').replace(/\/$/, '')}/Projects" style="background-color: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
+              🔗 View Project
+            </a>
+          </div>
+          
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+          <p style="font-size: 11px; color: #94a3b8; text-align: center;">This is an automated email notification from Project Management System.</p>
+        </div>
+      `
+    });
+
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email (Project Overdue to Manager)',
+      details: `Sent overdue project alert to manager ${recipientEmail} for project "${projectName}" [ProjectID: ${projectId || 'N/A'}]`
+    });
+  } catch (error) {
+    console.error(`[Email Error] Failed to send overdue project email to ${recipientEmail}:`, error.message);
+    await logEmailActivity({
+      recipientEmail,
+      action: 'Send Email Failed (Project Overdue to Manager)',
+      details: `Failed to send overdue project email to ${recipientEmail}: ${error.message}`
+    });
+  }
+}
+
+/**
  * Send contact form message to Admin and auto-reply confirmation to sender
  */
 export async function sendContactFormEmail({ fullName, email, subject, message }) {

@@ -1,6 +1,6 @@
 import { connectToDatabase } from '../lib/db.js';
 import { emitNotificationToUser, emitTaskEvent } from '../lib/socket.js';
-import { sendTaskOverdueLeaderEmail } from './emailService.js';
+import { sendTaskOverdueLeaderEmail, sendProjectOverdueManagerEmail } from './emailService.js';
 
 /**
  * Format date string into YYYY-MM-DD
@@ -126,10 +126,27 @@ export async function checkOverdueTasksAndNotifyLeaders() {
           created_at: new Date().toISOString()
         };
 
-        // Real-time notification via Socket.io
+        // Realtime notification via Socket.io
         emitNotificationToUser(targetLeaderId, notifPayload);
 
         notifiedCount++;
+
+        // Send Email to the leader ONLY when a new daily notification is created (max 1 per task per day)
+        if (leaderEmail) {
+          sendTaskOverdueLeaderEmail({
+            taskId: task.task_id,
+            recipientEmail: leaderEmail,
+            recipientName: leaderName,
+            assigneeName: task.assignee_name,
+            taskTitle: task.task_title,
+            projectName: task.project_name,
+            dueDate: task.due_date,
+            priority: task.task_priority,
+            status: task.task_status
+          }).catch(err => {
+            console.error('[Task Scheduler Email Error]', err.message);
+          });
+        }
       }
 
       // Real-time task overdue event
@@ -139,30 +156,118 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         assigneeId: task.assignee_id,
         dueDate: task.due_date,
       });
-
-      // Send Email to the leader (asynchronously) - Automatically throttled to max 1 email per task per day
-      if (leaderEmail) {
-        sendTaskOverdueLeaderEmail({
-          taskId: task.task_id,
-          recipientEmail: leaderEmail,
-          recipientName: leaderName,
-          assigneeName: task.assignee_name,
-          taskTitle: task.task_title,
-          projectName: task.project_name,
-          dueDate: task.due_date,
-          priority: task.task_priority,
-          status: task.task_status
-        }).catch(err => {
-          console.error('[Task Scheduler Email Error]', err.message);
-        });
-      }
     }
 
     if (notifiedCount > 0) {
       console.log(`[Task Scheduler] Checked ${tasks.length} overdue tasks. Sent ${notifiedCount} notifications to leaders.`);
     }
 
-    return { checkedCount: tasks.length, notifiedCount };
+    // =========================================================================
+    // 2. Check for overdue, uncompleted projects and notify Project Manager (created_by)
+    // =========================================================================
+    const [overdueProjects] = await db.query(`
+      SELECT 
+        p.id AS project_id,
+        p.name AS project_name,
+        p.status AS project_status,
+        p.priority AS project_priority,
+        p.end_date,
+        p.created_by,
+        u_pm.id AS pm_id,
+        u_pm.fullname AS pm_name,
+        u_pm.email AS pm_email,
+        GROUP_CONCAT(DISTINCT u_tl.fullname SEPARATOR ', ') AS team_leader_names
+      FROM projects p
+      LEFT JOIN users u_pm ON p.created_by = u_pm.id AND u_pm.deleted_at IS NULL
+      LEFT JOIN project_team_leaders ptl ON p.id = ptl.project_id
+      LEFT JOIN users u_tl ON ptl.user_id = u_tl.id AND u_tl.deleted_at IS NULL
+      WHERE p.deleted_at IS NULL
+        AND p.status != 'Completed'
+        AND p.end_date IS NOT NULL
+        AND p.end_date < CURDATE()
+      GROUP BY p.id
+    `);
+
+    let projectNotifiedCount = 0;
+
+    for (const proj of overdueProjects) {
+      const targetManagers = new Map(); // userId -> { email, name }
+
+      if (proj.pm_id && proj.pm_email) {
+        targetManagers.set(Number(proj.pm_id), {
+          email: proj.pm_email,
+          name: proj.pm_name,
+        });
+      } else {
+        // Fallback: notify active users with role 'manager'
+        const [managers] = await db.query(
+          `SELECT id, fullname, email FROM users WHERE role = 'manager' AND status = 'active' AND deleted_at IS NULL`
+        );
+        for (const m of managers) {
+          if (m.email) {
+            targetManagers.set(Number(m.id), { email: m.email, name: m.fullname });
+          }
+        }
+      }
+
+      if (targetManagers.size === 0) continue;
+
+      const formattedEnd = formatDate(proj.end_date);
+      const projTitle = 'แจ้งเตือนโปรเจกต์เกินกำหนดส่ง (Project Overdue)';
+      const projMessage = `โปรเจกต์ "${proj.project_name}" ยังไม่เสร็จสิ้นและเลยวันกำหนดส่งแล้ว (กำหนดส่ง: ${formattedEnd})`;
+      const projLink = `/Projects?projectId=${proj.project_id}`;
+      const projNotifType = 'project_overdue';
+
+      for (const [managerId, managerInfo] of targetManagers.entries()) {
+        const [existingProjNotif] = await db.query(
+          `SELECT id FROM notifications 
+           WHERE user_id = ? AND type = ? AND message = ? AND DATE(created_at) = CURDATE()
+           LIMIT 1`,
+          [managerId, projNotifType, projMessage]
+        );
+
+        if (existingProjNotif.length === 0) {
+          const [insertProjRes] = await db.query(
+            `INSERT INTO notifications (user_id, title, message, type, link, is_read, read_status)
+             VALUES (?, ?, ?, ?, ?, 0, 0)`,
+            [managerId, projTitle, projMessage, projNotifType, projLink]
+          );
+
+          emitNotificationToUser(managerId, {
+            id: insertProjRes.insertId,
+            user_id: managerId,
+            project_id: proj.project_id,
+            title: projTitle,
+            message: projMessage,
+            type: projNotifType,
+            link: projLink,
+            created_at: new Date().toISOString(),
+          });
+
+          projectNotifiedCount++;
+
+          // Send Overdue Project Email to Project Manager ONLY when a new daily notification is created
+          sendProjectOverdueManagerEmail({
+            projectId: proj.project_id,
+            recipientEmail: managerInfo.email,
+            recipientName: managerInfo.name,
+            projectName: proj.project_name,
+            teamLeaderName: proj.team_leader_names || '-',
+            endDate: proj.end_date,
+            priority: proj.project_priority,
+            status: proj.project_status,
+          }).catch((err) => {
+            console.error('[Project Scheduler Email Error]', err.message);
+          });
+        }
+      }
+    }
+
+    if (projectNotifiedCount > 0) {
+      console.log(`[Task Scheduler] Checked ${overdueProjects.length} overdue projects. Sent ${projectNotifiedCount} notifications to Project Managers.`);
+    }
+
+    return { checkedCount: tasks.length, notifiedCount: notifiedCount + projectNotifiedCount };
   } catch (error) {
     console.error('[Task Scheduler Error]', error.message);
     return { checkedCount: 0, notifiedCount: 0, error: error.message };
@@ -170,20 +275,20 @@ export async function checkOverdueTasksAndNotifyLeaders() {
 }
 
 /**
- * Start the recurring task scheduler
+ * Start the recurring task scheduler (Runs once a day to conserve DB & Resend email quota)
  */
 export function startTaskScheduler() {
-  console.log('[Task Scheduler] Starting task scheduler service for overdue tasks...');
+  console.log('[Task Scheduler] Starting daily scheduler service for overdue tasks & projects...');
 
-  // Initial check 6 seconds after server startup
+  // Initial check 10 seconds after server startup
   setTimeout(() => {
     checkOverdueTasksAndNotifyLeaders().catch(err => {
       console.error('[Task Scheduler Initial Run Error]', err.message);
     });
-  }, 6000);
+  }, 10000);
 
-  // Check periodically every 1 hour (3600000 ms)
-  const INTERVAL_MS = 60 * 60 * 1000;
+  // Check periodically once every 24 hours (86,400,000 ms)
+  const INTERVAL_MS = 24 * 60 * 60 * 1000;
   setInterval(() => {
     checkOverdueTasksAndNotifyLeaders().catch(err => {
       console.error('[Task Scheduler Recurring Run Error]', err.message);
