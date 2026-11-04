@@ -36,6 +36,9 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         p.id AS project_id,
         p.name AS project_name,
         p.created_by AS project_creator,
+        u_pm.id AS pm_id,
+        u_pm.fullname AS pm_name,
+        u_pm.email AS pm_email,
         u_assignee.id AS assignee_id,
         u_assignee.fullname AS assignee_name,
         u_assignee.email AS assignee_email,
@@ -45,6 +48,7 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         u_leader.email AS leader_email
       FROM tasks t
       JOIN projects p ON t.project_id = p.id AND p.deleted_at IS NULL
+      LEFT JOIN users u_pm ON p.created_by = u_pm.id AND u_pm.deleted_at IS NULL
       JOIN users u_assignee ON t.assigned_to = u_assignee.id AND u_assignee.deleted_at IS NULL
       LEFT JOIN users u_leader ON u_assignee.leader_id = u_leader.id AND u_leader.deleted_at IS NULL
       WHERE t.deleted_at IS NULL
@@ -56,34 +60,40 @@ export async function checkOverdueTasksAndNotifyLeaders() {
     let notifiedCount = 0;
 
     for (const task of tasks) {
-      const targetLeaderIds = new Set();
-      let leaderEmail = null;
-      let leaderName = null;
+      const targetRecipients = new Map(); // userId -> { email, name }
 
       // 1. Direct leader of the assignee
-      if (task.leader_id) {
-        targetLeaderIds.add(Number(task.leader_id));
-        leaderEmail = task.leader_email;
-        leaderName = task.leader_name;
+      if (task.leader_id && task.leader_email) {
+        targetRecipients.set(Number(task.leader_id), {
+          email: task.leader_email,
+          name: task.leader_name,
+        });
       }
 
-      // 2. If no direct leader set on the user, fallback to Project Team Leaders
-      if (targetLeaderIds.size === 0) {
-        const [ptlRows] = await db.query(
-          'SELECT ptl.user_id, u.fullname, u.email FROM project_team_leaders ptl JOIN users u ON ptl.user_id = u.id WHERE ptl.project_id = ? AND u.deleted_at IS NULL',
-          [task.project_id]
-        );
-        for (const row of ptlRows) {
-          targetLeaderIds.add(Number(row.user_id));
-          if (!leaderEmail) {
-            leaderEmail = row.email;
-            leaderName = row.fullname;
-          }
+      // 2. Project Team Leaders
+      const [ptlRows] = await db.query(
+        'SELECT ptl.user_id, u.fullname, u.email FROM project_team_leaders ptl JOIN users u ON ptl.user_id = u.id WHERE ptl.project_id = ? AND u.deleted_at IS NULL',
+        [task.project_id]
+      );
+      for (const row of ptlRows) {
+        if (row.email) {
+          targetRecipients.set(Number(row.user_id), {
+            email: row.email,
+            name: row.fullname,
+          });
         }
       }
 
-      // If still no leader found, continue
-      if (targetLeaderIds.size === 0) {
+      // 3. Project Manager (Project Creator)
+      if (task.pm_id && task.pm_email) {
+        targetRecipients.set(Number(task.pm_id), {
+          email: task.pm_email,
+          name: task.pm_name,
+        });
+      }
+
+      // If no leader/manager found at all, continue
+      if (targetRecipients.size === 0) {
         continue;
       }
 
@@ -93,8 +103,8 @@ export async function checkOverdueTasksAndNotifyLeaders() {
       const link = null;
       const notifType = 'task_overdue';
 
-      for (const targetLeaderId of targetLeaderIds) {
-        // Prevent duplicate notification to the same leader for this task on the same day
+      for (const [targetLeaderId, recipientInfo] of targetRecipients.entries()) {
+        // Prevent duplicate notification to the same leader/manager for this task on the same day
         const [existing] = await db.query(
           `SELECT id FROM notifications 
            WHERE user_id = ? AND task_id = ? AND type = ? AND DATE(created_at) = CURDATE()
@@ -131,12 +141,12 @@ export async function checkOverdueTasksAndNotifyLeaders() {
 
         notifiedCount++;
 
-        // Send Email to the leader ONLY when a new daily notification is created (max 1 per task per day)
-        if (leaderEmail) {
+        // Send Email to the leader / Project Manager ONLY when a new daily notification is created (max 1 per task per day)
+        if (recipientInfo.email) {
           sendTaskOverdueLeaderEmail({
             taskId: task.task_id,
-            recipientEmail: leaderEmail,
-            recipientName: leaderName,
+            recipientEmail: recipientInfo.email,
+            recipientName: recipientInfo.name,
             assigneeName: task.assignee_name,
             taskTitle: task.task_title,
             projectName: task.project_name,
@@ -173,9 +183,9 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         p.priority AS project_priority,
         p.end_date,
         p.created_by,
-        u_pm.id AS pm_id,
-        u_pm.fullname AS pm_name,
-        u_pm.email AS pm_email,
+        MAX(u_pm.id) AS pm_id,
+        MAX(u_pm.fullname) AS pm_name,
+        MAX(u_pm.email) AS pm_email,
         GROUP_CONCAT(DISTINCT u_tl.fullname SEPARATOR ', ') AS team_leader_names
       FROM projects p
       LEFT JOIN users u_pm ON p.created_by = u_pm.id AND u_pm.deleted_at IS NULL
@@ -185,7 +195,7 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         AND p.status != 'Completed'
         AND p.end_date IS NOT NULL
         AND p.end_date < CURDATE()
-      GROUP BY p.id
+      GROUP BY p.id, p.name, p.status, p.priority, p.end_date, p.created_by
     `);
 
     let projectNotifiedCount = 0;
