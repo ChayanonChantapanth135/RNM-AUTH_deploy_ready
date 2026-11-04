@@ -36,9 +36,6 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         p.id AS project_id,
         p.name AS project_name,
         p.created_by AS project_creator,
-        u_pm.id AS pm_id,
-        u_pm.fullname AS pm_name,
-        u_pm.email AS pm_email,
         u_assignee.id AS assignee_id,
         u_assignee.fullname AS assignee_name,
         u_assignee.email AS assignee_email,
@@ -48,7 +45,6 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         u_leader.email AS leader_email
       FROM tasks t
       JOIN projects p ON t.project_id = p.id AND p.deleted_at IS NULL
-      LEFT JOIN users u_pm ON p.created_by = u_pm.id AND u_pm.deleted_at IS NULL
       JOIN users u_assignee ON t.assigned_to = u_assignee.id AND u_assignee.deleted_at IS NULL
       LEFT JOIN users u_leader ON u_assignee.leader_id = u_leader.id AND u_leader.deleted_at IS NULL
       WHERE t.deleted_at IS NULL
@@ -60,13 +56,14 @@ export async function checkOverdueTasksAndNotifyLeaders() {
     let notifiedCount = 0;
 
     for (const task of tasks) {
-      const targetRecipients = new Map(); // userId -> { email, name }
+      const targetRecipients = new Map(); // userId -> { email, name, isAssignee }
 
       // 1. Direct leader of the assignee
       if (task.leader_id && task.leader_email) {
         targetRecipients.set(Number(task.leader_id), {
           email: task.leader_email,
           name: task.leader_name,
+          isAssignee: false,
         });
       }
 
@@ -80,36 +77,41 @@ export async function checkOverdueTasksAndNotifyLeaders() {
           targetRecipients.set(Number(row.user_id), {
             email: row.email,
             name: row.fullname,
+            isAssignee: false,
           });
         }
       }
 
-      // 3. Project Manager (Project Creator)
-      if (task.pm_id && task.pm_email) {
-        targetRecipients.set(Number(task.pm_id), {
-          email: task.pm_email,
-          name: task.pm_name,
+      // 3. The assigned user (Assignee) themselves
+      if (task.assignee_id && task.assignee_email) {
+        targetRecipients.set(Number(task.assignee_id), {
+          email: task.assignee_email,
+          name: task.assignee_name,
+          isAssignee: true,
         });
       }
 
-      // If no leader/manager found at all, continue
+      // If no recipient found at all, continue
       if (targetRecipients.size === 0) {
         continue;
       }
 
       const formattedDue = formatDate(task.due_date);
       const title = 'แจ้งเตือนงานเกินกำหนดส่ง (Overdue)';
-      const message = `งาน "${task.task_title}" ของ ${task.assignee_name} ในโปรเจกต์ "${task.project_name}" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: ${formattedDue})`;
       const link = null;
       const notifType = 'task_overdue';
 
-      for (const [targetLeaderId, recipientInfo] of targetRecipients.entries()) {
-        // Prevent duplicate notification to the same leader/manager for this task on the same day
+      for (const [targetUserId, recipientInfo] of targetRecipients.entries()) {
+        const message = recipientInfo.isAssignee
+          ? `งาน "${task.task_title}" ของคุณในโปรเจกต์ "${task.project_name}" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: ${formattedDue})`
+          : `งาน "${task.task_title}" ของ ${task.assignee_name} ในโปรเจกต์ "${task.project_name}" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: ${formattedDue})`;
+
+        // Prevent duplicate notification to the same user/leader for this task on the same day
         const [existing] = await db.query(
           `SELECT id FROM notifications 
            WHERE user_id = ? AND task_id = ? AND type = ? AND DATE(created_at) = CURDATE()
            LIMIT 1`,
-          [targetLeaderId, task.task_id, notifType]
+          [targetUserId, task.task_id, notifType]
         );
 
         if (existing.length > 0) {
@@ -121,12 +123,12 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         const [insertRes] = await db.query(
           `INSERT INTO notifications (user_id, task_id, title, message, type, link, is_read, read_status)
            VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
-          [targetLeaderId, task.task_id, title, message, notifType, link]
+          [targetUserId, task.task_id, title, message, notifType, link]
         );
 
         const notifPayload = {
           id: insertRes.insertId,
-          user_id: targetLeaderId,
+          user_id: targetUserId,
           task_id: task.task_id,
           project_id: task.project_id,
           title,
@@ -137,11 +139,11 @@ export async function checkOverdueTasksAndNotifyLeaders() {
         };
 
         // Realtime notification via Socket.io
-        emitNotificationToUser(targetLeaderId, notifPayload);
+        emitNotificationToUser(targetUserId, notifPayload);
 
         notifiedCount++;
 
-        // Send Email to the leader / Project Manager ONLY when a new daily notification is created (max 1 per task per day)
+        // Send Email to the leader & assignee ONLY when a new daily notification is created (max 1 per task per day)
         if (recipientInfo.email) {
           sendTaskOverdueLeaderEmail({
             taskId: task.task_id,
@@ -152,7 +154,8 @@ export async function checkOverdueTasksAndNotifyLeaders() {
             projectName: task.project_name,
             dueDate: task.due_date,
             priority: task.task_priority,
-            status: task.task_status
+            status: task.task_status,
+            isAssignee: recipientInfo.isAssignee
           }).catch(err => {
             console.error('[Task Scheduler Email Error]', err.message);
           });

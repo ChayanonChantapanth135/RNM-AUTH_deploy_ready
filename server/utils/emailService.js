@@ -419,7 +419,7 @@ export async function sendOtpEmail({ recipientEmail, recipientName, otpCode }) {
 }
 
 /**
- * Send overdue task notification email to assignee's Leader (Limited to at most 1 email per task per leader per day)
+ * Send overdue task notification email to assignee's Leader or Assignee (Limited to at most 1 email per task per recipient per day)
  */
 export async function sendTaskOverdueLeaderEmail({
   taskId,
@@ -430,7 +430,8 @@ export async function sendTaskOverdueLeaderEmail({
   projectName,
   dueDate,
   priority,
-  status
+  status,
+  isAssignee = false
 }) {
   if (!recipientEmail) return;
 
@@ -454,6 +455,11 @@ export async function sendTaskOverdueLeaderEmail({
       }
     }
 
+    const subtitleText = isAssignee ? 'Notification for Assigned Member' : 'Notification for Team Leader';
+    const bodyText = isAssignee
+      ? `The system has detected that your assigned task <b>"${taskTitle}"</b> in project <b>"${projectName || '-'}"</b> is incomplete and has passed its deadline. Details are as follows:`
+      : `The system has detected that an assigned task for <b>${assigneeName || 'Team Member'}</b> in your project is incomplete and has passed its deadline. Details are as follows:`;
+
     await sendMailUniversal({
       to: recipientEmail,
       fromName: 'Project Management System',
@@ -462,12 +468,12 @@ export async function sendTaskOverdueLeaderEmail({
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div style="background: linear-gradient(135deg, #dc2626, #b91c1c); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
             <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Task Overdue Alert</h2>
-            <p style="color: #fecaca; font-size: 13px; margin-top: 6px;">Notification for Team Leader</p>
+            <p style="color: #fecaca; font-size: 13px; margin-top: 6px;">${subtitleText}</p>
           </div>
 
-          <p style="color: #334155; font-size: 15px;">Dear <b>${recipientName || 'Team Leader'}</b>,</p>
+          <p style="color: #334155; font-size: 15px;">Dear <b>${recipientName || 'Team Member'}</b>,</p>
           <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-            The system has detected that an assigned task for <b>${assigneeName || 'Team Member'}</b> in your project is incomplete and has passed its deadline. Details are as follows:
+            ${bodyText}
           </p>
 
           <div style="background-color: #ffffff; padding: 18px; border-radius: 12px; border-left: 4px solid #dc2626; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -562,7 +568,7 @@ export async function sendProjectOverdueManagerEmail({
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">🚨 Project Overdue Alert</h2>
+            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">Project Overdue Alert</h2>
             <p style="color: #fecaca; font-size: 13px; margin-top: 6px;">Notification for Project Manager</p>
           </div>
 
@@ -598,7 +604,7 @@ export async function sendProjectOverdueManagerEmail({
 
           <div style="text-align: center; margin: 24px 0 16px 0;">
             <a href="${(process.env.APP_URL || 'https://www.chayanonlab.link').replace(/\/$/, '')}/Projects" style="background-color: #dc2626; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);">
-              🔗 View Project
+              View Project
             </a>
           </div>
           
