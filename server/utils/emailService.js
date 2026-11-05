@@ -245,7 +245,7 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div style="background: linear-gradient(135deg, #0d9488, #14b8a6); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">📋 New Task Created</h2>
+            <h2 style="color: #ffffff; margin: 0; font-size: 20px;">New Task Created</h2>
             <p style="color: #ccfbf1; font-size: 13px; margin-top: 6px;">New Task Notification for ${roleLabel || 'Member'}</p>
           </div>
 
@@ -286,7 +286,7 @@ export async function sendTaskCreationEmail({ recipientEmail, recipientName, tas
 
           <div style="text-align: center; margin: 24px 0 16px 0;">
             <a href="${(process.env.APP_URL || 'https://www.chayanonlab.link').replace(/\/$/, '')}/MyTasks" style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 2px 4px rgba(13, 148, 136, 0.3);">
-              📋 Go to My Tasks
+              Go to My Tasks
             </a>
           </div>
 
@@ -653,7 +653,7 @@ export async function sendContactFormEmail({ fullName, email, subject, message }
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div style="background: linear-gradient(135deg, #0f172a, #334155); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
-            <h2 style="color: #38bdf8; margin: 0; font-size: 20px;">✉️ New Contact Message</h2>
+            <h2 style="color: #38bdf8; margin: 0; font-size: 20px;">New Contact Message</h2>
             <p style="color: #94a3b8; font-size: 13px; margin-top: 6px;">Received via website contact form</p>
           </div>
 
