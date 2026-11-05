@@ -92,6 +92,14 @@ const translations = {
     notifProjectReviewingMsg: 'Project "{project}" is currently reviewing',
     notifNewComment: "New Comment on Task",
     notifNewCommentMsg: 'New comment on task "{task}"',
+    notifTaskOverdue: "Task Overdue Alert",
+    notifTaskOverdueSelfMsg:
+      'Your task "{task}" in project "{project}" is incomplete and overdue (Due: {due})',
+    notifTaskOverdueMemberMsg:
+      'Task "{task}" of {assignee} in project "{project}" is incomplete and overdue (Due: {due})',
+    notifProjectOverdue: "Project Overdue Alert",
+    notifProjectOverdueMsg:
+      'Project "{project}" is incomplete and has passed its due date (Due: {due})',
     personalTask: "Personal Tasks",
 
     // Login Page
@@ -871,6 +879,14 @@ const translations = {
       'โปรเจกต์ "{project}" มีสถานะเป็นรอการตรวจสอบ (Reviewing)',
     notifNewComment: "ความคิดเห็นใหม่ในงาน",
     notifNewCommentMsg: 'มีความคิดเห็นใหม่ในงาน "{task}"',
+    notifTaskOverdue: "แจ้งเตือนงานเกินกำหนดส่ง (Overdue)",
+    notifTaskOverdueSelfMsg:
+      'งาน "{task}" ของคุณในโปรเจกต์ "{project}" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: {due})',
+    notifTaskOverdueMemberMsg:
+      'งาน "{task}" ของ {assignee} ในโปรเจกต์ "{project}" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: {due})',
+    notifProjectOverdue: "แจ้งเตือนโปรเจกต์เกินกำหนดส่ง (Project Overdue)",
+    notifProjectOverdueMsg:
+      'โปรเจกต์ "{project}" ยังไม่เสร็จสิ้นและเลยวันกำหนดส่งแล้ว (กำหนดส่ง: {due})',
     personalTask: "งานส่วนตัว",
 
     // Login Page

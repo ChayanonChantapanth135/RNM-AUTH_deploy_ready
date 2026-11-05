@@ -334,6 +334,18 @@ const NotificationBell = () => {
     if (/ความคิดเห็นใหม่ในงาน|New Comment on Task/i.test(title)) {
       return t("notifNewComment");
     }
+    if (
+      item.type === "project_overdue" ||
+      /แจ้งเตือนโปรเจกต์เกินกำหนดส่ง|Project Overdue/i.test(title)
+    ) {
+      return t("notifProjectOverdue");
+    }
+    if (
+      item.type === "task_overdue" ||
+      /แจ้งเตือนงานเกินกำหนดส่ง|Task Overdue/i.test(title)
+    ) {
+      return t("notifTaskOverdue");
+    }
     if (/แจ้งเตือนจากระบบ|System Notification/i.test(title)) {
       return t("systemNotification");
     }
@@ -422,6 +434,39 @@ const NotificationBell = () => {
       return t("notifNewCommentMsg").replace("{task}", commentMatch[1]);
     }
 
+    // 8. Project Overdue: โปรเจกต์ "ProjectName" ยังไม่เสร็จสิ้นและเลยวันกำหนดส่งแล้ว (กำหนดส่ง: YYYY-MM-DD)
+    const projOverdueMatch = msg.match(
+      /(?:โปรเจกต์|Project)\s*["“'`](.*?)["”'`]\s*(?:ยังไม่เสร็จสิ้นและเลยวันกำหนดส่งแล้ว|is incomplete and has passed its due date).*?(?:กำหนดส่ง:|Due:)\s*([^)]+)\)/i,
+    );
+    if (projOverdueMatch) {
+      return t("notifProjectOverdueMsg")
+        .replace("{project}", projOverdueMatch[1])
+        .replace("{due}", projOverdueMatch[2].trim());
+    }
+
+    // 9. Task Overdue (Self): งาน "TaskName" ของคุณในโปรเจกต์ "ProjectName" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: YYYY-MM-DD)
+    const taskOverdueSelfMatch = msg.match(
+      /(?:งาน|Your task)\s*["“'`](.*?)["”'`]\s*(?:ของคุณในโปรเจกต์|in project)\s*["“'`](.*?)["”'`]\s*(?:ยังไม่เสร็จและเกินกำหนดส่งแล้ว|is incomplete and overdue).*?(?:กำหนดส่ง:|Due:)\s*([^)]+)\)/i,
+    );
+    if (taskOverdueSelfMatch) {
+      return t("notifTaskOverdueSelfMsg")
+        .replace("{task}", taskOverdueSelfMatch[1])
+        .replace("{project}", taskOverdueSelfMatch[2])
+        .replace("{due}", taskOverdueSelfMatch[3].trim());
+    }
+
+    // 10. Task Overdue (Member): งาน "TaskName" ของ AssigneeName ในโปรเจกต์ "ProjectName" ยังไม่เสร็จและเกินกำหนดส่งแล้ว (กำหนดส่ง: YYYY-MM-DD)
+    const taskOverdueMemberMatch = msg.match(
+      /(?:งาน|Task)\s*["“'`](.*?)["”'`]\s*(?:ของ|of)\s+(.*?)\s+(?:ในโปรเจกต์|in project)\s*["“'`](.*?)["”'`]\s*(?:ยังไม่เสร็จและเกินกำหนดส่งแล้ว|is incomplete and overdue).*?(?:กำหนดส่ง:|Due:)\s*([^)]+)\)/i,
+    );
+    if (taskOverdueMemberMatch) {
+      return t("notifTaskOverdueMemberMsg")
+        .replace("{task}", taskOverdueMemberMatch[1])
+        .replace("{assignee}", taskOverdueMemberMatch[2].trim())
+        .replace("{project}", taskOverdueMemberMatch[3])
+        .replace("{due}", taskOverdueMemberMatch[4].trim());
+    }
+
     return msg;
   };
 
@@ -469,6 +514,7 @@ const NotificationBell = () => {
           </div>
         );
       case "task_overdue":
+      case "project_overdue":
         return (
           <div className="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
             <svg
