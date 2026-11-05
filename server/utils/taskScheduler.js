@@ -202,27 +202,15 @@ export async function checkOverdueTasksAndNotifyLeaders() {
 
     let projectNotifiedCount = 0;
 
-    // Fetch all active Project Managers so they also get notified if a project is created by Admin or has no creator
-    const [activeManagers] = await db.query(
-      `SELECT id, fullname, email FROM users WHERE role = 'manager' AND status = 'active' AND deleted_at IS NULL`
-    );
-
     for (const proj of overdueProjects) {
       const targetManagers = new Map(); // userId -> { email, name }
 
-      // 1. Project Creator (if exists)
+      // Notify ONLY the Project Manager (creator) of that specific project
       if (proj.pm_id && proj.pm_email) {
         targetManagers.set(Number(proj.pm_id), {
           email: proj.pm_email,
           name: proj.pm_name,
         });
-      }
-
-      // 2. Active Project Managers (role = 'manager')
-      for (const m of activeManagers) {
-        if (m.email) {
-          targetManagers.set(Number(m.id), { email: m.email, name: m.fullname });
-        }
       }
 
       if (targetManagers.size === 0) continue;
