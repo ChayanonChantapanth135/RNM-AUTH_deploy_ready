@@ -146,64 +146,64 @@
 
 ```text
 RNM AUTH/
-├── frontend/                   # Client-side Application (React 19 + Vite)
-│   ├── public/                 # Favicons, Web Manifest, Assets
+├── frontend/                   
+│   ├── public/                 
 │   ├── src/
-│   │   ├── assets/             # รูปภาพ โลโก้แบรนด์ (LogoB, LogoW)
-│   │   ├── components/         # คอมโพเนนต์ส่วนกลาง (Header, Footer, NotificationBell, Modals)
-│   │   ├── lib/                # Contexts & Utilities (LanguageContext, ThemeContext, auth, dateUtils)
-│   │   ├── pages/              # หน้าการทำงานหลัก
-│   │   │   ├── About/          # หน้าเกี่ยวกับระบบ
-│   │   │   ├── Activity/       # หน้าประวัติกิจกรรมระบบทั้งหมด (Admin)
-│   │   │   ├── AllTasks/       # หน้าภาพรวมงานทั้งหมดในระบบ
-│   │   │   ├── Contract/       # หน้าฟอร์มติดต่อสอบถาม
-│   │   │   ├── Dashboard/      # หน้าแดชบอร์ดสรุปผลสถิติและกราฟ
-│   │   │   ├── Home/           # หน้า Landing Page
-│   │   │   ├── Login/          # หน้าเข้าสู่ระบบ
-│   │   │   ├── ManageProject/  # หน้าบริหารโครงการ (Grid & Kanban View)
-│   │   │   ├── ManageUser/     # หน้าจัดการผู้ใช้ & Import Preview Modal
-│   │   │   ├── MyActivity/     # หน้าประวัติกิจกรรมส่วนบุคคล
-│   │   │   ├── MyTasks/        # หน้างานที่ตนเองรับผิดชอบ
-│   │   │   ├── PersonalTask/   # หน้างานส่วนตัว (Kanban & FullCalendar Tray)
-│   │   │   ├── Profile/        # หน้าโปรไฟล์และการตั้งค่า
-│   │   │   ├── Reports/        # หน้ารายงานสถิติตามระดับสิทธิ์ (Admin, Manager, Leader, User)
-│   │   │   ├── ResetPassword/  # หน้ารีเซ็ตรหัสผ่านด้วย OTP
-│   │   │   └── ResetPasswordFirstTime/ # หน้าบังคับเปลี่ยนรหัสผ่านครั้งแรก
-│   │   ├── App.jsx             # จัดการเส้นทาง Routing ทั้งหมด
-│   │   ├── config.js           # กำหนด Base API URL (VITE_API_URL)
-│   │   ├── index.css           # Global Design Tokens & Styles
-│   │   └── main.jsx            # React Entry Point & Axios Interceptors
-│   ├── .env.example            # ตัวอย่างค่าตัวแปรสภาพแวดล้อม Frontend
+│   │   ├── assets/             
+│   │   ├── components/         
+│   │   ├── lib/                
+│   │   ├── pages/              
+│   │   │   ├── About/          
+│   │   │   ├── Activity/       
+│   │   │   ├── AllTasks/       
+│   │   │   ├── Contract/       
+│   │   │   ├── Dashboard/      
+│   │   │   ├── Home/           
+│   │   │   ├── Login/          
+│   │   │   ├── ManageProject/  
+│   │   │   ├── ManageUser/     
+│   │   │   ├── MyActivity/     
+│   │   │   ├── MyTasks/        
+│   │   │   ├── PersonalTask/   
+│   │   │   ├── Profile/        
+│   │   │   ├── Reports/        
+│   │   │   ├── ResetPassword/  
+│   │   │   └── ResetPasswordFirstTime/ 
+│   │   ├── App.jsx             
+│   │   ├── config.js           
+│   │   ├── index.css           
+│   │   └── main.jsx            
+│   ├── .env.example            
 │   ├── index.html
-│   ├── vercel.json             # Vercel Client-side Routing Rewrite
+│   ├── vercel.json             
 │   ├── vite.config.js
 │   └── package.json
 │
-├── server/                     # Backend RESTful API & WebSocket Server
+├── server/                     
 │   ├── controllers/
-│   │   ├── authController.js   # ควบคุม Logic หลัก (Auth, Projects, Tasks, Users, OTP)
+│   │   ├── authController.js   
 │   │   └── notificationController.js # ควบคุมระบบแจ้งเตือน In-App
 │   ├── lib/
-│   │   ├── cloudinary.js       # จัดการ Cloud Storage สำหรับไฟล์แนบและ Avatar
-│   │   ├── db.js               # เชื่อมต่อ MySQL Connection Pool
-│   │   ├── initDb.js           # Schema Auto-Setup, Default Roles, Admin Seed & Indexes
-│   │   └── socket.js           # จัดการ Realtime WebSockets Push Event
+│   │   ├── cloudinary.js       
+│   │   ├── db.js               
+│   │   ├── initDb.js           
+│   │   └── socket.js           
 │   ├── middleware/
-│   │   └── authMiddleware.js   # JWT Verification, Rate Limiters, Multer Upload
+│   │   └── authMiddleware.js   
 │   ├── routes/
-│   │   └── authRoutes.js       # เส้นทาง API Endpoints ทั้งหมด
+│   │   └── authRoutes.js       
 │   ├── utils/
-│   │   ├── cacheService.js     # In-Memory Cache ช่วยลดภาระ Query
-│   │   ├── emailService.js     # ส่งอีเมลผ่าน Brevo, Resend หรือ SMTP
-│   │   └── taskScheduler.js    # Cron Job ตรวจสอบงานเกินกำหนดส่งอัตโนมัติ
-│   ├── uploads/                # Local Uploads Storage (สร้างอัตโนมัติเมื่อรัน)
-│   ├── .env.example            # ตัวอย่างค่าตัวแปรสภาพแวดล้อม Backend
-│   ├── index.js                # Server Entry Point, Helmet, Compression & Error Handler
+│   │   ├── cacheService.js     
+│   │   ├── emailService.js     
+│   │   └── taskScheduler.js    
+│   ├── uploads/                
+│   ├── .env.example            
+│   ├── index.js                
 │   └── package.json
 │
-├── DEPLOYMENT_GUIDE.md         # คู่มือแนะนำการ Deploy บน Vercel + Render / Railway
-├── package.json                # Root Workspace Scripts
-└── README.md                   # เอกสารประกอบโปรเจกต์
+├── DEPLOYMENT_GUIDE.md         
+├── package.json                
+└── README.md                   
 ```
 
 ---
