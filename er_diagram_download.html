@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clean ER Diagram - Project & Task Management System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      margin: 0;
+      padding: 24px;
+    }
+    .toolbar {
+      position: sticky;
+      top: 12px;
+      background: #ffffff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      z-index: 100;
+      border: 1px solid #e2e8f0;
+    }
+    .btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn-secondary { background: #0f172a; }
+    .btn-secondary:hover { background: #1e293b; }
+    .card {
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      margin-bottom: 32px;
+      overflow-x: auto;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #0f172a;
+      text-align: left;
+    }
+    p.subtitle {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #64748b;
+      font-size: 14px;
+      text-align: left;
+    }
+    svg {
+      max-width: 100%;
+      height: auto;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div>
+      <strong>📐 Clean Orthogonal ER Diagram (เส้นมุมฉากเป็นระเบียบ ไม่ทับกัน)</strong>
+      <span style="margin-left: 12px; color: #64748b; font-size: 14px;">จัดเรียงตามลำดับชั้น (4 Tiers) สำหรับใส่เล่มรายงานสหกิจศึกษา</span>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn" onclick="downloadSVGAsPNG('er-clean-svg', 'ER_Diagram_Clean_Report.png')">⬇️ ดาวน์โหลดรูป PNG (ความละเอียดสูง)</button>
+      <button class="btn btn-secondary" onclick="downloadRawSVG('er-clean-svg', 'ER_Diagram_Clean_Report.svg')">⬇️ ดาวน์โหลดไฟล์ SVG</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>แผนภาพแสดงความสัมพันธ์ของฐานข้อมูล (Entity-Relationship Diagram)</h2>
+    <p class="subtitle">จัดกลุ่มตารางเป็น 4 ระดับชั้น (Roles/Users ➔ Projects/Personal ➔ Tasks ➔ Task Details) ด้วยเส้นมุมฉาก 90 องศา ไม่ตัดทับกัน</p>
+
+    <svg id="er-clean-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 980" width="1320" height="980">
+      <defs>
+        <style>
+          .tbl-box { fill: #ffffff; stroke: #334155; stroke-width: 1.8; rx: 6; }
+          .tbl-header-user { fill: #1e3a8a; }
+          .tbl-header-proj { fill: #0f766e; }
+          .tbl-header-task { fill: #4338ca; }
+          .tbl-header-sub  { fill: #334155; }
+          .tbl-title { fill: #ffffff; font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; font-weight: 700; text-anchor: middle; }
+          .col-text { fill: #1e293b; font-family: 'Consolas', 'Courier New', monospace; font-size: 11.5px; }
+          .col-type { fill: #64748b; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; }
+          .col-key-pk { fill: #d97706; font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5px; font-weight: 700; }
+          .col-key-fk { fill: #2563eb; font-family: 'Segoe UI', Arial, sans-serif; font-size: 10.5px; font-weight: 700; }
+          .row-line { stroke: #e2e8f0; stroke-width: 1; }
+          .rel-line { fill: none; stroke: #475569; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+          .rel-label-bg { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1; rx: 4; }
+          .rel-label { fill: #334155; font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 600; text-anchor: middle; }
+          .card-text { fill: #0f172a; font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.5px; font-weight: 700; }
+        </style>
+      </defs>
+
+      <!-- Background -->
+      <rect width="1320" height="980" fill="#ffffff" />
+
+      <!-- ==================== ORTHOGONAL RELATIONSHIP LINES ==================== -->
+
+      <!-- 1. ROLES (1) to USERS (N) -->
+      <path class="rel-line" d="M 270 115 L 490 115" />
+      <text class="card-text" x="282" y="108">1</text>
+      <text class="card-text" x="472" y="108">N</text>
+      <rect class="rel-label-bg" x="345" y="103" width="70" height="20" />
+      <text class="rel-label" x="380" y="117">has_role</text>
+
+      <!-- 2. USERS Self-Reference (leader_id) -->
+      <path class="rel-line" d="M 610 40 L 610 16 L 730 16 L 730 75 L 710 75" />
+      <text class="card-text" x="596" y="34">1</text>
+      <text class="card-text" x="718" y="69">N</text>
+      <rect class="rel-label-bg" x="625" y="6" width="85" height="20" />
+      <text class="rel-label" x="667" y="20">leader_id</text>
+
+      <!-- 3. USERS (1) to NOTIFICATIONS (N) -->
+      <path class="rel-line" d="M 710 115 L 970 115" />
+      <text class="card-text" x="722" y="108">1</text>
+      <text class="card-text" x="952" y="108">N</text>
+      <rect class="rel-label-bg" x="805" y="103" width="75" height="20" />
+      <text class="rel-label" x="842" y="117">receives</text>
+
+      <!-- 4. USERS (1) to PERSONAL_TASKS (N) -->
+      <path class="rel-line" d="M 710 185 L 880 185 L 880 390 L 970 390" />
+      <text class="card-text" x="722" y="178">1</text>
+      <text class="card-text" x="952" y="383">N</text>
+      <rect class="rel-label-bg" x="840" y="275" width="80" height="20" />
+      <text class="rel-label" x="880" y="289">manages</text>
+
+      <!-- 5. USERS (1) to PROJECT_TEAM_LEADERS (N) -->
+      <path class="rel-line" d="M 490 185 L 360 185 L 360 390 L 270 390" />
+      <text class="card-text" x="475" y="178">1</text>
+      <text class="card-text" x="282" y="383">N</text>
+      <rect class="rel-label-bg" x="315" y="275" width="90" height="20" />
+      <text class="rel-label" x="360" y="289">leads_team</text>
+
+      <!-- 6. USERS (1) to PROJECTS (N) -->
+      <path class="rel-line" d="M 600 265 L 600 325" />
+      <text class="card-text" x="610" y="282">1</text>
+      <text class="card-text" x="610" y="318">N</text>
+      <rect class="rel-label-bg" x="558" y="285" width="84" height="20" />
+      <text class="rel-label" x="600" y="299">created_by</text>
+
+      <!-- 7. PROJECTS (1) to PROJECT_TEAM_LEADERS (N) -->
+      <path class="rel-line" d="M 490 420 L 270 420" />
+      <text class="card-text" x="475" y="413">1</text>
+      <text class="card-text" x="282" y="413">N</text>
+      <rect class="rel-label-bg" x="340" y="408" width="80" height="20" />
+      <text class="rel-label" x="380" y="422">has_leader</text>
+
+      <!-- 8. PROJECTS (1) to TASKS (N) -->
+      <path class="rel-line" d="M 600 505 L 600 565" />
+      <text class="card-text" x="610" y="522">1</text>
+      <text class="card-text" x="610" y="558">N</text>
+      <rect class="rel-label-bg" x="562" y="525" width="76" height="20" />
+      <text class="rel-label" x="600" y="539">contains</text>
+
+      <!-- 9. USERS (1) to TASKS (N) (assigned_to via clean right channel) -->
+      <path class="rel-line" d="M 710 230 L 790 230 L 790 645 L 710 645" />
+      <text class="card-text" x="722" y="223">1</text>
+      <text class="card-text" x="722" y="638">N</text>
+      <rect class="rel-label-bg" x="745" y="430" width="90" height="20" />
+      <text class="rel-label" x="790" y="444">assigned_to</text>
+
+      <!-- 10. TASKS (1) to TASK_STATUS_HISTORY (N) -->
+      <path class="rel-line" d="M 490 700 L 240 700 L 240 785" />
+      <text class="card-text" x="475" y="693">1</text>
+      <text class="card-text" x="250" y="777">N</text>
+      <rect class="rel-label-bg" x="315" y="688" width="90" height="20" />
+      <text class="rel-label" x="360" y="702">status_logs</text>
+
+      <!-- 11. TASKS (1) to COMMENTS (N) -->
+      <path class="rel-line" d="M 600 745 L 600 785" />
+      <text class="card-text" x="610" y="762">1</text>
+      <text class="card-text" x="610" y="778">N</text>
+
+      <!-- 12. TASKS (1) to FILES (N) -->
+      <path class="rel-line" d="M 710 700 L 960 700 L 960 785" />
+      <text class="card-text" x="722" y="693">1</text>
+      <text class="card-text" x="970" y="777">N</text>
+      <rect class="rel-label-bg" x="795" y="688" width="85" height="20" />
+      <text class="rel-label" x="837" y="702">attachments</text>
+
+
+      <!-- ==================== ROW 1: ROLES, USERS, NOTIFICATIONS ==================== -->
+
+      <!-- TABLE: ROLES (x=50, y=55, w=220, h=115) -->
+      <g transform="translate(50, 55)">
+        <rect class="tbl-box" width="220" height="115" />
+        <rect class="tbl-header-user" width="220" height="30" rx="6" />
+        <rect class="tbl-header-user" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">ROLES</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="155" y="50">int</text>
+        <line class="row-line" x1="0" y1="58" x2="220" y2="58" />
+        <text class="col-key-fk" x="12" y="75">UK</text><text class="col-text" x="42" y="75">role_name</text><text class="col-type" x="155" y="75">varchar</text>
+        <line class="row-line" x1="0" y1="83" x2="220" y2="83" />
+        <text class="col-text" x="42" y="100">description</text><text class="col-type" x="155" y="100">varchar</text>
+      </g>
+
+      <!-- TABLE: USERS (x=490, y=40, w=220, h=225) -->
+      <g transform="translate(490, 40)">
+        <rect class="tbl-box" width="220" height="225" />
+        <rect class="tbl-header-user" width="220" height="30" rx="6" />
+        <rect class="tbl-header-user" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">USERS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="155" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">UK</text><text class="col-text" x="42" y="73">email</text><text class="col-type" x="155" y="73">varchar</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-text" x="42" y="96">fullname</text><text class="col-type" x="155" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="119">password</text><text class="col-type" x="155" y="119">varchar</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-key-fk" x="12" y="142">FK</text><text class="col-text" x="42" y="142">role_id</text><text class="col-type" x="155" y="142">int</text>
+        <line class="row-line" x1="0" y1="149" x2="220" y2="149" />
+        <text class="col-key-fk" x="12" y="165">FK</text><text class="col-text" x="42" y="165">leader_id</text><text class="col-type" x="155" y="165">int</text>
+        <line class="row-line" x1="0" y1="172" x2="220" y2="172" />
+        <text class="col-text" x="42" y="188">status</text><text class="col-type" x="155" y="188">enum</text>
+        <line class="row-line" x1="0" y1="195" x2="220" y2="195" />
+        <text class="col-text" x="42" y="212">expire_date</text><text class="col-type" x="155" y="212">date</text>
+      </g>
+
+      <!-- TABLE: NOTIFICATIONS (x=970, y=55, w=230, h=160) -->
+      <g transform="translate(970, 55)">
+        <rect class="tbl-box" width="230" height="160" />
+        <rect class="tbl-header-user" width="230" height="30" rx="6" />
+        <rect class="tbl-header-user" y="15" width="230" height="15" />
+        <text class="tbl-title" x="115" y="20">NOTIFICATIONS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="160" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="230" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">user_id</text><text class="col-type" x="160" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="230" y2="80" />
+        <text class="col-text" x="42" y="96">title</text><text class="col-type" x="160" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="230" y2="103" />
+        <text class="col-text" x="42" y="119">message</text><text class="col-type" x="160" y="119">text</text>
+        <line class="row-line" x1="0" y1="126" x2="230" y2="126" />
+        <text class="col-text" x="42" y="143">is_read</text><text class="col-type" x="160" y="143">tinyint</text>
+      </g>
+
+
+      <!-- ==================== ROW 2: PROJECT_TEAM_LEADERS, PROJECTS, PERSONAL_TASKS ==================== -->
+
+      <!-- TABLE: PROJECT_TEAM_LEADERS (x=50, y=340, w=220, h=135) -->
+      <g transform="translate(50, 340)">
+        <rect class="tbl-box" width="220" height="135" />
+        <rect class="tbl-header-proj" width="220" height="30" rx="6" />
+        <rect class="tbl-header-proj" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">PROJECT_TEAM_LEADERS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="150" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">project_id</text><text class="col-type" x="150" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-key-fk" x="12" y="96">FK</text><text class="col-text" x="42" y="96">user_id</text><text class="col-type" x="150" y="96">int</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="120">assigned_at</text><text class="col-type" x="150" y="120">timestamp</text>
+      </g>
+
+      <!-- TABLE: PROJECTS (x=490, y=325, w=220, h=180) -->
+      <g transform="translate(490, 325)">
+        <rect class="tbl-box" width="220" height="180" />
+        <rect class="tbl-header-proj" width="220" height="30" rx="6" />
+        <rect class="tbl-header-proj" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">PROJECTS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="155" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-text" x="42" y="73">name</text><text class="col-type" x="155" y="73">varchar</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-text" x="42" y="96">status</text><text class="col-type" x="155" y="96">enum</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="119">priority</text><text class="col-type" x="155" y="119">enum</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-text" x="42" y="142">end_date</text><text class="col-type" x="155" y="142">date</text>
+        <line class="row-line" x1="0" y1="149" x2="220" y2="149" />
+        <text class="col-key-fk" x="12" y="166">FK</text><text class="col-text" x="42" y="166">created_by</text><text class="col-type" x="155" y="166">int</text>
+      </g>
+
+      <!-- TABLE: PERSONAL_TASKS (x=970, y=325, w=230, h=180) -->
+      <g transform="translate(970, 325)">
+        <rect class="tbl-box" width="230" height="180" />
+        <rect class="tbl-header-proj" width="230" height="30" rx="6" />
+        <rect class="tbl-header-proj" y="15" width="230" height="15" />
+        <text class="tbl-title" x="115" y="20">PERSONAL_TASKS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="160" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="230" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">user_id</text><text class="col-type" x="160" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="230" y2="80" />
+        <text class="col-text" x="42" y="96">title</text><text class="col-type" x="160" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="230" y2="103" />
+        <text class="col-text" x="42" y="119">status</text><text class="col-type" x="160" y="119">enum</text>
+        <line class="row-line" x1="0" y1="126" x2="230" y2="126" />
+        <text class="col-text" x="42" y="142">position</text><text class="col-type" x="160" y="142">int</text>
+        <line class="row-line" x1="0" y1="149" x2="230" y2="149" />
+        <text class="col-text" x="42" y="166">task_date</text><text class="col-type" x="160" y="166">date</text>
+      </g>
+
+
+      <!-- ==================== ROW 3: TASKS ==================== -->
+
+      <!-- TABLE: TASKS (x=490, y=565, w=220, h=180) -->
+      <g transform="translate(490, 565)">
+        <rect class="tbl-box" width="220" height="180" />
+        <rect class="tbl-header-task" width="220" height="30" rx="6" />
+        <rect class="tbl-header-task" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">TASKS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="155" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">project_id</text><text class="col-type" x="155" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-text" x="42" y="96">title</text><text class="col-type" x="155" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="119">priority</text><text class="col-type" x="155" y="119">enum</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-text" x="42" y="142">status</text><text class="col-type" x="155" y="142">enum</text>
+        <line class="row-line" x1="0" y1="149" x2="220" y2="149" />
+        <text class="col-key-fk" x="12" y="166">FK</text><text class="col-text" x="42" y="166">assigned_to</text><text class="col-type" x="155" y="166">int</text>
+      </g>
+
+
+      <!-- ==================== ROW 4: TASK_STATUS_HISTORY, COMMENTS, FILES ==================== -->
+
+      <!-- TABLE: TASK_STATUS_HISTORY (x=130, y=785, w=220, h=155) -->
+      <g transform="translate(130, 785)">
+        <rect class="tbl-box" width="220" height="155" />
+        <rect class="tbl-header-sub" width="220" height="30" rx="6" />
+        <rect class="tbl-header-sub" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">TASK_STATUS_HISTORY</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="150" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">task_id</text><text class="col-type" x="150" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-text" x="42" y="96">status</text><text class="col-type" x="150" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-key-fk" x="12" y="119">FK</text><text class="col-text" x="42" y="119">changed_by</text><text class="col-type" x="150" y="119">int</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-text" x="42" y="143">changed_at</text><text class="col-type" x="150" y="143">timestamp</text>
+      </g>
+
+      <!-- TABLE: COMMENTS (x=490, y=785, w=220, h=155) -->
+      <g transform="translate(490, 785)">
+        <rect class="tbl-box" width="220" height="155" />
+        <rect class="tbl-header-sub" width="220" height="30" rx="6" />
+        <rect class="tbl-header-sub" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">COMMENTS</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="150" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">task_id</text><text class="col-type" x="150" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-key-fk" x="12" y="96">FK</text><text class="col-text" x="42" y="96">user_id</text><text class="col-type" x="150" y="96">int</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="119">comment</text><text class="col-type" x="150" y="119">text</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-text" x="42" y="143">created_at</text><text class="col-type" x="150" y="143">timestamp</text>
+      </g>
+
+      <!-- TABLE: FILES (x=850, y=785, w=220, h=155) -->
+      <g transform="translate(850, 785)">
+        <rect class="tbl-box" width="220" height="155" />
+        <rect class="tbl-header-sub" width="220" height="30" rx="6" />
+        <rect class="tbl-header-sub" y="15" width="220" height="15" />
+        <text class="tbl-title" x="110" y="20">FILES</text>
+        <text class="col-key-pk" x="12" y="50">PK</text><text class="col-text" x="42" y="50">id</text><text class="col-type" x="150" y="50">int</text>
+        <line class="row-line" x1="0" y1="57" x2="220" y2="57" />
+        <text class="col-key-fk" x="12" y="73">FK</text><text class="col-text" x="42" y="73">task_id</text><text class="col-type" x="150" y="73">int</text>
+        <line class="row-line" x1="0" y1="80" x2="220" y2="80" />
+        <text class="col-text" x="42" y="96">filename</text><text class="col-type" x="150" y="96">varchar</text>
+        <line class="row-line" x1="0" y1="103" x2="220" y2="103" />
+        <text class="col-text" x="42" y="119">filepath</text><text class="col-type" x="150" y="119">varchar</text>
+        <line class="row-line" x1="0" y1="126" x2="220" y2="126" />
+        <text class="col-key-fk" x="12" y="143">FK</text><text class="col-text" x="42" y="143">uploaded_by</text><text class="col-type" x="150" y="143">int</text>
+      </g>
+
+    </svg>
+  </div>
+
+  <script>
+    function downloadSVGAsPNG(svgId, filename) {
+      const svgElement = document.getElementById(svgId);
+      const scale = 2; // 2x Retina HD quality
+      const width = 1320 * scale;
+      const height = 980 * scale;
+
+      const clonedSvg = svgElement.cloneNode(true);
+      clonedSvg.setAttribute('width', width);
+      clonedSvg.setAttribute('height', height);
+
+      const svgData = new XMLSerializer().serializeToString(clonedSvg);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, width, height);
+        URL.revokeObjectURL(url);
+
+        const a = document.createElement('a');
+        a.download = filename;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      };
+      img.src = url;
+    }
+
+    function downloadRawSVG(svgId, filename) {
+      const svgElement = document.getElementById(svgId);
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = url;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+  </script>
+</body>
+</html>
