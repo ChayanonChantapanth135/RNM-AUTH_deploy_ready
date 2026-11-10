@@ -56,7 +56,7 @@ router.get('/activity-logs', verifyToken, authCtrl.getActivityLogs);
 // --- OTP & RESET PASSWORD & PUBLIC ROUTES (Rate Limited) ---
 router.post('/send-otp', otpLimiter, authCtrl.sendOtp);
 router.post('/reset-password', authCtrl.resetPassword);
-router.post('/reset-password-first-time', authCtrl.resetPasswordFirstTime);
+router.post('/reset-password-first-time', verifyToken, authCtrl.resetPasswordFirstTime);
 router.post('/contact', contactLimiter, authCtrl.sendContactMessage);
 
 // --- NOTIFICATION ROUTES (Protected) ---

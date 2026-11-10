@@ -423,6 +423,11 @@ export const refresh = async (req, res) => {
     try {
         const jwtSecret = process.env.JWT_KEY || process.env.JWT_SECRET || 'jwt-secret-key-rnm';
         const decoded = jwt.verify(token, jwtSecret, { ignoreExpiration: true });
+        // ไม่อนุญาตให้ต่ออายุหาก Token หมดอายุเกินกว่า 24 ชั่วโมงแล้ว
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        if (decoded.exp && (nowSeconds - decoded.exp) > 24 * 60 * 60) {
+            return res.status(401).json({ message: 'Session expired completely, please login again' });
+        }
         const db = await connectToDatabase();
         const [rows] = await db.query('SELECT * FROM users WHERE id = ? AND deleted_at IS NULL', [decoded.id]);
         if (rows.length === 0) {
@@ -908,6 +913,8 @@ export const permanentDeleteUser = async (req, res) => {
         });
 
         memoryCache.del('team_leaders');
+        memoryCache.del('users_list_active');
+        memoryCache.del('users_list_all');
         res.status(200).json({ message: 'User permanently deleted successfully' });
     } catch (error) {
         console.error('Error permanently deleting user:', error.message);
@@ -1364,6 +1371,11 @@ const checkAndUpdateProjectStatus = async (db, projectId, changedByUserId = null
                     });
                 }
             }
+        } else {
+            // หากไม่มีงานเหลืออยู่ในโครงการเลย ให้ปรับสถานะกลับเป็น Pending
+            if (oldStatus && oldStatus !== 'Pending') {
+                await db.query("UPDATE projects SET status = 'Pending' WHERE id = ?", [projectId]);
+            }
         }
     } catch (err) {
         console.error("Error auto updating project status:", err.message);
@@ -1423,6 +1435,10 @@ export const getProjects = async (req, res) => {
                 }
             } else {
                 p.progress = 0;
+                if (p.status !== 'Pending') {
+                    p.status = 'Pending';
+                    await db.query("UPDATE projects SET status = 'Pending' WHERE id = ?", [p.id]);
+                }
             }
         }
 
@@ -2006,7 +2022,7 @@ export const updateTaskStatus = async (req, res) => {
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
-        const { title, project_id, project_name, assigned_to, current_status, created_by, team_leader_id } = taskRows[0];
+        const { title, project_id, project_name, assigned_to, current_status, created_by } = taskRows[0];
 
         const requesterId = req.userId || (userId ? Number(userId) : null);
         if (requesterId && assigned_to) {
@@ -2014,7 +2030,7 @@ export const updateTaskStatus = async (req, res) => {
             const reqRole = (reqUser[0]?.role || '').toLowerCase().trim().replace(/\s+/g, '_');
             const isAdmin = reqRole === 'admin';
             const isManager = reqRole === 'manager' || reqRole === 'project_manager' || Number(created_by) === Number(requesterId);
-            const isTeamLeader = Number(team_leader_id) === Number(requesterId);
+            const isTeamLeader = taskRows.some(r => Number(r.team_leader_id) === Number(requesterId));
             const isAssignee = Number(assigned_to) === Number(requesterId);
             if (!isAdmin && !isManager && !isTeamLeader && !isAssignee) {
                 return res.status(403).json({ message: 'ไม่มีสิทธิ์เปลี่ยนสถานะงานที่ไม่ได้รับมอบหมาย' });
@@ -2286,15 +2302,16 @@ export const deleteTask = async (req, res) => {
         if (taskRows.length === 0) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลงาน / Task not found' });
         }
-        const { title, project_id, created_by, team_leader_id } = taskRows[0];
+        const { title, project_id, created_by } = taskRows[0];
 
         // ตรวจสอบสิทธิ์: Admin หรือ ผู้สร้างโครงการ (Project Manager) หรือ Team Leader ของโครงการ สามารถลบงานได้
-        if (userId) {
-            const [userRows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
+        const requesterId = req.userId || (userId ? Number(userId) : null);
+        if (requesterId) {
+            const [userRows] = await db.query('SELECT role FROM users WHERE id = ?', [requesterId]);
             const role = userRows[0]?.role;
             const isAdmin = role === 'admin';
-            const isProjectManager = Number(created_by) === Number(userId);
-            const isTeamLeader = Number(team_leader_id) === Number(userId);
+            const isProjectManager = Number(created_by) === Number(requesterId);
+            const isTeamLeader = taskRows.some(r => Number(r.team_leader_id) === Number(requesterId));
 
             if (!isAdmin && !isProjectManager && !isTeamLeader) {
                 return res.status(403).json({ message: 'ไม่มีสิทธิ์ลบงานนี้ (เฉพาะ Admin, Project Manager หรือ Team Leader ของโครงการเท่านั้น)' });
@@ -3217,20 +3234,32 @@ export const resetPassword = async (req, res) => {
  */
 export const resetPasswordFirstTime = async (req, res) => {
     const { userId, password } = req.body;
+    const targetUserId = req.userId || userId;
     try {
+        if (!targetUserId || !password) {
+            return res.status(400).json({ message: 'User ID and new password are required' });
+        }
+        // ป้องกันการสวมสิทธิ์เปลี่ยนรหัสผ่านของผู้อื่น
+        if (req.userId && userId && String(req.userId) !== String(userId)) {
+            return res.status(403).json({ message: 'ไม่มีสิทธิ์เปลี่ยนรหัสผ่านของผู้ใช้อื่น' });
+        }
+
         const db = await connectToDatabase();
-        const [rows] = await db.query('SELECT id, email FROM users WHERE id = ?', [userId]);
+        const [rows] = await db.query('SELECT id, email, is_force_reset FROM users WHERE id = ? AND deleted_at IS NULL', [targetUserId]);
         if (rows.length === 0) {
             return res.status(404).json({ message: 'User not found' });
+        }
+        if (rows[0].is_force_reset !== 1) {
+            return res.status(400).json({ message: 'บัญชีนี้ได้ตั้งค่ารหัสผ่านเริ่มต้นไปแล้ว' });
         }
 
         const hashPassword = await bcrypt.hash(password, 10);
         await db.query(
             'UPDATE users SET password = ?, is_force_reset = 0 WHERE id = ?',
-            [hashPassword, userId]
+            [hashPassword, targetUserId]
         );
 
-        await logActivity(db, userId, 'Reset Password First Time', `User reset password on first login for: ${rows[0].email}`);
+        await logActivity(db, targetUserId, 'Reset Password First Time', `User reset password on first login for: ${rows[0].email}`);
 
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (error) {
@@ -3247,14 +3276,14 @@ export const resetPasswordFirstTime = async (req, res) => {
  * ดึงรายการงานส่วนตัวทั้งหมดของผู้ใช้งาน (Personal Tasks)
  */
 export const getPersonalTasks = async (req, res) => {
-    const { userId } = req.query;
+    const targetUserId = req.query.userId || req.userId;
     try {
         const db = await connectToDatabase();
         let query = 'SELECT id, user_id, title, status, position, is_completed, task_date, created_at FROM personal_tasks';
         let params = [];
-        if (userId) {
+        if (targetUserId) {
             query += ' WHERE user_id = ?';
-            params.push(userId);
+            params.push(targetUserId);
         }
         query += ' ORDER BY position ASC, created_at ASC';
         const [rows] = await db.query(query, params);
@@ -3276,7 +3305,7 @@ export const createPersonalTask = async (req, res) => {
         }
         const db = await connectToDatabase();
         
-        let validUserId = user_id || null;
+        let validUserId = user_id || req.userId || null;
         if (validUserId) {
             const [u] = await db.query('SELECT id FROM users WHERE id = ?', [validUserId]);
             if (u.length === 0) validUserId = null;
@@ -3342,8 +3371,14 @@ export const updatePersonalTask = async (req, res) => {
             return res.status(400).json({ message: 'No fields to update' });
         }
 
+        let whereClause = 'WHERE id = ?';
         params.push(id);
-        await db.query(`UPDATE personal_tasks SET ${updates.join(', ')} WHERE id = ?`, params);
+        if (req.userId) {
+            whereClause += ' AND (user_id = ? OR user_id IS NULL)';
+            params.push(req.userId);
+        }
+
+        await db.query(`UPDATE personal_tasks SET ${updates.join(', ')} ${whereClause}`, params);
         res.status(200).json({ message: 'Personal task updated successfully' });
     } catch (error) {
         console.error('Error updating personal task:', error.message);
@@ -3393,16 +3428,21 @@ export const reorderPersonalTasks = async (req, res) => {
             completedParams.push(taskId, isCompleted);
         });
 
+        let whereSql = `WHERE id IN (${placeholders})`;
+        const params = [...statusParams, ...positionParams, ...completedParams, ...ids];
+        if (req.userId) {
+            whereSql += ` AND (user_id = ? OR user_id IS NULL)`;
+            params.push(req.userId);
+        }
+
         const sql = `
             UPDATE personal_tasks 
             SET 
                 status = CASE ${statusCases} ELSE status END,
                 position = CASE ${positionCases} ELSE position END,
                 is_completed = CASE ${completedCases} ELSE is_completed END
-            WHERE id IN (${placeholders})
+            ${whereSql}
         `;
-
-        const params = [...statusParams, ...positionParams, ...completedParams, ...ids];
 
         await db.query(sql, params);
         res.status(200).json({ message: 'Tasks reordered successfully' });
@@ -3419,7 +3459,11 @@ export const deletePersonalTask = async (req, res) => {
     const { id } = req.params;
     try {
         const db = await connectToDatabase();
-        await db.query('DELETE FROM personal_tasks WHERE id = ?', [id]);
+        if (req.userId) {
+            await db.query('DELETE FROM personal_tasks WHERE id = ? AND (user_id = ? OR user_id IS NULL)', [id, req.userId]);
+        } else {
+            await db.query('DELETE FROM personal_tasks WHERE id = ?', [id]);
+        }
         res.status(200).json({ message: 'Personal task deleted successfully' });
     } catch (error) {
         console.error('Error deleting personal task:', error.message);
