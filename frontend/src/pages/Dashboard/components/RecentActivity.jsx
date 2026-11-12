@@ -6,7 +6,7 @@ import { formatDateTime } from "../../../lib/dateUtils";
 /**
  * คอมโพเนนต์แสดงบันทึกกิจกรรมล่าสุดบนแดชบอร์ด (RecentActivity Component) - Glassmorphism Theme
  */
-const RecentActivity = ({ t, recentActivities = [] }) => {
+const RecentActivity = ({ t, recentActivities = [], isAdmin = false }) => {
   const { language } = useLanguage();
   return (
     <div className="glass-panel rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-2xl">
@@ -17,12 +17,14 @@ const RecentActivity = ({ t, recentActivities = [] }) => {
               {t("recentActivity")}
             </h3>
           </div>
-          <Link
-            to="/Activity"
-            className="px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-slate-300 no-underline"
-          >
-            {t("viewAll")} &rarr;
-          </Link>
+          {isAdmin && (
+            <Link
+              to="/Activity"
+              className="px-4 py-2 text-xs font-semibold rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-slate-300 no-underline"
+            >
+              {t("viewAll")} &rarr;
+            </Link>
+          )}
         </div>
 
         <div className="space-y-3 overflow-y-auto max-h-[380px] pr-1">
