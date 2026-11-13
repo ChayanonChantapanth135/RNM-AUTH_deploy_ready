@@ -1,374 +1,210 @@
-# Enterprise Project & Task Management System
+# Project & Task Management System
 
-![Website](https://img.shields.io/badge/Live%20Demo-chayanonlab.link-2563eb?style=for-the-badge&logo=googlechrome&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-20+-68a063?style=for-the-badge&logo=node.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-6.x-646cff?style=for-the-badge&logo=vite&logoColor=white)
-![Express](https://img.shields.io/badge/Express-4.x-000000?style=for-the-badge&logo=express&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479a1?style=for-the-badge&logo=mysql&logoColor=white)
-![TiDB Cloud](https://img.shields.io/badge/TiDB%20Cloud-Serverless-f34b29?style=for-the-badge&logo=pingcap&logoColor=white)
-![Socket.io](https://img.shields.io/badge/Socket.io-4.x-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-Ready-3448c5?style=for-the-badge&logo=cloudinary&logoColor=white)
+เว็บแอปพลิเคชันสำหรับบริหารจัดการโครงการ มอบหมายงาน และติดตามความคืบหน้าของทีมงานแบบเรียลไทม์ พัฒนาด้วย React, Node.js (Express), Socket.io และฐานข้อมูล MySQL / TiDB Cloud
 
-ระบบบริหารจัดการโครงการและติดตามภารกิจในองค์กรแบบครบวงจร (Production-Ready Enterprise Solution) พัฒนาด้วยสถาปัตยกรรม **Modern Modular Frontend & High-Performance RESTful Backend** รองรับทั้งฐานข้อมูล **MySQL และ TiDB Cloud Serverless (SSL)** ภายใต้ระบบดีไซน์ **Multi-Accent Theme & Solid Contrast Design System** ที่ทันสมัย ลื่นไหล ปลอดภัย พร้อมระบบคำนวณความคืบหน้าโครงการอัตโนมัติ การจัดการสิทธิ์ผู้ใช้งานตามบทบาท (RBAC) ระบบสุ่มรหัสผ่านชั่วคราว 6 หลักและส่งอีเมลต้อนรับอัตโนมัติ การบังคับเปลี่ยนรหัสผ่านครั้งแรก ปฏิทินกำหนดส่งงานแบบลากวางสองทิศทาง (Bidirectional Drag & Drop) ระบบ Personal Kanban Board ระบบนำเข้าข้อมูลผู้ใช้พร้อมหน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal) ระบบแคชความเร็วสูง (In-Memory Caching) การจัดเก็บไฟล์ขึ้น Cloudinary และระบบแจ้งเตือนงานเกินกำหนดอัตโนมัติผ่านอีเมลและ In-App WebSockets
-
-> 🌐 **Live Website (Frontend)**: [https://www.chayanonlab.link](https://www.chayanonlab.link)    
-> 📖 **Deployment Guide**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+- **Live Demo:** [https://www.chayanonlab.link](https://www.chayanonlab.link)
+- **Deployment Guide:** [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 
 ---
 
-## 📑 สารบัญ (Table of Contents)
+## ความสามารถหลักของระบบ
 
-- [ฟีเจอร์เด่นของระบบ (Key Features)](#-ฟีเจอร์เด่นของระบบ-key-features)
-- [เทคโนโลยีที่ใช้ (Tech Stack)](#-เทคโนโลยีที่ใช้-tech-stack)
-- [โครงสร้างโปรเจกต์ (Project Structure)](#-โครงสร้างโปรเจกต์-project-structure)
-- [การติดตั้งและรันในเครื่อง (Local Development)](#-การติดตั้งและรันในเครื่อง-local-development)
-- [การตั้งค่า Environment Variables](#-การตั้งค่า-environment-variables)
-- [บัญชีผู้ใช้เริ่มต้นสำหรับทดสอบ (Default Credentials)](#-บัญชีผู้ใช้เริ่มต้นสำหรับทดสอบ-default-credentials)
-- [สถาปัตยกรรมความปลอดภัยและประสิทธิภาพ (Security & Performance)](#-สถาปัตยกรรมความปลอดภัยและประสิทธิภาพ-security--performance)
-- [การนำขึ้นระบบจริง (Production Deployment)](#-การนำขึ้นระบบจริง-production-deployment)
-- [รายการ API Endpoints สำคัญ](#-รายการ-api-endpoints-สำคัญ)
+### 1. การยืนยันตัวตนและความปลอดภัย
+- **เข้าสู่ระบบด้วย JWT & bcrypt**: เข้ารหัสรหัสผ่านด้วย `bcrypt` และออก Token อายุ 40 นาที (มีระบบต่ออายุอัตโนมัติ)
+- **รีเซ็ตรหัสผ่านผ่าน OTP**: ส่งรหัส OTP 6 หลักไปยังอีเมลผู้ใช้งาน โดยไม่ส่งรหัสผ่าน API Response หรือแสดงใน Log
+- **บังคับเปลี่ยนรหัสผ่านครั้งแรก**: ผู้ใช้ที่ถูกสร้างใหม่จะต้องเปลี่ยนรหัสผ่านเมื่อเข้าใช้งานครั้งแรก
+- **จำกัดอายุบัญชี & Rate Limit**: กำหนดวันเริ่มใช้งาน วันหมดอายุ (อ้างอิงเวลา `Asia/Bangkok`) และจำกัดความถี่ในการล็อกอิน (10 ครั้ง/นาที) รวมถึงการขอ OTP (3 ครั้ง/นาที)
 
----
+### 2. การจัดการผู้ใช้และสิทธิ์ตามบทบาท (RBAC)
+แบ่งสิทธิ์การใช้งานออกเป็น 6 บทบาท ตามสายงาน ได้แก่ `admin`, `manager`, `storyboard`, `animation`, `designer` และ `programmer` โดยผู้ดูแลระบบสามารถกำหนด Team Leader ประจำโครงการ หรือผูกหัวหน้าสายตรงให้สมาชิกแต่ละคนได้
 
-## 🚀 ฟีเจอร์เด่นของระบบ (Key Features)
+| ความสามารถ | Admin | Project Manager | Team Leader | Member |
+| :--- | :---: | :---: | :---: | :---: |
+| จัดการบัญชีผู้ใช้ / นำเข้า-ส่งออก Excel | ✅ | ❌ | ❌ | ❌ |
+| สร้าง / แก้ไข / ลบ โครงการ | ✅ | ✅ | ❌ | ❌ |
+| สร้างงานและมอบหมายงาน | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ❌ |
+| อัปเดตสถานะงาน | ✅ | ✅ | ✅ (ในโครงการที่ดูแล) | ✅ (งานของตนเอง) |
+| แนบไฟล์และแสดงความคิดเห็น | ✅ | ✅ | ✅ | ✅ |
+| กระดานงานส่วนตัว & ปฏิทิน | ✅ | ✅ | ✅ | ✅ |
+| ดูรายงานสรุปผล (Reports) | ทั้งระบบ | โครงการที่ดูแล | ทีมในโครงการ | สถิติตนเอง |
+| ดูประวัติกิจกรรมระบบ (Activity Logs) | ✅ | ❌ | ❌ | ❌ |
 
-### 1. ระบบยืนยันตัวตนและความปลอดภัย (Authentication & Security)
+- **นำเข้า/ส่งออกผู้ใช้แบบกลุ่ม (Excel / CSV)**: มีหน้าต่างพรีวิวสำหรับตรวจสอบรายการที่เพิ่มใหม่หรืออัปเดตก่อนบันทึกจริง พร้อมสุ่มรหัสผ่านชั่วคราว 6 หลักและจัดส่งอีเมลต้อนรับแบบคิวหน่วงเวลา (600ms) เพื่อลดปัญหาติด Rate Limit ของผู้ให้บริการอีเมล
 
-- **JWT & bcrypt Authentication**: ล็อกอินปลอดภัย เข้ารหัสรหัสผ่านด้วย `bcrypt` และออก Session Token ด้วย `jsonwebtoken` (อายุ Token 40 นาที พร้อมระบบ Auto-Refresh)
-- **Zero-Leak OTP Verification**: ระบบกู้คืนรหัสผ่านด้วยรหัส OTP 6 หลัก ส่งตรงผ่าน Email Service ปลอดภัย ไม่มีการส่งรหัส OTP หลุดใน API Response หรือ Server Log
-- **First-Time Password Change**: บังคับให้ผู้ใช้งานเปลี่ยนรหัสผ่านทันทีเมื่อเข้าสู่ระบบครั้งแรกเพื่อความปลอดภัยสูงสุด
-- **User Suspension & Timezone-Aware Validity**: รองรับการระงับบัญชี (Suspend) และกำหนดวันเริ่มใช้งาน (Start Date) รวมถึงวันหมดอายุ (Expire Date) โดยคำนวณตาม Timezone ประเทศไทย (`Asia/Bangkok`, UTC+7) อย่างเที่ยงตรง
-- **Brute-Force Protection**: ติดตั้ง Rate Limiting ดักจับการพยายามล็อกอินซ้ำ (`loginLimiter`: 10 ครั้ง/นาที) และการขอรหัส OTP (`otpLimiter`: 3 ครั้ง/นาที)
-- **Security Headers & CORS**: ป้องกันช่องโหว่เว็บด้วย `helmet` และกำหนดค่า CORS ยืดหยุ่น รองรับทั้ง Vercel, Localhost และ Custom Domain
+### 3. การจัดการโครงการและงาน (Projects & Tasks)
+- **คำนวณความคืบหน้าและปรับสถานะอัตโนมัติ**: คิดเปอร์เซ็นต์ความคืบหน้าจากสัดส่วนงานที่เสร็จสมบูรณ์ พร้อมปรับสถานะโครงการเป็น `In Progress` เมื่อเริ่มมีงาน และ `Completed` เมื่องานทั้งหมดเสร็จสิ้น
+- **มุมมองโครงการ**: สลับดูได้ทั้งแบบตาราง (Table/Grid) และแบบกระดานสถานะ (Board View)
+- **รายละเอียดงาน**: แนบไฟล์ได้สูงสุด 25MB ต่อไฟล์ (รองรับ Cloudinary และ fallback ลงโฟลเดอร์เครื่อง), แสดงความคิดเห็นแบบเรียลไทม์ และเก็บประวัติการเปลี่ยนสถานะย้อนหลัง
 
-### 2. การจัดการผู้ใช้และสิทธิ์การเข้าถึง (User & RBAC Management)
+### 4. งานส่วนตัวและปฏิทิน (Personal Tasks)
+- **Personal Kanban Board**: บอร์ดลากวางจัดการงานส่วนตัว 3 สถานะ (`To Do`, `In Progress`, `Completed`) บันทึกลำดับลงฐานข้อมูล
+- **FullCalendar**: ลากงานจากถาดงานค้างมาวางบนปฏิทินเพื่อกำหนดวันส่ง หรือลากกลับเพื่อยกเลิกกำหนดการ พร้อมป้ายเตือนสถานะใกล้ครบกำหนดและเกินกำหนด
 
-- **ระบบสิทธิ์ตามบทบาทหน้าที่ (Role-Based Access Control - 6 บทบาท)**:
-  1. **Admin** (`admin`) - สิทธิ์สูงสุด จัดการผู้ใช้งาน โครงการ งานทั้งหมด กิจกรรมระบบ และดูรายงานสถิติระดับบริหาร
-  2. **Project Manager** (`manager`) - สร้างและบริหารโครงการ มอบหมาย Team Leader และติดตามงานในความดูแล
-  3. **Storyboard** (`storyboard`) - วางแผนสตอรี่บอร์ด บท และดำเนินงานที่ได้รับมอบหมาย
-  4. **Animation** (`animation`) - แอนิเมเตอร์และโมชันดีไซเนอร์ ดำเนินงานด้านภาพเคลื่อนไหว
-  5. **Designer** (`designer`) - กราฟิกและ UI/UX ดีไซเนอร์ ออกแบบสื่อและชิ้นงาน
-  6. **Programmer** (`programmer`) - นักพัฒนาซอฟต์แวร์ ดำเนินงานด้านระบบและโค้ด
-     _(ทุกบทบาทสามารถได้รับแต่งตั้งเป็น **Team Leader** ในแต่ละโครงการเพื่อกำกับดูแลงานในทีมได้)_
-- **Direct Leader Binding**: สมาชิกสามารถเลือกหัวหน้าสายตรง (Leader) ได้ในหน้าโปรไฟล์เพื่อการส่งต่อและอนุมัติงาน
-- **Automated Password Generation & Welcome Email**:
-  - เมื่อ Admin เพิ่มผู้ใช้ใหม่ หรือนำเข้าผู้ใช้ผ่าน Excel/CSV ระบบสามารถสุ่มรหัสผ่านชั่วคราว 6 หลัก (`tempPassword`) ให้โดยอัตโนมัติ
-  - ส่งอีเมลต้อนรับ (Welcome Email) แจ้งสิทธิ์การเข้าใช้งานและรหัสผ่านชั่วคราวให้ผู้ใช้ใหม่ทันที
-  - ผู้ใช้ใหม่ทุกคนจะได้รับสถานะ `is_force_reset = 1` เพื่อบังคับเปลี่ยนรหัสผ่านเมื่อเข้าสู่ระบบครั้งแรก
-- **Interactive Excel / CSV Import with Preview**:
-  - เทมเพลตแบบกระชับ (Streamlined Columns): `fullname`, `email`, `role`, `status`, `start_date`, `expire_date` (ตัดคอลัมน์ที่ไม่จำเป็นออกเพื่อความปลอดภัยและความสะดวก)
-  - มี **หน้าต่างพรีวิวตรวจสอบข้อมูลล่วงหน้า (Import Preview Modal)** แสดงจำนวนผู้ใช้ที่จะเพิ่มใหม่ (Create), อัปเดตข้อมูลเดิม (Update), และแจ้งเตือนข้อมูลที่ไม่สมบูรณ์ก่อนกดยืนยันบันทึกจริง
-  - ระบบคิวส่งอีเมลพร้อมหน่วงเวลา (Throttled Queue 600ms) ป้องกันการติด Rate Limit ของ SMTP / Resend
-- **User Export**: ส่งออกรายชื่อผู้ใช้ทั้งหมดเป็นไฟล์ Excel ในฟอร์แมตเดียวกับเทมเพลต สามารถนำไปแก้ไขและ Import กลับเข้ามาใหม่ได้อย่างไร้รอยต่อ
-- **Avatar & Profile Management**: อัปโหลดเปลี่ยนรูปโปรไฟล์ รองรับทั้งบันทึกลง **Cloudinary** หรือ Local Disk พร้อมระบบลบรูปเดิมอัตโนมัติ
-
-#### 📊 ตารางเปรียบเทียบสิทธิ์ผู้ใช้งาน (Role Permission Matrix)
-
-| ความสามารถ / บทบาท                                 | Admin (`admin`) | Manager (`manager`) |      Team Leader      |        Member / Staff         |
-| :------------------------------------------------- | :-------------: | :-----------------: | :-------------------: | :---------------------------: |
-| จัดการบัญชีผู้ใช้ / กำหนดบทบาท / นำเข้า Excel      |       ✅        |         ❌          |          ❌           |              ❌               |
-| สร้าง / แก้ไข / ลบ โครงการ                         |       ✅        |         ✅          |          ❌           |              ❌               |
-| สร้างงาน / มอบหมายงานในโครงการ                     |       ✅        |         ✅          | ✅ (ในโครงการที่ดูแล) |              ❌               |
-| เปลี่ยนสถานะงานในโครงการ                           |       ✅        |         ✅          | ✅ (ในโครงการที่ดูแล) | ✅ (เฉพาะงานที่ได้รับมอบหมาย) |
-| แนบไฟล์ / คอมเมนต์งานแบบเรียลไทม์                  |       ✅        |         ✅          |          ✅           |              ✅               |
-| บอร์ดส่วนตัว & ปฏิทิน (Personal Kanban & Calendar) |       ✅        |         ✅          |          ✅           |              ✅               |
-| สิทธิ์การดูรายงานสรุป (Reports)                    | ภาพรวมทั้งระบบ  |  โครงการในความดูแล  |     ทีมในโครงการ      |          สถิติตนเอง           |
-| ประวัติกิจกรรมระบบ (System Activity Logs)          |       ✅        |         ❌          |          ❌           |              ❌               |
-
-### 3. การบริหารโครงการ (Project Management)
-
-- **Smart Progress & Status Automation**:
-  - คำนวณเปอร์เซ็นต์ความคืบหน้า (Progress 0-100%) อัตโนมัติจากสัดส่วนของงานที่เสร็จสิ้น
-  - **Auto In-Progress**: ปรับสถานะโครงการเป็น `In Progress` ทันทีที่มีการสร้างงานในโครงการ
-  - **Auto Complete**: ปรับสถานะโครงการเป็น `Completed` อัตโนมัติเมื่อทุกงานในโครงการเสร็จสมบูรณ์
-- **Team Leader Assignment**: มอบหมายหัวหน้าทีมผู้รับผิดชอบโครงการ พร้อมกำหนดวันส่ง (End Date) และระดับความสำคัญ (Priority)
-- **Dual View Modes**: สลับมุมมองแสดงผลโครงการได้ทั้งแบบ **Grid Cards** และ **Kanban Board View** จัดกลุ่มตามสถานะ
-
-### 4. การจัดการงานในโครงการ (Project Tasks)
-
-- **Task Assignment & Priority**: สร้างงาน มอบหมายผู้รับผิดชอบ ระบุประเภทงาน และระดับความสำคัญ (`High`, `Medium`, `Low`)
-- **Status History Timeline**: บันทึกประวัติการเปลี่ยนสถานะงานอย่างละเอียด ย้อนดูได้ว่าใครเป็นผู้เปลี่ยนสถานะและเวลาใด
-- **Task Comments & Attachments**: แสดงความคิดเห็นแบบ Real-time และอัปโหลดไฟล์แนบเข้างาน (รองรับ Cloudinary Storage และไฟล์แนบขนาดสูงสุด 25MB) พร้อม Global Error Handling คืนค่า JSON เสมอ
-
-### 5. ระบบงานส่วนตัว (Personal Tasks - Kanban & Calendar)
-
-- **Personal Kanban Board**: จัดการงานส่วนตัวด้วยบอร์ดลากวางสถานะ `ต้องทำ (To Do)`, `กำลังทำ (In Progress)`, `เสร็จสิ้น (Completed)` บันทึกลำดับตำแหน่ง (Position) ลงฐานข้อมูลอัตโนมัติ
-- **Interactive FullCalendar with Bidirectional Tray**:
-  - ลากงานจากถาดงานค้างขึ้นปฏิทินเพื่อกำหนดวันส่ง (`task_date`)
-  - ลากงานจากปฏิทินลงถาดเพื่อยกเลิกวันส่ง (Unschedule) ได้สองทิศทาง
-  - มีป้ายแจ้งเตือนสถานะวันส่ง: ⚠️ **เกินกำหนด (Overdue)**, ⏰ **ใกล้ครบกำหนด (Due Soon)**, 📅 **ปกติ** ปลอดภัยจากปัญหา Timezone Shift ด้วย Local Date Parsing
-
-### 6. ระบบแจ้งเตือน & ระบบเบื้องหลัง (Real-time Notifications & Scheduler)
-
-- **Real-time WebSockets (`socket.io`)**: อัปเดตสถานะงาน, คอมเมนต์ใหม่, ไฟล์แนบใหม่ และแจ้งเตือนกระดิ่งแบบ Real-time ทันทีโดยไม่ต้องกดรีเฟรชหน้าจอ
-- **Automated Overdue Task Monitor**: ระบบ Cron Scheduler ตรวจสอบงานเกินกำหนดส่งอัตโนมัติ และส่งอีเมลแจ้งเตือนไปยัง Team Leader
-- **Multi-Provider Email Service**: รองรับการส่งอีเมล 3 ช่องทาง:
-  1. **Brevo HTTP API** (แนะนำสำหรับ Cloud Hosting เช่น Railway/Render - ฟรี 300 ฉบับ/วัน ไม่ต้องเปิดพอร์ต SMTP)
-  2. **Resend HTTP API** (ส่งผ่าน HTTPS Port 443 ปลอดภัยจากปัญหาการบล็อกพอร์ต SMTP)
-  3. **Standard SMTP** (เช่น Gmail App Password)
-
-### 7. ระบบธีม ดีไซน์คอนทราสต์ และสองภาษา (Design System & i18n)
-
-- **Theme Modes**: รองรับทั้ง **โหมดมืด (Dark Mode)** และ **โหมดสว่าง (Light Mode)**
-- **Solid Accent Colors**: ปรับแต่งสีไฮไลต์ของระบบได้ 10 โทนสี (Blue, Purple, Pink, Violet, Indigo, Orange, Teal, Bronze, Mint, Gold)
-- **Bilingual Support (i18n)**: รองรับการสลับระหว่าง **ภาษาไทย (TH)** และ **ภาษาอังกฤษ (EN)** ได้ทันที ครอบคลุมทุกหน้าและตารางสถิติ
+### 5. การแจ้งเตือนและส่วนติดต่อผู้ใช้
+- **แจ้งเตือนแบบเรียลไทม์**: ใช้ `socket.io` อัปเดตสถานะงาน ความคิดเห็น ไฟล์แนบ และการแจ้งเตือนกระดิ่งโดยไม่ต้องรีเฟรชหน้า
+- **ตรวจงานเกินกำหนดอัตโนมัติ**: มี Cron Job คอยตรวจงานที่เลยกำหนดส่งและแจ้งเตือนไปยังผู้รับผิดชอบและหัวหน้าทีม
+- **รองรับอีเมลหลายช่องทาง**: ใช้ได้ทั้ง Brevo HTTP API, Resend HTTP API และ SMTP (เช่น Gmail)
+- **ธีมและภาษา**: รองรับ Dark / Light Mode, ปรับสีหลักได้ 10 โทน และสลับภาษาไทย–อังกฤษ (TH/EN)
 
 ---
 
-## 🛠️ เทคโนโลยีที่ใช้ (Tech Stack)
+## Tech Stack
 
-### **Frontend**
-
-- **Core**: React 19, Vite, React Router DOM v7
-- **Styling**: Tailwind CSS v4, Vanilla CSS Design System Tokens
-- **Icons & Animation**: Bootstrap Icons, Ionicons, Framer Motion, GSAP
-- **Components & Libraries**: `@fullcalendar/react`, `@hello-pangea/dnd`, `sweetalert2`, `exceljs`, `xlsx`, `axios`, `socket.io-client`, `recharts`
-
-### **Backend**
-
-- **Runtime**: Node.js (v20+), Express.js (ES Modules)
-- **Real-time**: Socket.io
-- **Database Driver**: `mysql2/promise` (Connection Pooling พร้อม `dateStrings: true`)
-- **Cloud Storage**: Cloudinary (`multer-storage-cloudinary`) สำหรับรูปโปรไฟล์และไฟล์แนบ
-- **Email Service**: Brevo HTTP API, Resend HTTP API, Nodemailer
-- **Security & Performance**: `helmet`, `express-rate-limit`, `compression`, `bcrypt`, `jsonwebtoken`, `multer`
-
-### **Database**
-
-- **RDBMS**: MySQL 8.0+ / MariaDB / Cloud MySQL (TiDB Cloud, Railway, Aiven, Supabase)
-- **Database Migration**: ตรวจสอบและสร้างตาราง 13 ตาราง พร้อม Performance Composite Indexes อัตโนมัติใน [server/lib/initDb.js](server/lib/initDb.js) รองรับทั้ง Database เดี่ยวและ Railway URL
+- **Frontend**: React 19, Vite, React Router v7, Tailwind CSS v4, FullCalendar, `@hello-pangea/dnd`, Recharts, Axios, Socket.io Client, ExcelJS / XLSX, SweetAlert2
+- **Backend**: Node.js 20+, Express 4, Socket.io, `mysql2/promise`, Multer (`multer-storage-cloudinary`), bcrypt, jsonwebtoken, helmet, express-rate-limit, Nodemailer
+- **Database**: MySQL 8.0+ / TiDB Cloud Serverless (สร้างตารางและ Index อัตโนมัติผ่าน `server/lib/initDb.js`)
+- **Hosting / Storage**: Vercel (Frontend), Railway / Render (Backend), Cloudinary (Files & Avatars)
 
 ---
 
-## 📁 โครงสร้างโปรเจกต์ (Project Structure)
+## โครงสร้างโปรเจกต์
 
 ```text
-RNM AUTH/
-├── frontend/                   
-│   ├── public/                 
+RNM AUTH_deploy_ready/
+├── frontend/
 │   ├── src/
-│   │   ├── assets/             
-│   │   ├── components/         
-│   │   ├── lib/                
-│   │   ├── pages/              
-│   │   │   ├── About/          
-│   │   │   ├── Activity/       
-│   │   │   ├── AllTasks/       
-│   │   │   ├── Contract/       
-│   │   │   ├── Dashboard/      
-│   │   │   ├── Home/           
-│   │   │   ├── Login/          
-│   │   │   ├── ManageProject/  
-│   │   │   ├── ManageUser/     
-│   │   │   ├── MyActivity/     
-│   │   │   ├── MyTasks/        
-│   │   │   ├── PersonalTask/   
-│   │   │   ├── Profile/        
-│   │   │   ├── Reports/        
-│   │   │   ├── ResetPassword/  
-│   │   │   └── ResetPasswordFirstTime/ 
-│   │   ├── App.jsx             
-│   │   ├── config.js           
-│   │   ├── index.css           
-│   │   └── main.jsx            
-│   ├── .env.example            
-│   ├── index.html
-│   ├── vercel.json             
-│   ├── vite.config.js
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── lib/
+│   │   ├── pages/              # Dashboard, ManageProject, AllTasks, PersonalTask, ManageUser, Reports ฯลฯ
+│   │   ├── App.jsx
+│   │   ├── config.js
+│   │   └── main.jsx
+│   ├── vercel.json
 │   └── package.json
-│
-├── server/                     
-│   ├── controllers/
-│   │   ├── authController.js   
-│   │   └── notificationController.js # ควบคุมระบบแจ้งเตือน In-App
-│   ├── lib/
-│   │   ├── cloudinary.js       
-│   │   ├── db.js               
-│   │   ├── initDb.js           
-│   │   └── socket.js           
-│   ├── middleware/
-│   │   └── authMiddleware.js   
-│   ├── routes/
-│   │   └── authRoutes.js       
-│   ├── utils/
-│   │   ├── cacheService.js     
-│   │   ├── emailService.js     
-│   │   └── taskScheduler.js    
-│   ├── uploads/                
-│   ├── .env.example            
-│   ├── index.js                
+├── server/
+│   ├── controllers/            # authController.js, notificationController.js
+│   ├── lib/                    # db.js, initDb.js, cloudinary.js, socket.js
+│   ├── middleware/             # authMiddleware.js
+│   ├── routes/                 # authRoutes.js
+│   ├── utils/                  # cacheService.js, emailService.js, taskScheduler.js
+│   ├── uploads/
+│   ├── index.js
 │   └── package.json
-│
-├── DEPLOYMENT_GUIDE.md         
-├── package.json                
-└── README.md                   
+├── DEPLOYMENT_GUIDE.md
+├── package.json
+└── README.md
 ```
 
 ---
 
-## ⚡ การติดตั้งและรันในเครื่อง (Local Development)
+## การติดตั้งและรันในเครื่อง (Local Development)
 
-### 1. ความต้องการของระบบ (Prerequisites)
+### สิ่งที่ต้องเตรียม
+- Node.js เวอร์ชัน 20 ขึ้นไป
+- MySQL 8.0+ หรือ TiDB Cloud (สร้างฐานข้อมูลเปล่าเตรียมไว้ เช่น `myapp_db`)
 
-- **Node.js**: เวอร์ชัน 20.0.0 ขึ้นไป
-- **MySQL Database**: เช่น MySQL 8.0+ บน XAMPP หรือ Standalone MySQL Server (สร้าง Database เปล่า เช่น `myapp_db`)
-
-### 2. การติดตั้ง Dependencies
-
-คุณสามารถติดตั้ง dependencies ได้โดยตรงผ่าน terminal:
+### 1. ติดตั้ง Dependencies
 
 ```bash
-# ติดตั้ง Backend Dependencies
 cd server && npm install && cd ..
-
-# ติดตั้ง Frontend Dependencies
 cd frontend && npm install && cd ..
 ```
 
-### 3. การรันระบบ (Run Application)
+### 2. ตั้งค่า Environment Variables
 
-สามารถสั่งรันจาก Root Directory ได้สะดวก:
+**ฝั่ง Backend (`server/.env`)** — คัดลอกมาจาก `server/.env.example`
+
+| ตัวแปร | ตัวอย่าง | คำอธิบาย |
+| :--- | :--- | :--- |
+| `PORT` | `3000` | พอร์ตของ Backend |
+| `DB_HOST` | `localhost` | Host ของ MySQL / TiDB |
+| `DB_USER` | `root` | ชื่อผู้ใช้ฐานข้อมูล |
+| `DB_PASSWORD` | `""` | รหัสผ่านฐานข้อมูล |
+| `DB_NAME` | `myapp_db` | ชื่อฐานข้อมูล |
+| `DB_PORT` | `3306` หรือ `4000` | พอร์ตฐานข้อมูล (TiDB ใช้ `4000`) |
+| `DB_SSL` | `true` | เปิดใช้ SSL (จำเป็นสำหรับ TiDB Cloud) |
+| `JWT_KEY` | `your_secret_key` | Secret Key สำหรับสร้าง JWT |
+| `FRONTEND_URL` | `http://localhost:5173` | URL ของ Frontend สำหรับ CORS |
+| `BASE_URL` | `http://localhost:3000` | URL ของ Backend |
+| `RESEND_API_KEY` | `re_...` | API Key ของ Resend (กรณีใช้ Resend) |
+| `RESEND_FROM` | `support@yourdomain.com` | อีเมลผู้ส่งสำหรับ Resend |
+| `EMAIL_USER` | `your_email@gmail.com` | อีเมล SMTP (กรณีใช้ Gmail) |
+| `EMAIL_PASS` | `xxxx xxxx xxxx xxxx` | App Password สำหรับ SMTP |
+| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name` | Cloud Name (ถ้าไม่ใส่จะเก็บลง `server/uploads/`) |
+| `CLOUDINARY_API_KEY` | `your_api_key` | Cloudinary API Key |
+| `CLOUDINARY_API_SECRET` | `your_api_secret` | Cloudinary API Secret |
+
+**ฝั่ง Frontend (`frontend/.env`)** — คัดลอกมาจาก `frontend/.env.example`
+
+| ตัวแปร | ตัวอย่าง | คำอธิบาย |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | `http://localhost:3000` | URL ของ Backend API |
+
+### 3. สั่งรันโปรเจกต์
+
+รันจากโฟลเดอร์หลัก:
 
 ```bash
-# รัน Frontend Development Server (พอร์ต 5173)
+# รัน Frontend (พอร์ต 5173)
 npm run dev:frontend
 
-# รัน Backend Development Server (พอร์ต 3000 พร้อม nodemon)
+# รัน Backend (พอร์ต 3000)
 npm run dev:server
 ```
 
-_(หรือเข้าโฟลเดอร์ `server` แล้วสั่ง `npm run dev` และเข้าโฟลเดอร์ `frontend` สั่ง `npm run dev`)_
-
-เปิดเบราว์เซอร์ไปที่: `http://localhost:5173`
+จากนั้นเปิดเบราว์เซอร์ไปที่ `http://localhost:5173`
 
 ---
 
-## ⚙️ การตั้งค่า Environment Variables
+## การ Deploy ขึ้น Production
 
-### 1. ฝั่ง Backend (`server/.env`)
+ดูขั้นตอนโดยละเอียดได้ที่ [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 
-สร้างไฟล์ `server/.env` โดยคัดลอกตัวอย่างจาก `server/.env.example`:
-
-| ตัวแปร                  | ตัวอย่างค่า              | คำอธิบาย                                         |
-| :---------------------- | :----------------------- | :----------------------------------------------- |
-| `PORT`                  | `3000`                   | พอร์ตของ Backend Server                          |
-| `DB_HOST`               | `localhost`              | ที่อยู่ของฐานข้อมูล (MySQL หรือ TiDB Cloud Host) |
-| `DB_USER`               | `root`                   | ชื่อผู้ใช้ MySQL / TiDB                          |
-| `DB_PASSWORD`           | `""`                     | รหัสผ่าน MySQL / TiDB                            |
-| `DB_NAME`               | `myapp_db`               | ชื่อฐานข้อมูล                                    |
-| `DB_PORT`               | `3306` หรือ `4000`       | พอร์ต MySQL (ค่าเริ่มต้น 3306, TiDB ใช้ 4000)    |
-| `DB_SSL`                | `true`                   | เปิดใช้งาน SSL/TLS (จำเป็นสำหรับ TiDB Cloud)     |
-| `JWT_KEY`               | `random_secret_string`   | คีย์เข้ารหัส JWT Session Token                   |
-| `FRONTEND_URL`          | `http://localhost:5173`  | โดเมนของ Frontend (สำหรับ CORS)                  |
-| `BASE_URL`              | `http://localhost:3000`  | โดเมนของ Backend Server                          |
-| `RESEND_API_KEY`        | `re_...`                 | API Key จาก Resend                               |
-| `RESEND_FROM`           | `support@yourdomain.com` | อีเมลผู้ส่งผ่าน Resend (ต้องใช้โดเมนตนเอง)       |
-| `EMAIL_USER`            | `your_email@gmail.com`   | อีเมลสำหรับ SMTP (กรณีใช้ Gmail)                 |
-| `EMAIL_PASS`            | `xxxx xxxx xxxx xxxx`    | App Password 16 หลักจาก Google Account           |
-| `CLOUDINARY_CLOUD_NAME` | `your_cloud_name`        | Cloudinary Name สำหรับบันทึกไฟล์ถาวรบนคลาวด์     |
-| `CLOUDINARY_API_KEY`    | `your_api_key`           | Cloudinary API Key                               |
-| `CLOUDINARY_API_SECRET` | `your_api_secret`        | Cloudinary API Secret                            |
-
-### 2. ฝั่ง Frontend (`frontend/.env`)
-
-สร้างไฟล์ `frontend/.env` โดยคัดลอกตัวอย่างจาก `frontend/.env.example`:
-
-| ตัวแปร         | ตัวอย่างค่า             | คำอธิบาย                                                                            |
-| :------------- | :---------------------- | :---------------------------------------------------------------------------------- |
-| `VITE_API_URL` | `http://localhost:3000` | ที่อยู่ของ Backend API (เมื่อขึ้น Production ให้เปลี่ยนเป็น URL ของ Render/Railway) |
+- **Frontend (Vercel)**: ตั้ง Root Directory เป็น `frontend`, Framework เป็น `Vite`, Build Command `npm run build`, Output `dist` และตั้งค่า `VITE_API_URL` ชี้ไปยัง URL ของ Backend (มี `vercel.json` รองรับ SPA rewrite แล้ว)
+- **Backend (Railway / Render)**: ตั้ง Root Directory เป็น `server`, Build Command `npm install`, Start Command `npm start` และใส่ Environment Variables ตาม `server/.env.example`
 
 ---
 
-## 🛡️ สถาปัตยกรรมความปลอดภัยและประสิทธิภาพ (Security & Performance)
+## รายการ API Endpoints หลัก
 
-1. **Zero-Leak OTP Architecture**:
-   - การเรียกใช้ `POST /auth/send-otp` จะไม่ส่งรหัส OTP กลับไปใน JSON Response และไม่แสดงรหัส OTP เป็น Plain Text บน Server Console Log
-2. **Persistent Cloud Storage Fallback**:
-   - เมื่อตั้งค่า Cloudinary ครบถ้วน ระบบจะอัปโหลดรูปโปรไฟล์และไฟล์แนบขึ้น Cloudinary ทันที
-   - หากยังไม่ได้ตั้งค่า Cloudinary ระบบจะบันทึกลงโฟลเดอร์ `server/uploads/` ให้อัตโนมัติโดยไม่เกิดข้อผิดพลาดโฟลเดอร์สูญหาย (`ENOENT`)
-3. **Robust Multer Error Handling**:
-   - เมื่ออัปโหลดไฟล์ที่มีขนาดเกินโควตา (25MB) หรือประเภทไฟล์ไม่ถูกต้อง Express Error Handling Middleware จะตอบกลับเป็น JSON Format (`400 Bad Request`) แทนการแสดง HTML Error Page
-4. **Timezone Accuracy (`Asia/Bangkok`)**:
-   - การตรวจสอบวันเริ่มงานและวันหมดอายุของบัญชีผู้ใช้จะคำนวณตามเวลาท้องถิ่นประเทศไทยอย่างแม่นยำ ป้องกันปัญหาผู้ใช้เข้าใช้งานไม่ได้ก่อนเวลาอันควร
-5. **In-Memory Caching (`cacheService`)**:
-   - เพิ่มประสิทธิภาพการตอบสนองของระบบด้วย In-Memory Cache ในส่วนของ Users, Projects, Tasks และ Personal Tasks พร้อมระบบ Invalidate Cache อัตโนมัติเมื่อเกิดการแก้ไขข้อมูล
-
----
-
-## 🌐 การนำขึ้นระบบจริง (Production Deployment)
-
-ดูคำแนะนำเพิ่มเติมได้ที่ [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
-
-### 1. Frontend (Deploy บน Vercel)
-
-- **Root Directory**: `frontend`
-- **Framework Preset**: `Vite`
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist`
-- **Environment Variable**: `VITE_API_URL=https://your-backend.onrender.com`
-- ระบบมีไฟล์ [frontend/vercel.json](frontend/vercel.json) ตั้งค่า Client-side rewrite ไว้เรียบร้อยแล้ว รองรับการกด Refresh ทุกหน้าโดยไม่ติดปัญหา 404
-
-### 2. Backend (Deploy บน Render หรือ Railway)
-
-- **Root Directory**: `server`
-- **Environment**: Node.js
-- **Build Command**: `npm install`
-- **Start Command**: `npm start` (รันคำสั่ง `node index.js`)
-- **Environment Variables**: ตั้งค่าตามตารางใน [server/.env.example](server/.env.example)
-
----
-
-## 📑 รายการ API Endpoints สำคัญ
-
-| Method   | Endpoint                          | สิทธิ์การเข้าถึง (Auth) | คำอธิบาย                                              |
-| :------- | :-------------------------------- | :---------------------: | :---------------------------------------------------- |
-| `POST`   | `/auth/login`                     |  Public (Rate Limited)  | เข้าสู่ระบบ และรับ JWT Session Token                  |
-| `POST`   | `/auth/refresh`                   |         Public          | ต่ออายุ JWT Token เมื่อใกล้หมดอายุ                    |
-| `POST`   | `/auth/logout`                    |         Public          | ออกจากระบบ และบันทึกประวัติ Logout                    |
-| `POST`   | `/auth/send-otp`                  |  Public (Rate Limited)  | ส่งรหัส OTP ไปยังอีเมลเพื่อกู้คืนรหัสผ่าน (Zero-Leak) |
-| `POST`   | `/auth/reset-password`            |         Public          | ตั้งรหัสผ่านใหม่ด้วยรหัส OTP                          |
-| `POST`   | `/auth/reset-password-first-time` |         Public          | บังคับเปลี่ยนรหัสผ่านเมื่อเข้าใช้งานครั้งแรก          |
-| `POST`   | `/auth/change-password`           |     Token Required      | เปลี่ยนรหัสผ่านจากหน้า Profile                        |
-| `POST`   | `/auth/contact`                   |  Public (Rate Limited)  | ส่งข้อความติดต่อสอบถามผ่านฟอร์ม Contact               |
-| `GET`    | `/auth/users`                     |     Token Required      | ดึงรายชื่อผู้ใช้งานทั้งหมด (รองรับ Cache)             |
-| `POST`   | `/auth/users`                     | Token Required (Admin)  | สร้างผู้ใช้งานใหม่ พร้อมอัปโหลด Avatar                |
-| `PUT`    | `/auth/users/:id`                 |     Token Required      | แก้ไขข้อมูลผู้ใช้ / เปลี่ยนบทบาท                      |
-| `DELETE` | `/auth/users/:id`                 | Token Required (Admin)  | ลบผู้ใช้แบบ Soft Delete                               |
-| `POST`   | `/auth/users/:id/restore`         | Token Required (Admin)  | กู้คืนผู้ใช้ที่ถูก Soft Delete กลับมา                 |
-| `POST`   | `/auth/users/import`              | Token Required (Admin)  | นำเข้าผู้ใช้งานแบบ Batch จาก Excel/CSV                |
-| `GET`    | `/auth/team-leaders`              |     Token Required      | ดึงรายชื่อผู้ใช้ที่สามารถแต่งตั้งเป็น Team Leader ได้ |
-| `GET`    | `/auth/projects`                  |     Token Required      | ดึงรายการโครงการทั้งหมด พร้อม Progress คำนวณอัตโนมัติ |
-| `POST`   | `/auth/projects`                  |     Token Required      | สร้างโครงการใหม่และมอบหมาย Team Leader                |
-| `PUT`    | `/auth/projects/:id`              |     Token Required      | แก้ไขข้อมูลโครงการ                                    |
-| `DELETE` | `/auth/projects/:id`              |     Token Required      | ลบโครงการพร้อมงานทั้งหมด                              |
-| `POST`   | `/auth/tasks`                     |     Token Required      | สร้างงานใหม่ภายใต้โครงการ                             |
-| `PUT`    | `/auth/tasks/:id`                 |     Token Required      | แก้ไขรายละเอียดงาน                                    |
-| `PUT`    | `/auth/tasks/:id/status`          |     Token Required      | อัปเดตสถานะงาน (Sync เรียลไทม์ผ่าน WebSockets)        |
-| `DELETE` | `/auth/tasks/:id`                 |     Token Required      | ลบงานออกจากโครงการ                                    |
-| `GET`    | `/auth/tasks/:id/status-history`  |     Token Required      | ดึงประวัติ Timeline การเปลี่ยนสถานะงาน                |
-| `GET`    | `/auth/tasks/:id/comments`        |     Token Required      | ดึงรายการความคิดเห็นในงาน                             |
-| `POST`   | `/auth/tasks/:id/comments`        |     Token Required      | ส่งความคิดเห็นใหม่ในงาน                               |
-| `GET`    | `/auth/tasks/:id/files`           |     Token Required      | ดึงรายการไฟล์แนบของงาน                                |
-| `POST`   | `/auth/tasks/:id/files`           |     Token Required      | อัปโหลดไฟล์แนบเข้าสู่งาน (รองรับ Cloudinary)          |
-| `GET`    | `/auth/personal-tasks`            |     Token Required      | ดึงรายการงานส่วนตัวของผู้ใช้งาน                       |
-| `POST`   | `/auth/personal-tasks`            |     Token Required      | สร้างงานส่วนตัวใหม่                                   |
-| `PUT`    | `/auth/personal-tasks/reorder`    |     Token Required      | อัปเดตลำดับและสถานะการลากวางบน Kanban                 |
-| `PUT`    | `/auth/personal-tasks/:id`        |     Token Required      | แก้ไขรายละเอียดงานส่วนตัว                             |
-| `DELETE` | `/auth/personal-tasks/:id`        |     Token Required      | ลบงานส่วนตัวออกจากบอร์ดและปฏิทิน                      |
-| `GET`    | `/auth/calendar-events`           |     Token Required      | ดึงข้อมูลกำหนดการสำหรับแสดงผลบน FullCalendar          |
-| `GET`    | `/auth/notifications`             |     Token Required      | ดึงรายการแจ้งเตือน In-App ของตนเอง                    |
-| `PUT`    | `/auth/notifications/read-all`    |     Token Required      | ทำเครื่องหมายว่าอ่านแจ้งเตือนแล้วทั้งหมด              |
-| `PUT`    | `/auth/notifications/:id/read`    |     Token Required      | ทำเครื่องหมายอ่านแจ้งเตือนทีละรายการ                  |
-| `DELETE` | `/auth/notifications/:id`         |     Token Required      | ลบรายการแจ้งเตือน                                     |
-| `GET`    | `/auth/dashboard-stats`           |     Token Required      | ดึงข้อมูลสถิติและผลรวมสำหรับแดชบอร์ด                  |
-| `GET`    | `/auth/activity-logs`             | Token Required (Admin)  | ดึงบันทึกประวัติกิจกรรมในระบบ                         |
+| Method | Endpoint | สิทธิ์ | คำอธิบาย |
+| :--- | :--- | :---: | :--- |
+| `POST` | `/auth/login` | Public | เข้าสู่ระบบและรับ JWT |
+| `POST` | `/auth/refresh` | Public | ต่ออายุ JWT |
+| `POST` | `/auth/logout` | Public | ออกจากระบบและบันทึก Log |
+| `POST` | `/auth/send-otp` | Public | ส่ง OTP ไปยังอีเมลเพื่อรีเซ็ตรหัสผ่าน |
+| `POST` | `/auth/reset-password` | Public | ตั้งรหัสผ่านใหม่ด้วย OTP |
+| `POST` | `/auth/reset-password-first-time` | Public | เปลี่ยนรหัสผ่านเมื่อเข้าใช้งานครั้งแรก |
+| `POST` | `/auth/change-password` | User | เปลี่ยนรหัสผ่านในหน้า Profile |
+| `POST` | `/auth/contact` | Public | ส่งข้อความจากหน้าติดต่อสอบถาม |
+| `GET` | `/auth/users` | User | ดึงรายชื่อผู้ใช้ |
+| `POST` | `/auth/users` | Admin | สร้างผู้ใช้ใหม่ |
+| `PUT` | `/auth/users/:id` | User | แก้ไขข้อมูลผู้ใช้ / เปลี่ยนบทบาท |
+| `DELETE` | `/auth/users/:id` | Admin | ลบผู้ใช้ (Soft Delete) |
+| `POST` | `/auth/users/:id/restore` | Admin | กู้คืนผู้ใช้ที่ถูกลบ |
+| `POST` | `/auth/users/import` | Admin | นำเข้าผู้ใช้จาก Excel/CSV |
+| `GET` | `/auth/team-leaders` | User | ดึงรายชื่อผู้ใช้สำหรับแต่งตั้งเป็น Team Leader |
+| `GET` | `/auth/projects` | User | ดึงรายการโครงการทั้งหมด |
+| `POST` | `/auth/projects` | User | สร้างโครงการใหม่ |
+| `PUT` | `/auth/projects/:id` | User | แก้ไขโครงการ |
+| `DELETE` | `/auth/projects/:id` | User | ลบโครงการและงานที่เกี่ยวข้อง |
+| `POST` | `/auth/tasks` | User | สร้างงานใหม่ในโครงการ |
+| `PUT` | `/auth/tasks/:id` | User | แก้ไขรายละเอียดงาน |
+| `PUT` | `/auth/tasks/:id/status` | User | อัปเดตสถานะงาน |
+| `DELETE` | `/auth/tasks/:id` | User | ลบงาน |
+| `GET` | `/auth/tasks/:id/status-history` | User | ดูประวัติการเปลี่ยนสถานะงาน |
+| `GET` | `/auth/tasks/:id/comments` | User | ดูความคิดเห็นของงาน |
+| `POST` | `/auth/tasks/:id/comments` | User | เพิ่มความคิดเห็นในงาน |
+| `GET` | `/auth/tasks/:id/files` | User | ดูรายการไฟล์แนบของงาน |
+| `POST` | `/auth/tasks/:id/files` | User | อัปโหลดไฟล์แนบ |
+| `GET` | `/auth/personal-tasks` | User | ดึงรายการงานส่วนตัว |
+| `POST` | `/auth/personal-tasks` | User | สร้างงานส่วนตัว |
+| `PUT` | `/auth/personal-tasks/reorder` | User | อัปเดตสถานะและลำดับบนบอร์ด |
+| `PUT` | `/auth/personal-tasks/:id` | User | แก้ไขงานส่วนตัว |
+| `DELETE` | `/auth/personal-tasks/:id` | User | ลบงานส่วนตัว |
+| `GET` | `/auth/calendar-events` | User | ดึงกำหนดการแสดงบนปฏิทิน |
+| `GET` | `/auth/notifications` | User | ดึงรายการแจ้งเตือนของตนเอง |
+| `PUT` | `/auth/notifications/read-all` | User | อ่านแจ้งเตือนทั้งหมด |
+| `PUT` | `/auth/notifications/:id/read` | User | อ่านแจ้งเตือนรายรายการ |
+| `DELETE` | `/auth/notifications/:id` | User | ลบแจ้งเตือน |
+| `GET` | `/auth/dashboard-stats` | User | ดึงสถิติสำหรับหน้า Dashboard |
+| `GET` | `/auth/activity-logs` | Admin | ดึงประวัติกิจกรรมทั้งหมดในระบบ |
 
 ---
 
-## 👨‍💻 ผู้พัฒนาและข้อมูลติดต่อ (Author & Contact)
+## ผู้พัฒนา
 
-- **Website**: [chayanonlab.link](https://www.chayanonlab.link/)
-- **GitHub**: [@ChayanonChantapanth135](https://github.com/ChayanonChantapanth135)
-- **Project Repository**: [RNM-AUTH_deploy_ready](https://github.com/ChayanonChantapanth135/RNM-AUTH_deploy_ready)
+- **Website:** [chayanonlab.link](https://www.chayanonlab.link/)
+- **GitHub:** [@ChayanonChantapanth135](https://github.com/ChayanonChantapanth135)
+- **Repository:** [RNM-AUTH_deploy_ready](https://github.com/ChayanonChantapanth135/RNM-AUTH_deploy_ready)
