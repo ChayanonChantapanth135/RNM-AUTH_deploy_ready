@@ -77,7 +77,10 @@ import rateLimit from 'express-rate-limit';
 export const loginLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 10, // Limit each IP to 10 login requests per windowMs
-    message: { message: 'มีคำขอเข้าสู่ระบบบ่อยเกินไป กรุณารอ 1 นาทีก่อนลองใหม่อีกครั้ง' },
+    message: {
+        code: 'RATE_LIMIT_LOGIN',
+        message: 'มีคำขอเข้าสู่ระบบบ่อยเกินไป กรุณารอ 1 นาทีก่อนลองใหม่อีกครั้ง',
+    },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -86,7 +89,10 @@ export const loginLimiter = rateLimit({
 export const otpLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 3, // Limit each IP to 3 OTP requests per windowMs
-    message: { message: 'มีการขอรหัส OTP บ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่' },
+    message: {
+        code: 'RATE_LIMIT_OTP',
+        message: 'มีการขอรหัส OTP บ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่',
+    },
     standardHeaders: true,
     legacyHeaders: false,
 });
@@ -95,7 +101,10 @@ export const otpLimiter = rateLimit({
 export const contactLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 5, // Limit each IP to 5 contact requests per windowMs
-    message: { message: 'มีการส่งข้อความติดต่อบ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง' },
+    message: {
+        code: 'RATE_LIMIT_CONTACT',
+        message: 'มีการส่งข้อความติดต่อบ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่อีกครั้ง',
+    },
     standardHeaders: true,
     legacyHeaders: false,
 });

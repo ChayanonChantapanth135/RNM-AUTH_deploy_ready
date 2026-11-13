@@ -40,11 +40,15 @@ const ContractPage = () => {
       setFormData({ fullName: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Error sending contact message:", error);
-      const msg =
-        error.response?.data?.message ||
-        (language === "th"
-          ? "ไม่สามารถส่งข้อความได้ กรุณาลองใหม่อีกครั้ง"
-          : "Failed to send message. Please try again.");
+      const isRateLimited =
+        error.response?.status === 429 ||
+        error.response?.data?.code === "RATE_LIMIT_CONTACT";
+      const msg = isRateLimited
+        ? t("contactRateLimited")
+        : error.response?.data?.message ||
+          (language === "th"
+            ? "ไม่สามารถส่งข้อความได้ กรุณาลองใหม่อีกครั้ง"
+            : "Failed to send message. Please try again.");
       Swal.fire({
         icon: "error",
         title: language === "th" ? "เกิดข้อผิดพลาด" : "Error",

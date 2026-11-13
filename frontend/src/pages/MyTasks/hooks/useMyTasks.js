@@ -112,23 +112,45 @@ export const useMyTasks = () => {
       loadData();
     };
 
+    const handleSocketStatusUpdated = (payload) => {
+      if (!payload || !payload.taskId) {
+        loadData();
+        return;
+      }
+      setMyTasks((prev) =>
+        prev.map((task) =>
+          Number(task.id) === Number(payload.taskId) && payload.status
+            ? { ...task, status: payload.status }
+            : task
+        )
+      );
+    };
+
+    const handleSocketTaskDeleted = (payload) => {
+      if (!payload || !payload.taskId) {
+        loadData();
+        return;
+      }
+      setMyTasks((prev) => prev.filter((task) => Number(task.id) !== Number(payload.taskId)));
+    };
+
     window.addEventListener("taskStatusUpdated", handleStatusUpdate);
 
     const socket = getSocket();
     if (socket) {
       socket.on("task:created", handleStatusUpdate);
-      socket.on("task:status:updated", handleStatusUpdate);
+      socket.on("task:status:updated", handleSocketStatusUpdated);
       socket.on("task:updated", handleStatusUpdate);
-      socket.on("task:deleted", handleStatusUpdate);
+      socket.on("task:deleted", handleSocketTaskDeleted);
     }
 
     return () => {
       window.removeEventListener("taskStatusUpdated", handleStatusUpdate);
       if (socket) {
         socket.off("task:created", handleStatusUpdate);
-        socket.off("task:status:updated", handleStatusUpdate);
+        socket.off("task:status:updated", handleSocketStatusUpdated);
         socket.off("task:updated", handleStatusUpdate);
-        socket.off("task:deleted", handleStatusUpdate);
+        socket.off("task:deleted", handleSocketTaskDeleted);
       }
     };
   }, []);

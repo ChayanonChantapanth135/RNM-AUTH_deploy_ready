@@ -65,7 +65,9 @@ export const useLogin = (t) => {
       const errData = err.response?.data;
       const rawMsg = (errData?.message || "").toLowerCase();
 
-      if (errData?.code === "ACCOUNT_EXPIRED" || rawMsg.includes("expired")) {
+      if (err.response?.status === 429 || errData?.code === "RATE_LIMIT_LOGIN") {
+        setError(t("loginRateLimited") || "มีคำขอเข้าสู่ระบบบ่อยเกินไป กรุณารอ 1 นาทีก่อนลองใหม่อีกครั้ง");
+      } else if (errData?.code === "ACCOUNT_EXPIRED" || rawMsg.includes("expired")) {
         setError(t("accountExpired") || "บัญชีของคุณหมดอายุการใช้งานแล้ว กรุณาติดต่อผู้ดูแลระบบ");
       } else if (errData?.code === "ACCOUNT_NOT_STARTED" || rawMsg.includes("not started")) {
         const notStartedMsg = t("accountNotStarted") || "บัญชีนี้จะเริ่มใช้งานได้ตั้งแต่วันที่ {startDate}";

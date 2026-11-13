@@ -67,7 +67,9 @@ export const useResetPassword = (language, t) => {
     } catch (err) {
       const errData = err.response?.data;
       const rawMsg = (errData?.message || "").toLowerCase();
-      if (err.response?.status === 404 || rawMsg.includes("not found") || rawMsg.includes("ไม่พบ")) {
+      if (err.response?.status === 429 || errData?.code === "RATE_LIMIT_OTP") {
+        setError(t("otpRateLimited") || (language === "th" ? "มีการขอรหัส OTP บ่อยเกินไป กรุณารอ 1 นาทีแล้วลองใหม่" : "Too many OTP requests. Please wait 1 minute and try again."));
+      } else if (err.response?.status === 404 || rawMsg.includes("not found") || rawMsg.includes("ไม่พบ")) {
         setError(t("userNotFound") || (language === "th" ? "ไม่พบอีเมลผู้ใช้ในระบบ" : "User not found"));
       } else {
         setError(t("otpSendFailed") || (language === "th" ? "ไม่สามารถส่งรหัส OTP ได้" : "Failed to send OTP."));

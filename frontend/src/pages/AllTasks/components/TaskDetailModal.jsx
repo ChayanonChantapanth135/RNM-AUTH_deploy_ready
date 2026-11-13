@@ -11,7 +11,7 @@ import { getSocket } from "../../../lib/socket";
 const TaskDetailModal = ({
   showViewModal,
   setShowViewModal,
-  selectedTask,
+  selectedTask: initialSelectedTask,
   tempStatus,
   setTempStatus,
   handleUpdateTask,
@@ -23,6 +23,10 @@ const TaskDetailModal = ({
   hideEditInfoButton = false,
 }) => {
   const { language } = useLanguage();
+  const [selectedTask, setSelectedTask] = useState(initialSelectedTask);
+  useEffect(() => {
+    setSelectedTask(initialSelectedTask);
+  }, [initialSelectedTask]);
   const [isEditing, setIsEditing] = useState(false);
   const taskProj = projects.find(
     (p) => Number(p.id) === Number(selectedTask?.project_id || selectedTask?.projectId)
@@ -124,28 +128,34 @@ const TaskDetailModal = ({
       if (Number(payload.taskId) === Number(selectedTask.id)) {
         if (payload.status) {
           setTempStatus(payload.status);
-          selectedTask.status = payload.status;
         }
-        if (payload.title !== undefined) selectedTask.title = payload.title;
-        if (payload.description !== undefined) selectedTask.description = payload.description;
-        if (payload.priority !== undefined) selectedTask.priority = payload.priority;
-        if (payload.dueDate !== undefined) {
-          selectedTask.dueDate = payload.dueDate;
-          selectedTask.due_date = payload.dueDate;
-          selectedTask.displayDueDate = formatDate(payload.dueDate, language);
-        }
-        if (payload.assignedTo !== undefined) {
-          selectedTask.assignedTo = payload.assignedTo;
-          selectedTask.assigned_to = payload.assignedTo;
-          const assignedUser = users.find((u) => Number(u.id) === Number(payload.assignedTo));
-          const assignedName = assignedUser ? (assignedUser.fullname || assignedUser.username) : "Unassigned";
-          selectedTask.assignee = assignedName;
-          selectedTask.assigned_to_name = assignedName;
-        }
-        if (payload.taskType !== undefined) {
-          selectedTask.taskType = payload.taskType;
-          selectedTask.task_type = payload.taskType;
-        }
+
+        setSelectedTask((prev) => {
+          if (!prev) return prev;
+          const next = { ...prev };
+          if (payload.status) next.status = payload.status;
+          if (payload.title !== undefined) next.title = payload.title;
+          if (payload.description !== undefined) next.description = payload.description;
+          if (payload.priority !== undefined) next.priority = payload.priority;
+          if (payload.dueDate !== undefined) {
+            next.dueDate = payload.dueDate;
+            next.due_date = payload.dueDate;
+            next.displayDueDate = formatDate(payload.dueDate, language);
+          }
+          if (payload.assignedTo !== undefined) {
+            next.assignedTo = payload.assignedTo;
+            next.assigned_to = payload.assignedTo;
+            const assignedUser = users.find((u) => Number(u.id) === Number(payload.assignedTo));
+            const assignedName = assignedUser ? (assignedUser.fullname || assignedUser.username) : "Unassigned";
+            next.assignee = assignedName;
+            next.assigned_to_name = assignedName;
+          }
+          if (payload.taskType !== undefined) {
+            next.taskType = payload.taskType;
+            next.task_type = payload.taskType;
+          }
+          return next;
+        });
 
         setFormData((prev) => ({
           ...prev,

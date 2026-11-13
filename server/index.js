@@ -36,9 +36,6 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }))
 
-// เริ่มต้นใช้งาน Socket.io บน HTTP Server
-initSocket(server)
-
 // 2. ตั้งค่า CORS ให้ยืดหยุ่นและรองรับทั้ง Vercel, Localhost และ Custom Domains
 const frontendUrls = (process.env.FRONTEND_URL || '')
   .split(',')
@@ -54,6 +51,9 @@ const allowedOrigins = [
   'https://www.chayanonlab.link',
   ...frontendUrls
 ];
+
+// เริ่มต้นใช้งาน Socket.io บน HTTP Server พร้อมจำกัด Origin ตาม allowedOrigins
+initSocket(server, allowedOrigins)
 
 app.use(cors({
   origin: (origin, callback) => {

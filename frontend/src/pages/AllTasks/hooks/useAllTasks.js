@@ -171,15 +171,51 @@ export const useAllTasks = () => {
       setTasks((prevTasks) => prevTasks.filter((task) => Number(task.id) !== Number(payload.taskId)));
     };
 
+    const handleTaskUpdated = (payload) => {
+      if (!payload || !payload.taskId) {
+        fetchTasks();
+        return;
+      }
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => {
+          if (Number(task.id) !== Number(payload.taskId)) return task;
+          const updated = { ...task };
+          if (payload.title !== undefined) updated.title = payload.title;
+          if (payload.description !== undefined) updated.description = payload.description;
+          if (payload.priority !== undefined) updated.priority = payload.priority;
+          if (payload.dueDate !== undefined) {
+            updated.dueDate = payload.dueDate;
+            updated.due_date = payload.dueDate;
+          }
+          if (payload.taskType !== undefined) {
+            updated.taskType = payload.taskType;
+            updated.task_type = payload.taskType;
+          }
+          if (payload.assignedTo !== undefined) {
+            updated.assignedTo = payload.assignedTo;
+            updated.assigned_to = payload.assignedTo;
+          }
+          if (payload.status) {
+            const s = payload.status.toLowerCase();
+            if (s === "pending") updated.status = "Pending";
+            else if (s === "in progress" || s === "in_progress") updated.status = "In Progress";
+            else if (s === "reviewing" || s === "review") updated.status = "Reviewing";
+            else if (s === "completed") updated.status = "Completed";
+          }
+          return updated;
+        })
+      );
+    };
+
     socket.on("task:created", handleTaskChange);
     socket.on("task:status:updated", handleStatusUpdated);
-    socket.on("task:updated", handleTaskChange);
+    socket.on("task:updated", handleTaskUpdated);
     socket.on("task:deleted", handleTaskDeleted);
 
     return () => {
       socket.off("task:created", handleTaskChange);
       socket.off("task:status:updated", handleStatusUpdated);
-      socket.off("task:updated", handleTaskChange);
+      socket.off("task:updated", handleTaskUpdated);
       socket.off("task:deleted", handleTaskDeleted);
     };
   }, []);
