@@ -45,7 +45,7 @@ const Footer = () => {
           }}
         >
           <p style={{ margin: 0, fontWeight: 600 }}>
-            © 2026 RNM Task Management. All rights reserved.
+            © 2026 PROJECT TASK. All rights reserved.
           </p>
 
           <ul

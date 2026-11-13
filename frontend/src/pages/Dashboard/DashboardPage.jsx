@@ -45,11 +45,6 @@ const DashboardPage = () => {
     >
       <Header />
 
-      {/* Hardware-Accelerated Ambient Orbs */}
-      <div className="absolute top-10 left-1/4 w-[450px] h-[450px] rounded-full pointer-events-none ambient-blob-1"></div>
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none ambient-blob-2"></div>
-      <div className="absolute bottom-10 left-1/3 w-[500px] h-[500px] rounded-full pointer-events-none ambient-blob-3"></div>
-
       <main className="flex-1 p-6 max-w-7xl mx-auto w-full animate-fade-in-up relative z-10">
         {/* Stats Cards */}
         <div

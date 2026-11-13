@@ -51,8 +51,8 @@ const LoginPage = () => {
       >
         {/* Icon Header */}
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-500 p-0.5 mx-auto mb-6 shadow-lg shadow-teal-500/30">
-          <div className="w-full h-full bg-[#153648] rounded-[14px] flex items-center justify-center text-2xl">
-            🔐
+          <div className="w-full h-full bg-[#153648] rounded-[14px] flex items-center justify-center text-2xl text-teal-400">
+            <i className="bi bi-shield-lock"></i>
           </div>
         </div>
 
@@ -61,18 +61,18 @@ const LoginPage = () => {
           {t("loginTitle")}
         </h1>
         <p className="text-center text-slate-400 text-sm mb-8 font-normal">
-          {language === "th" ? "ยินดีต้อนรับสู่ระบบบริหารงาน" : "Welcome back to the portal"}
+          {language === "th" ? "ลงชื่อเข้าใช้งานระบบ" : "Sign in to your account"}
         </p>
 
         {/* Feedback Messages */}
         {message && (
           <div className="mb-5 p-3.5 rounded-xl bg-emerald-500/15 text-emerald-300 text-xs font-semibold flex items-center gap-2">
-            ✅ {message}
+            <i className="bi bi-check-circle-fill"></i> {message}
           </div>
         )}
         {error && (
           <div className="mb-5 p-3.5 rounded-xl bg-rose-500/15 text-rose-300 text-xs font-semibold flex items-center gap-2">
-            ⚠️ {error}
+            <i className="bi bi-exclamation-triangle-fill"></i> {error}
           </div>
         )}
 

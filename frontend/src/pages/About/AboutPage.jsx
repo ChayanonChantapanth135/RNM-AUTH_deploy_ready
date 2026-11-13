@@ -15,28 +15,28 @@ const AboutPage = () => {
 
   const features = [
     {
-      icon: "📊",
+      icon: <i className="bi bi-bar-chart-line text-teal-400"></i>,
       titleKey: "featureAnalyticsTitle",
       descKey: "featureAnalyticsDesc",
       badge: "Analytics",
       gradient: "from-blue-500/20 to-teal-500/20",
     },
     {
-      icon: "📂",
+      icon: <i className="bi bi-kanban text-indigo-400"></i>,
       titleKey: "featureWorkflowTitle",
       descKey: "featureWorkflowDesc",
       badge: "Workflow",
       gradient: "from-purple-500/20 to-indigo-500/20",
     },
     {
-      icon: "🛡️",
+      icon: <i className="bi bi-shield-check text-emerald-400"></i>,
       titleKey: "featureAccessTitle",
       descKey: "featureAccessDesc",
       badge: "Security",
       gradient: "from-emerald-500/20 to-teal-500/20",
     },
     {
-      icon: "⚡",
+      icon: <i className="bi bi-clock-history text-cyan-400"></i>,
       titleKey: "featureAuditTitle",
       descKey: "featureAuditDesc",
       badge: "Audit Trail",
@@ -45,12 +45,12 @@ const AboutPage = () => {
   ];
 
   const techStack = [
-    { name: "React 18", category: "Frontend Framework", icon: "⚛️" },
-    { name: "Vite", category: "Build Tool & HMR", icon: "⚡" },
-    { name: "Node.js & Express", category: "Backend REST API", icon: "🟢" },
-    { name: "MySQL 8", category: "Relational Database", icon: "🐬" },
-    { name: "Tailwind CSS", category: "Styling & Tokens", icon: "🎨" },
-    { name: "Glassmorphism UI", category: "Design System", icon: "💎" },
+    { name: "React 19", category: "Frontend Framework", icon: <i className="bi bi-code-slash text-sky-400"></i> },
+    { name: "Vite", category: "Build Tool", icon: <i className="bi bi-lightning-charge text-amber-400"></i> },
+    { name: "Node.js & Express", category: "Backend REST API", icon: <i className="bi bi-hdd-network text-emerald-400"></i> },
+    { name: "MySQL / TiDB", category: "Relational Database", icon: <i className="bi bi-database text-blue-400"></i> },
+    { name: "Tailwind CSS", category: "Styling", icon: <i className="bi bi-palette text-cyan-400"></i> },
+    { name: "Socket.io", category: "Real-time Sync", icon: <i className="bi bi-broadcast text-purple-400"></i> },
   ];
 
   return (
@@ -63,32 +63,16 @@ const AboutPage = () => {
     >
       <Header />
 
-      {/* Ambient Orbs */}
-      <div className="absolute top-10 left-1/4 w-[450px] h-[450px] rounded-full pointer-events-none ambient-blob-1"></div>
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none ambient-blob-2"></div>
-      <div className="absolute bottom-10 left-1/3 w-[500px] h-[500px] rounded-full pointer-events-none ambient-blob-3"></div>
-
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-10 animate-fade-in-up relative z-10">
         {/* Hero Section */}
         <div
-          className="rounded-3xl p-8 md:p-12 mb-10 shadow-xl relative overflow-hidden text-center flex flex-col items-center"
+          className="rounded-2xl p-8 md:p-12 mb-10 shadow-sm relative overflow-hidden text-center flex flex-col items-center"
           style={{
             backgroundColor: "var(--bg-surface)",
             border: "1px solid var(--border-surface)",
           }}
         >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div className="relative z-10 max-w-3xl flex flex-col items-center">
-            <span
-              className="inline-block px-3.5 py-1.5 rounded-full text-xs font-extrabold tracking-wider mb-4 uppercase shadow-sm"
-              style={{
-                background: "rgba(13, 148, 136, 0.15)",
-                color: "#0d9488",
-                border: "1px solid rgba(13, 148, 136, 0.3)",
-              }}
-            >
-              🚀 {t("aboutTitle")}
-            </span>
             <h1
               className="text-3xl md:text-5xl font-black leading-tight mb-4 tracking-tight"
               style={{ color: "var(--text-primary)" }}

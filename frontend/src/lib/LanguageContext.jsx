@@ -434,24 +434,24 @@ const translations = {
     projectManagementDesc: "Manage projects and assigned team members",
 
     // About & Contract Pages
-    aboutTitle: "About RNM Task System",
-    aboutSubtitle: "Modern platform for team project and task management",
-    aboutVisionTitle: "Our Mission & Vision",
+    aboutTitle: "About PROJECT TASK",
+    aboutSubtitle: "Project and task tracking system for team collaboration",
+    aboutVisionTitle: "Overview",
     aboutVisionDesc:
-      "RNM Task Management is designed to elevate teamwork, enhance project transparency, and optimize task workflows through real-time updates and seamless activity tracking.",
-    featureAnalyticsTitle: "Real-time Analytics & Dashboard",
+      "PROJECT TASK helps teams plan projects, assign tasks, track progress in real time, and keep a clear history of status changes.",
+    featureAnalyticsTitle: "Real-time Dashboard",
     featureAnalyticsDesc:
-      "Track total active users, projects, and pending or overdue tasks with intuitive visual charts.",
-    featureWorkflowTitle: "Structured Task Workflows",
+      "View active users, projects, task progress, and overdue items in one place.",
+    featureWorkflowTitle: "Task Workflow",
     featureWorkflowDesc:
-      "Organize tasks by status (Pending, In Progress, Reviewing, Completed) and assign priority levels.",
+      "Organize tasks by status (Pending, In Progress, Reviewing, Completed) with priority levels.",
     featureAccessTitle: "Role-Based Access Control",
     featureAccessDesc:
-      "Granular permissions for Admins, Team Leaders, Translators, and Video Editors.",
-    featureAuditTitle: "Comprehensive Activity Logs",
+      "Manage permissions by role for Admin, Project Manager, Storyboard, Animation, Designer, and Programmer.",
+    featureAuditTitle: "Activity Logs",
     featureAuditDesc:
-      "Transparent audit trail tracking every project modification, user creation, and status update.",
-    techStackTitle: "Powered by Modern Technology",
+      "Keep a clear record of project updates, user changes, and task status history.",
+    techStackTitle: "Tech Stack",
 
     contractTitle: "Contact Us & Support",
     contractSubtitle:
@@ -602,7 +602,7 @@ const translations = {
     sendOtpSuccess: "OTP has been sent to your email!",
     sendOtpFailed: "Failed to send OTP.",
     otpVerifyFailed: "Invalid or expired OTP code.",
-    welcomeBackPortal: "Welcome back to the portal",
+    welcomeBackPortal: "Sign in to your account",
 
     // Project & Task Modals & Tables
     colProjectNameUpper: "Project Name",
@@ -1225,24 +1225,24 @@ const translations = {
     projectManagementDesc: "บริหารจัดการโครงการและทีมงานที่รับผิดชอบ",
 
     // About & Contract Pages
-    aboutTitle: "เกี่ยวกับระบบ RNM Task",
-    aboutSubtitle: "แพลตฟอร์มยุคใหม่สำหรับการบริหารจัดการโครงการและงานในทีม",
-    aboutVisionTitle: "วิสัยทัศน์และเป้าหมายของเรา",
+    aboutTitle: "เกี่ยวกับระบบ PROJECT TASK",
+    aboutSubtitle: "ระบบบริหารจัดการโครงการและติดตามงานสำหรับทีม",
+    aboutVisionTitle: "ภาพรวมของระบบ",
     aboutVisionDesc:
-      "RNM Task Management ถูกออกแบบมาเพื่อยกระดับการทำงานร่วมกันของทีม เพิ่มความโปร่งใสในโครงการ และจัดระเบียบขั้นตอนการทำงานด้วยระบบอัปเดตแบบเรียลไทม์และบันทึกประวัติกิจกรรมอย่างละเอียด",
-    featureAnalyticsTitle: "ระบบวิเคราะห์ & แดชบอร์ดเรียลไทม์",
+      "PROJECT TASK ช่วยให้ทีมวางแผนโครงการ มอบหมายงาน ติดตามความคืบหน้าแบบเรียลไทม์ และตรวจสอบประวัติการเปลี่ยนสถานะงานได้สะดวก",
+    featureAnalyticsTitle: "แดชบอร์ดสรุปผลแบบเรียลไทม์",
     featureAnalyticsDesc:
-      "ติดตามสถิติผู้ใช้งาน โครงการ และงานที่เกินกำหนดได้อย่างแม่นยำผ่านกราฟภาพรวม",
-    featureWorkflowTitle: "ผังการทำงานที่เป็นระบบ",
+      "ติดตามจำนวนผู้ใช้งาน โครงการ ความคืบหน้า และงานที่เกินกำหนดส่งได้ในหน้าเดียว",
+    featureWorkflowTitle: "จัดการสถานะงานเป็นลำดับ",
     featureWorkflowDesc:
-      "จัดกลุ่มงานตามสถานะ (รอดำเนินการ, กำลังดำเนินการ, รอตรวจสอบ, เสร็จสิ้น) พร้อมกำหนดระดับความสำคัญ",
-    featureAccessTitle: "ระบบกำหนดสิทธิ์ตามบทบาท",
+      "แบ่งงานตามสถานะ (รอดำเนินการ, กำลังดำเนินการ, รอตรวจสอบ, เสร็จสิ้น) พร้อมกำหนดระดับความสำคัญ",
+    featureAccessTitle: "ควบคุมสิทธิ์ตามบทบาท",
     featureAccessDesc:
-      "จัดการสิทธิ์การเข้าถึงอย่างปลอดภัยสำหรับ แอดมิน, หัวหน้าทีม, นักแปล, และนักตัดต่อวิดีโอ",
-    featureAuditTitle: "บันทึกประวัติกิจกรรมครบถ้วน",
+      "กำหนดสิทธิ์การเข้าถึงตามหน้าที่สำหรับ Admin, Project Manager, Storyboard, Animation, Designer และ Programmer",
+    featureAuditTitle: "บันทึกประวัติกิจกรรม",
     featureAuditDesc:
-      "ติดตามทุกการเปลี่ยนแปลงของโครงการ การสร้างผู้ใช้งาน และการอัปเดตสถานะงานอย่างโปร่งใส",
-    techStackTitle: "พัฒนาด้วยเทคโนโลยีทันสมัย",
+      "เก็บบันทึกการแก้ไขโครงการ การจัดการผู้ใช้งาน และการเปลี่ยนสถานะงานย้อนหลังได้",
+    techStackTitle: "เทคโนโลยีที่ใช้พัฒนา",
 
     contractTitle: "ติดต่อเรา & สนับสนุนการใช้งาน",
     contractSubtitle:

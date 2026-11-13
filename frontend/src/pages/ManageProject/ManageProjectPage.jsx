@@ -90,11 +90,6 @@ const ManageProjectPage = () => {
     >
       <Header />
 
-      {/* Ambient Orbs */}
-      <div className="absolute top-10 left-1/4 w-[450px] h-[450px] rounded-full pointer-events-none ambient-blob-1"></div>
-      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full pointer-events-none ambient-blob-2"></div>
-      <div className="absolute bottom-10 left-1/3 w-[500px] h-[500px] rounded-full pointer-events-none ambient-blob-3"></div>
-
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8 animate-fade-in-up relative z-10">
         {/* Header and Title */}
         <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
