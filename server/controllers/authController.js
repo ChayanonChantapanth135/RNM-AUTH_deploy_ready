@@ -1179,9 +1179,6 @@ export const importUsers = async (req, res) => {
             }
         }
 
-        // >>> MOCK TEST START: จับเวลา Batch Insert และปิดการส่งเมลจริงชั่วคราว <<<
-        console.time('⏱️ [Benchmark] Database Batch Insert');
-
         // Batch Insert ผู้ใช้ใหม่ทั้งหมดในคำสั่งเดียว (Single Query Batch)
         if (newUsersToInsert.length > 0) {
             await db.query(
@@ -1191,32 +1188,27 @@ export const importUsers = async (req, res) => {
             importedCount += newUsersToInsert.length;
         }
 
-        console.timeEnd('⏱️ [Benchmark] Database Batch Insert');
-        console.log(`📊 [Benchmark Summary] Total new users inserted: ${newUsersToInsert.length} records`);
-
-        // ส่งอีเมลต้อนรับให้ผู้ใช้ใหม่ทุกคน (MOCK MODE: ปิดการส่งจริงเพื่อประหยัดโควตา)
+        // ส่งอีเมลต้อนรับให้ผู้ใช้ใหม่ทุกคนแบบปลอดภัยจาก Rate Limit
         if (newUsersToNotify.length > 0) {
             (async () => {
-                console.log(`[Import Users] [MOCK MODE] Simulating email dispatch for ${newUsersToNotify.length} new users (No quota used)...`);
+                console.log(`[Import Users] Starting email dispatch for ${newUsersToNotify.length} new users...`);
                 for (const u of newUsersToNotify) {
                     try {
-                        console.log(`[Import Users] [MOCK] Bypassed email to: ${u.email} (Temp password: ${u.tempPassword})`);
-                        // ปิดการส่งอีเมลจริงชั่วคราว:
-                        // await sendWelcomeUserEmail({
-                        //     recipientEmail: u.email,
-                        //     recipientName: u.fullname,
-                        //     tempPassword: u.tempPassword
-                        // });
-                        // หน่วงเวลาสั้นๆ ในการจำลอง
-                        await new Promise(res => setTimeout(res, 50));
+                        console.log(`[Import Users] Sending temporary password to: ${u.email}`);
+                        await sendWelcomeUserEmail({
+                            recipientEmail: u.email,
+                            recipientName: u.fullname,
+                            tempPassword: u.tempPassword
+                        });
+                        // หน่วงเวลา 600ms ป้องกันการบล็อกจาก Mail Gateway
+                        await new Promise(res => setTimeout(res, 600));
                     } catch (e) {
                         console.error(`[Import Users Email Error] Failed to send to ${u.email}:`, e.message);
                     }
                 }
-                console.log(`[Import Users] [MOCK MODE] Finished email simulation.`);
+                console.log(`[Import Users] Finished email dispatch for new users.`);
             })();
         }
-        // >>> MOCK TEST END <<<
 
         memoryCache.del('team_leaders');
         memoryCache.del('users_list_active');
